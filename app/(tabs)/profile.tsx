@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,11 +8,13 @@ import Button from '@/components/Button';
 import { COLORS, SIZES, icons, images } from '@/constants';
 import { Image } from 'expo-image';
 import { launchImagePicker } from '@/utils/ImagePickerHelper';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useFocusEffect } from 'expo-router';
 import SettingsItem from '@/components/SettingsItem';
 import { useLanguageContext } from '@/contexts/LanguageContext';
 import { useAuthStatus, useLogout, getStoredUser } from '@/data/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQueryClient } from '@tanstack/react-query';
+import Header from '@/components/Header';
 
 type Nav = {
   navigate: (value: string) => void
@@ -22,18 +24,64 @@ const Profile = () => {
   const refRBSheet = useRef<any>(null);
   const { navigate } = useNavigation<Nav>();
   const { t, isRTL } = useLanguageContext();
-    // Use the auth hooks from useAuth
-  const { data: authStatus, isLoading } = useAuthStatus();
+  const [userInfo,setUserInfo]=useState(null)
+  // Use the auth hooks from useAuth
+  const { data: authStatus, isLoading, refetch } = useAuthStatus();
   const logoutMutation = useLogout();
+  const queryClient = useQueryClient();
   // const token = await AsyncStorage.getItem('token');
+// const getUser =async()=>{
+//   const user = await getStoredUser();
+//   console.log(user,'useruser');
+  
+//   if (user) {
+//     setUserInfo(user)
+//   }
+  
+// }
+//   // console.log('Profile Component - authStatus:', authStatus, 'isLoading:', isLoading);
+// useEffect(() => {
+//   getUser()
+// }, []);
 
-  // console.log('Profile Component - authStatus:', authStatus, 'isLoading:', isLoading);
-useEffect(() => {
-  console.log('Profile Component - authStatus:', authStatus, 'isLoading:', isLoading);
-}, [authStatus, isLoading]);
+
+  // Move useState hook to component top level
+  const [image, setImage] = useState(images.user1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const pickImage = async () => {
+    try {
+      const tempUri = await launchImagePicker()
+
+      if (!tempUri) return
+
+      // Set the image
+      setImage({ uri: tempUri })
+    } catch (error) { }
+  };
+
+
+  // Refresh user data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Profile screen focused, refreshing user data...');
+  refetch();
+    }, [refetch ])
+  );
 
   // Check if logout is in progress
   const isLoggingOut = logoutMutation.isPending;
+
+  // Function to manually refresh auth status
+  // This can be called from other parts of the app or when needed
+  const refreshAuthStatus = useCallback(async () => {
+    try {
+      await refetch();
+      console.log('Auth status refreshed manually');
+    } catch (error) {
+      console.error('Error refreshing auth status:', error);
+    }
+  }, [refetch]);
 
     const handleLogout = async () => {
     try {
@@ -52,45 +100,12 @@ useEffect(() => {
   /**
    * render header
    */
-  const renderHeader = () => {
-    return (
-      <TouchableOpacity style={styles.headerContainer}>
-        <View style={[styles.headerLeft, ]}>
-          <Image
-            source={images.logo}
-            contentFit='contain'
-            style={styles.logo}
-          />
-          <Text style={[styles.headerTitle, {
-            color: COLORS.greyscale900,
-            marginLeft: isRTL ? 0 : 12,
-            marginRight: isRTL ? 12 : 0
-          }]}>{t('profile.title')}</Text>
-        </View>
-        <TouchableOpacity>
-          <Image
-            source={icons.moreCircle}
-            contentFit='contain'
-            style={[styles.headerIcon, {
-              tintColor: COLORS.greyscale900
-            }]}
-          />
-        </TouchableOpacity>
-      </TouchableOpacity>
-    )
-  }
+
   // Move useState hook to component top level
-  const [image, setImage] = useState(images.user1);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const pickImage = async () => {
-    try {
-      const tempUri = await launchImagePicker()
-
-      if (!tempUri) return
-
-      // Set the image
-      setImage({ uri: tempUri })
-    } catch (error) { }
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
   };
 
   /**
@@ -119,11 +134,12 @@ useEffect(() => {
         {authStatus?.isAuthenticated ? (
           <>
             <Text style={[styles.title, { color: COLORS.greyscale900 }]}>
-              {authStatus?.user?.firstName ? `${authStatus.user.firstName} ${authStatus.user.lastName}` : t('profile.userName')}
+              {authStatus?.user?.firstName ? `${authStatus.user.firstName} ` : t('profile.userName')}
             </Text>
             <Text style={[styles.subtitle, { color: COLORS.greyscale900 }]}>
               {authStatus?.user?.email || t('profile.userEmail')}
             </Text>
+         
           </>
         ) : (
           <>
@@ -143,13 +159,6 @@ useEffect(() => {
     )
   }
 
-  // Move useState hook to component top level
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
-  };
-
   /**
    * Render Settings
    */
@@ -160,11 +169,11 @@ useEffect(() => {
         {/* Only show these items if user is authenticated */}
         {authStatus?.isAuthenticated ? (
           <>
-            <SettingsItem
+            {/* <SettingsItem
               icon={icons.bell3}
               name={t('profile.myNotification')}
               onPress={() => navigate("notifications")}
-            />
+            /> */}
             <SettingsItem
               icon={icons.location2Outline}
               name={t('profile.address')}
@@ -175,11 +184,11 @@ useEffect(() => {
               name={t('profile.editProfile')}
               onPress={() => navigate("editprofile")}
             />
-            <SettingsItem
+            {/* <SettingsItem
               icon={icons.wallet2Outline}
               name={t('profile.payment')}
               onPress={() => navigate("settingspayment")}
-            />
+            /> */}
           </>
         ) : (
           /* Show login button when not authenticated */
@@ -215,14 +224,14 @@ useEffect(() => {
         <SettingsItem
           icon={icons.bell2}
           name={t('profile.notification')}
-          onPress={() => navigate("settingsnotifications")}
+          onPress={() => navigate("notifications")}
         />
-        <SettingsItem
+        {/* <SettingsItem
           icon={icons.shieldOutline}
           name={t('profile.security')}
           onPress={() => navigate("settingssecurity")}
-        />
-        <TouchableOpacity
+        /> */}
+        {/* <TouchableOpacity
           onPress={() => navigate("settingslanguage")}
           style={styles.settingsItemContainer}>
           <View style={[styles.leftContainer, ]}>
@@ -254,34 +263,8 @@ useEffect(() => {
               }]}
             />
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.settingsItemContainer}>
-          <View style={[styles.leftContainer,]}>
-            <Image
-              source={icons.show}
-              contentFit='contain'
-              style={[styles.settingsIcon, {
-                tintColor: COLORS.greyscale900
-              }]}
-            />
-            <Text style={[styles.settingsName, {
-              color: COLORS.greyscale900,
-              marginLeft: isRTL ? 0 : 12,
-              marginRight: isRTL ? 12 : 0
-            }]}>{t('profile.darkMode')}</Text>
-          </View>
-          <View style={styles.rightContainer}>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleDarkMode}
-              thumbColor={isDarkMode ? '#fff' : COLORS.white}
-              trackColor={{ false: '#EEEEEE', true: COLORS.primary }}
-              ios_backgroundColor={COLORS.white}
-              style={styles.switch}
-            />
-          </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+       
         <SettingsItem
           icon={icons.lockedComputerOutline}
           name={t('profile.privacyPolicy')}
@@ -292,11 +275,11 @@ useEffect(() => {
           name={t('profile.helpCenter')}
           onPress={() => navigate("settingshelpcenter")}
         />
-        <SettingsItem
+        {/* <SettingsItem
           icon={icons.people4}
           name={t('profile.inviteFriends')}
           onPress={() => navigate("settingsinvitefriends")}
-        />
+        /> */}
         {authStatus?.isAuthenticated && (
           <TouchableOpacity
             onPress={() => refRBSheet.current.open()}
@@ -334,7 +317,7 @@ useEffect(() => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white, direction: isRTL ? "rtl" : "ltr" }]} key={`profile-${authStatus?.isAuthenticated ? 'auth' : 'guest'}`}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        {renderHeader()}
+        <Header title={t('profile.title')} />
         <ScrollView showsVerticalScrollIndicator={false}>
           {authStatus?.isAuthenticated && renderProfile()}
           {renderSettings()}
@@ -359,13 +342,13 @@ useEffect(() => {
             backgroundColor: COLORS.white
           }
         }}>
-        <Text style={[styles.bottomTitle, { textAlign: isRTL ? 'right' : 'center' }]}>{t('profile.logout')}</Text>
+        <Text style={[styles.bottomTitle, { textAlign:  'center' }]}>{t('profile.logout')}</Text>
         <View style={[styles.separateLine, {
           backgroundColor: COLORS.grayscale200,
         }]} />
         <Text style={[styles.bottomSubtitle, {
           color: COLORS.black,
-          textAlign: isRTL ? 'right' : 'center'
+          textAlign: 'center'
         }]}>{t('profile.logoutConfirm')}</Text>
         <View style={[styles.bottomContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Button
@@ -411,6 +394,13 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: "row",
     alignItems: "center"
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  refreshButton: {
+    marginRight: 12
   },
   logo: {
     height: 32,
@@ -480,6 +470,12 @@ const styles = StyleSheet.create({
     color: COLORS.greyscale900,
     fontFamily: "medium",
     marginTop: 4
+  },
+  lastUpdatedText: {
+    fontSize: 14,
+    color: COLORS.greyscale600,
+    marginTop: 4,
+    textAlign: 'center'
   },
   settingsContainer: {
     marginVertical: 12

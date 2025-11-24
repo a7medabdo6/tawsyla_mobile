@@ -17,10 +17,12 @@
       "supportsTablet": true
     },
     "android": {
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#22BB9C"
-      }
+      },
+      "package": "com.a7medabdo.tawsila"
     },
     "web": {
       "bundler": "metro",
@@ -29,10 +31,24 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#22BB9C",
+          "defaultChannel": "default"
+        }
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b725ce55-00cd-4897-acf5-8b43b5c79f2b"
+      }
     }
   }
 }

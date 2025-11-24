@@ -3,6 +3,9 @@ import { images } from "@/constants";
 // Export auth hooks
 export * from "./useAuth";
 
+// Export push notification hook
+export { usePushNotifications } from "../hooks/usePushNotifications";
+
 export const userAddresses = [
   {
     id: "1",
@@ -197,9 +200,8 @@ export const friends = [
 export const notifications = [
   {
     id: "1",
-    title: "Security Updates!",
-    description:
-      "Our app now supports Two-Factor Authentication. Enable it now to make your account more secure.",
+    title: "اشعار جديد",
+    description:"تم تسجيل طلب توصيل جديد للعنوان التالي: 364 Stillwater Ave, Attleboro, MA 02703",
     date: "2024-06-04T04:52:06.501Z",
     time: "4:52 PM",
     type: "Security",

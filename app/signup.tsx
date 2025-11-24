@@ -20,7 +20,7 @@ interface InputValues {
   password: string
   confirmPassword: string
   fullName: string
-  phoneNumber: string
+  phone:string
 }
 
 interface InputValidities {
@@ -28,7 +28,7 @@ interface InputValidities {
   password: boolean | undefined
   confirmPassword: boolean | undefined
   fullName: boolean | undefined
-  phoneNumber: boolean | undefined
+  phone: boolean | undefined
 }
 
 interface FormState {
@@ -43,14 +43,14 @@ const initialState: FormState = {
     password: '',
     confirmPassword: '',
     fullName: '',
-    phoneNumber: '',
+    phone:""
   },
   inputValidities: {
     email: false,
     password: false,
     confirmPassword: false,
     fullName: false,
-    phoneNumber: false,
+    phone:false
   },
   formIsValid: false,
 }
@@ -77,14 +77,32 @@ const Signup = () => {
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
-      const result = validateInput(inputId, inputValue)
+      let result;
+      
+      if (inputId === 'confirmPassword') {
+        // Pass the current password value for confirmPassword validation
+        result = validateInput(inputId, inputValue, formState.inputValues.password);
+      } else {
+        result = validateInput(inputId, inputValue);
+      }
+      
       dispatchFormState({
         inputId,
         validationResult: result,
         inputValue,
       })
+      
+      // If this is a password change, also re-validate confirmPassword
+      if (inputId === 'password' && formState.inputValues.confirmPassword) {
+        const confirmPasswordResult = validateInput('confirmPassword', formState.inputValues.confirmPassword, inputValue);
+        dispatchFormState({
+          inputId: 'confirmPassword',
+          validationResult: confirmPasswordResult,
+          inputValue: formState.inputValues.confirmPassword,
+        });
+      }
     },
-    [dispatchFormState])
+    [dispatchFormState, formState.inputValues.password, formState.inputValues.confirmPassword])
 
   useEffect(() => {
     if (error) {
@@ -96,7 +114,7 @@ const Signup = () => {
   useEffect(() => {
     if (register.isSuccess) {
       // Navigate to main app on successful registration
-      navigate("(tabs)");
+      navigate("login");
     }
   }, [register.isSuccess, navigate]);
 
@@ -133,23 +151,17 @@ const Signup = () => {
       return;
     }
 
-    if (formState.inputValues.password !== formState.inputValues.confirmPassword) {
-      Alert.alert('Password Mismatch', 'Password and Confirm Password must match');
-      return;
-    }
+    // Password matching is now handled by the validation system
+    // No need for manual check here
 
     // Split full name into first and last name
-    const nameParts = formState.inputValues.fullName.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
 
     register.mutate({
+      phone:formState.inputValues.phone,
       email: formState.inputValues.email,
       password: formState.inputValues.password,
       confirmPassword: formState.inputValues.confirmPassword,
-      firstName: firstName,
-      lastName: lastName,
-      phoneNumber: formState.inputValues.phoneNumber
+      firstName:  formState.inputValues.fullName,
     });
   };
 
@@ -174,7 +186,8 @@ const Signup = () => {
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+      <View style={[styles.container, { backgroundColor: COLORS.white ,         direction: isRTL ? "rtl" : "ltr" 
+}]}>
         <Header title="" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.logoContainer}>
@@ -185,7 +198,8 @@ const Signup = () => {
             />
           </View>
           <Text style={[styles.title, {
-            color: COLORS.black
+            color: COLORS.black,
+            textAlign:  "center"
           }]}>{t('auth.signup.title')}</Text>
           
           {register.isPending && (
@@ -214,16 +228,16 @@ const Signup = () => {
             keyboardType="email-address"
             editable={!register.isPending}
           />
-          <Input
-            id="phoneNumber"
+           <Input
+            id="phone"
             onInputChanged={inputChangedHandler}
-            errorText={formState.inputValidities['phoneNumber']}
-            placeholder={t('auth.signup.phoneNumber')}
+            errorText={formState.inputValidities['phone']}
+            placeholder={t('auth.signup.phone')}
             placeholderTextColor={COLORS.black}
-            icon={icons.call}
-            keyboardType="phone-pad"
+            icon={icons.mobile}
             editable={!register.isPending}
           />
+        
           <Input
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities['password']}
@@ -254,7 +268,7 @@ const Signup = () => {
                 color={isChecked ? COLORS.primary : "gray"}
                 onValueChange={setChecked}
               />
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1,marginHorizontal:6  }}>
                 <Text style={[styles.privacy, {
                   color: COLORS.black
                 }]}>{t('auth.signup.privacyPolicy')}</Text>
@@ -264,9 +278,12 @@ const Signup = () => {
           <Button
             title={register.isPending ? t('auth.signup.creatingAccount') : t('auth.signup.signUpButton')}
             filled
+
             onPress={handleRegister}
-            style={styles.button}
-            disabled={register.isPending}
+            style={[styles.button,{
+              borderColor:register.isPending||!formState.formIsValid||!isChecked?COLORS.lightGreen:COLORS.primary,
+              backgroundColor:register.isPending||!formState.formIsValid||!isChecked?COLORS.lightGreen:COLORS.primary}]}
+            disabled={register.isPending||!formState.formIsValid||!isChecked}
           />
           <View style={styles.bottomContainer}>
           <Text style={[styles.bottomLeft, {
@@ -305,7 +322,7 @@ const createStyles = (isRTL: boolean) => StyleSheet.create({
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 32
+    marginVertical: 12
   },
   title: {
     fontSize: 28,

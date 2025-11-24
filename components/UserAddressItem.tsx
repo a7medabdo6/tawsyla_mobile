@@ -1,14 +1,17 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
 import React from 'react';
 import { COLORS, SIZES, icons } from '../constants';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Colors } from '@/constants/Colors';
 
 interface UserAddressItemProps {
     name: string;
     address: string;
+    isDefault:any
     onPress: () => void;
 }
 
-const UserAddressItem: React.FC<UserAddressItemProps> = ({ name, address, onPress }) => {
+const UserAddressItem: React.FC<UserAddressItemProps> = ({ name, address,isDefault, onPress }) => {
 
     return (
         <TouchableOpacity
@@ -35,11 +38,17 @@ const UserAddressItem: React.FC<UserAddressItemProps> = ({ name, address, onPres
                     }]}>{address}</Text>
                 </View>
             </View>
+            <View style={{display:"flex",flexDirection:"row",}}>
+                {isDefault &&       
+                      <FontAwesome style={{marginHorizontal:20}} name="check-square" size={24} color={COLORS.primary} />
+            }
             <Image
                 source={icons.editPencil as ImageSourcePropType}
                 resizeMode='contain'
                 style={styles.editIcon}
             />
+            </View>
+           
         </TouchableOpacity>
     )
 };
@@ -52,17 +61,18 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         alignItems: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: COLORS.grayscale100
+        borderBottomColor: COLORS.grayscale100,
     },
     routeLeftContainer: {
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+      
     },
     locationIcon1: {
         height: 52,
         width: 52,
         borderRadius: 999,
-        marginRight: 12,
+        // marginRight: 12,
         backgroundColor: COLORS.tansparentPrimary,
         alignItems: "center",
         justifyContent: "center",

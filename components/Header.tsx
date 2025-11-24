@@ -9,7 +9,7 @@ import {
   TextStyle,
   ImageStyle,
 } from "react-native";
-import { SIZES, COLORS, icons } from "../constants";
+import { SIZES, COLORS, icons ,images} from "../constants";
 import { NavigationProp } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
@@ -24,6 +24,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const { t, isRTL } = useLanguageContext();
 
   return (
+
+    
     <View
       style={[
         styles.container,
@@ -33,7 +35,22 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         },
       ]}
     >
-      <Text style={styles.title}>{title}</Text>
+        <TouchableOpacity style={styles.headerContainer}>
+        <View style={[styles.headerLeft, ]}>
+          <Image
+            source={images.logo}
+            contentFit='contain'
+            style={styles.logo}
+          />
+          <Text style={[styles.headerTitle, {
+            color: COLORS.greyscale900,
+            marginLeft: isRTL ? 0 : 12,
+            marginRight: isRTL ? 12 : 0
+          }]}>{title}</Text>
+        </View>
+       
+      </TouchableOpacity>
+      
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Image
           source={icons.back as ImageSourcePropType}
@@ -52,6 +69,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   } as ViewStyle,
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  refreshButton: {
+    marginRight: 12
+  },
+  logo: {
+    height: 32,
+    width: 32,
+    tintColor: COLORS.primary
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontFamily: "bold",
+    color: COLORS.greyscale900,
+    marginLeft: 12
+  },
+  headerIcon: {
+    height: 24,
+    width: 24,
+    tintColor: COLORS.greyscale900
+  },
   backIcon: {
     width: 24,
     height: 24,

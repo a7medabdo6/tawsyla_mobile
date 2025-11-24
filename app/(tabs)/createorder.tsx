@@ -1,134 +1,245 @@
-import { View, Text, TouchableOpacity, Image, useWindowDimensions, StatusBar, ImageSourcePropType, StyleSheet } from 'react-native';
-import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { COLORS, icons, images } from '@/constants';
-import { FromMeRoute, ToMeRoute } from '@/tabs';
-
-const renderScene = SceneMap({
-  first: FromMeRoute,
-  second: ToMeRoute,
-});
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  useWindowDimensions,
+  StatusBar,
+  ImageSourcePropType,
+  StyleSheet,
+  FlatList,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { COLORS, icons, images } from "@/constants";
+import { FromMeRoute, ToMeRoute } from "@/tabs";
+import { useLanguageContext } from "@/contexts/LanguageContext";
+import { useOrders, useOrdersInfinite } from "@/data/useOrders";
+import OrderCard from "@/tabs/FromMeRoute";
+import NoDataFound from "@/components/NoDataFound";
+import LoginCard from "@/components/LoginCard";
+import { useAuthStatus } from "@/data";
+import { OrderStatus } from "../myordertrack";
 
 const MyOrder = () => {
   const layout = useWindowDimensions();
+  const { data: authData } = useAuthStatus();
 
-  const [index, setIndex] = React.useState(0);
+  const { t, isRTL } = useLanguageContext();
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+    refetch,
+    isRefetching,
+  } = useOrdersInfinite(5); // 5 products per page
+  const allOrders = data?.pages.flatMap((page) => page.data) || [];
+  console.log(data, "datadatadatadata");
 
-  const [routes] = React.useState([
-    { key: 'first', title: 'From Me' },
-    { key: 'second', title: 'To Me' },
-  ])
+  // console.log(allOrders?.[0]?.id, "datadata");
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
-  const renderTabBar = (props:any) => (
-    <TabBar
-      {...props}
-      indicatorStyle={{
-        backgroundColor: COLORS.primary
-      }}
-      style={{
-        backgroundColor: COLORS.white,
-      }}
-      renderLabel={({ route, focused }) => (
-        <Text style={[{ 
-          color: focused ? COLORS.primary : 'gray',
-          fontSize: 16,
-          fontFamily: "bold"
-          }]}>
-          {route.title}
-        </Text>
-      )}
-    />
-  );
+  const handleRefresh = () => {
+    refetch();
+  };
 
-   /**
+  /**
    * render header
    */
-    const renderHeader = () => {
-      return (
-        <View style={styles.headerContainer}>
-          <View style={styles.headerLeft}>
-            <Image
-              source={images.logo as ImageSourcePropType}
-              resizeMode='contain'
-              style={styles.headerLogo}
-            />
-            <Text style={[styles.headerTitle, {
-              color: COLORS.greyscale900
-            }]}>My Orders</Text>
-          </View>
-          <View style={styles.headerRight}>
-            <TouchableOpacity>
-              <Image
-                source={icons.moreCircle as ImageSourcePropType}
-                resizeMode='contain'
-                style={[styles.moreCircleIcon, {
-                  tintColor: COLORS.greyscale900
-                }]}
-              />
-            </TouchableOpacity>
-          </View>
+  const renderHeader = () => {
+    return (
+      <View style={styles.headerContainer}>
+        <View style={styles.headerLeft}>
+          <Image
+            source={images.logo as ImageSourcePropType}
+            resizeMode="contain"
+            style={styles.headerLogo}
+          />
+          <Text
+            style={[
+              styles.headerTitle,
+              {
+                color: COLORS.greyscale900,
+              },
+            ]}
+          >
+            {t("My Orders")}
+          </Text>
         </View>
-      )
-    }
-
-    
+        <View style={styles.headerRight}>
+          {/* <TouchableOpacity>
+            <Image
+              source={icons.moreCircle as ImageSourcePropType}
+              resizeMode="contain"
+              style={[
+                styles.moreCircleIcon,
+                {
+                  tintColor: COLORS.greyscale900,
+                },
+              ]}
+            />
+          </TouchableOpacity> */}
+        </View>
+      </View>
+    );
+  };
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return (
+      <View style={styles.loadingFooter}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>جاري تحميل المزيد...</Text>
+      </View>
+    );
+  };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: COLORS.white,
+        direction: isRTL ? "rtl" : "ltr",
+      }}
+    >
       <StatusBar hidden={true} />
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         {renderHeader()}
-        <View style={{ flex: 1, marginHorizontal: 22 }}>
-          <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={{ width: layout.width }}
-            renderTabBar={renderTabBar}
-          />
+        <View
+          style={{
+            flex: 1,
+            marginHorizontal: 15,
+            alignItems: "center",
+            marginBottom: 70,
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {!authData?.user ? (
+            <LoginCard text={"You must login to view your Orders"} />
+          ) : (
+            <>
+              {isLoading ? (
+                <ActivityIndicator
+                  size="large"
+                  color={COLORS.primary}
+                  style={{ marginTop: 20 }}
+                />
+              ) : (
+                <>
+                  <>
+                    {allOrders?.length === 0 && <NoDataFound />}
+                    <FlatList
+                      data={allOrders}
+                      keyExtractor={(item: any) => item.id.toString()}
+                      renderItem={({ item, index }: any) => (
+                        <OrderCard item={item} />
+                      )}
+                      numColumns={1}
+                      showsVerticalScrollIndicator={false}
+                      contentContainerStyle={styles.listContainer}
+                      onEndReached={handleLoadMore}
+                      onEndReachedThreshold={0.1}
+                      ListFooterComponent={renderFooter}
+                      refreshControl={
+                        <RefreshControl
+                          refreshing={isRefetching}
+                          onRefresh={handleRefresh}
+                          colors={[COLORS.primary]}
+                          tintColor={COLORS.primary}
+                        />
+                      }
+                      ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                          <Text style={styles.emptyText}>
+                            لا توجد منتجات متاحة
+                          </Text>
+                        </View>
+                      }
+                    />
+                  </>
+                </>
+              )}
+            </>
+          )}
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
+  loadingFooter: {
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: COLORS.gray,
+    textAlign: "center",
+  },
+  listContainer: {
+    paddingHorizontal: 8,
+    paddingVertical: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: COLORS.gray,
+    textAlign: "center",
+  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
     justifyContent: "space-between",
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    marginTop: 10,
   },
   headerLeft: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary
+    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,
     fontFamily: "bold",
     color: COLORS.black,
-    marginLeft: 12
+    marginHorizontal: 12,
   },
   headerRight: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   searchIcon: {
     width: 24,
     height: 24,
-    tintColor: COLORS.black
+    tintColor: COLORS.black,
   },
   moreCircleIcon: {
     width: 24,
     height: 24,
     tintColor: COLORS.black,
-    marginLeft: 12
+    marginLeft: 12,
   },
-})
-export default MyOrder
+});
+export default MyOrder;

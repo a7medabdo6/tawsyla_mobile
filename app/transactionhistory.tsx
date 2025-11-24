@@ -32,7 +32,7 @@ const TransactionHistoryScreen = () => {
                     }]}>Transaction History</Text>
                 </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity>
+                    {/* <TouchableOpacity>
                         <Image
                             source={icons.moreCircle}
                             contentFit='contain'
@@ -40,7 +40,7 @@ const TransactionHistoryScreen = () => {
                                 tintColor: COLORS.greyscale900
                             }]}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
         )

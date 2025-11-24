@@ -23,7 +23,7 @@ const SPACING = 12;
 const ProductHomeList = () => {
   const [active, setActive] = useState("1");
   // Reverse data for RTL, because react-native-reanimated-carousel doesn't have inverted prop
-  const { data, isLoading, error } = useProducts();
+  const { data, isLoading, error } = useProducts(1, 10); // Show first 8 products on home
   // console.log(data, "datadatadatadataaaaa");
 
   if (isLoading) return <ActivityIndicator size="large" />;
@@ -32,9 +32,10 @@ const ProductHomeList = () => {
   const renderItem = ({ item }: any) => (
     <ProductCard
       name={item?.nameAr || item?.nameEn}
-      image={`http://10.0.2.2:4000${item.image?.path}`} // Replace with actual image URL
+      image={item.image?.path ? `http://159.65.75.17:3000/api/v1/files${item.image.path}` : undefined}
       price="2.99"
       rating={item?.rating}
+      style={{width:"45%"}}
       varints={item?.variants}
       productId={item?.id}
     />
@@ -44,7 +45,7 @@ const ProductHomeList = () => {
       <View style={{ direction: "ltr" }}>
         <FlatList
           numColumns={2}
-          data={[...data?.data,...data?.data]}
+          data={data?.data || []}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
@@ -64,7 +65,7 @@ export default ProductHomeList;
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 20,
+    marginBottom: 20,
     // backgroundColor:"red"
   },
   heading: {

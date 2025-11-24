@@ -1,12 +1,17 @@
 import { Tabs } from "expo-router";
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform ,StyleSheet} from "react-native";
 import { Image } from "expo-image";
 import { COLORS, icons, FONTS, SIZES } from "../../constants";
 import { useLanguageContext } from "../../contexts/LanguageContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useCart } from "@/data/useCart";
 
 const TabLayout = () => {
   const { t, isRTL } = useLanguageContext();
+ const { data: cartItems } = useCart(); // Get cart items from your cart context
+//  console.log(cartItems,"cartItems");
+ 
+  // const cartItemCount = cartItems?.reduce((total: number, item: any) => total + item.quantity, 0);
 
   return (
     <Tabs
@@ -21,6 +26,8 @@ const TabLayout = () => {
           elevation: 0,
           height: Platform.OS === "ios" ? 90 : 110,
           // backgroundColor: COLORS.white,
+                  direction: isRTL ? "rtl" : "ltr",
+
         },
       }}
     >
@@ -82,6 +89,7 @@ const TabLayout = () => {
                   }}
                   color="black"
                 />
+                
                 {/* <Image
                   source={focused ? icons.document : icons.documentOutline}
                   contentFit="contain"
@@ -151,6 +159,7 @@ const TabLayout = () => {
                   alignItems: "center",
                   paddingTop: 16,
                   width: SIZES.width / 4,
+                  position: "relative",
                 }}
               >
                 <Ionicons
@@ -163,7 +172,13 @@ const TabLayout = () => {
                   }}
                   color="black"
                 />
-
+ {cartItems?.totalItems > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {cartItems?.totalItems > 9 ? '9+' : cartItems?.totalItems}
+                    </Text>
+                  </View>
+                )}
                 {/* <Text
                   style={{
                     ...FONTS.body4,
@@ -217,5 +232,24 @@ const TabLayout = () => {
     </Tabs>
   );
 };
+
+const styles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    right: "30%",
+    top: 10,
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+});
 
 export default TabLayout;

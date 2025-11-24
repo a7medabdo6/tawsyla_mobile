@@ -127,3 +127,28 @@ export const validateExpiryDate = (id: string, value: string) => {
     const validationResult = validate({ [id]: value }, { [id]: constraints });
     return validationResult && validationResult[id];
   };
+
+export const validateConfirmPassword = (id: string, value: string, password: string): string | undefined => {
+    const constraints: Constraints = {
+        [id]: {
+            presence: {
+                allowEmpty: false,
+            },
+        },
+    };
+
+    if (value !== "") {
+        constraints[id].length = {
+            minimum: 6,
+            message: "must be at least 6 characters",
+        };
+        
+        // Custom validation to check if confirmPassword matches password
+        if (value !== password) {
+            return "Passwords do not match";
+        }
+    }
+
+    const validationResult = validate({ [id]: value }, constraints);
+    return validationResult && validationResult[id]?.[0];
+};

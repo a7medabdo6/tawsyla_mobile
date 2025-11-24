@@ -5,20 +5,21 @@ import {
     validateNumber,
     validateCreditCardNumber,
     validateExpiryDate,
-    validateCVV
+    validateCVV,
+    validateConfirmPassword
   } from '../ValidationConstraints';
   
-  export const validateInput = (inputId: string, inputValue: string): string | undefined => {
+  export const validateInput = (inputId: string, inputValue: string, password?: string): string | undefined => {
     if (
       inputId === 'fullName' ||
       inputId === 'firstName' ||
       inputId === 'lastName' ||
       inputId === 'location' ||
       inputId === 'phoneNumber' ||
-      inputId === 'bio' ||
-      inputId === 'address' ||
-      inputId === 'street' ||
-      inputId === 'postalCode' ||
+      inputId === 'phone' ||
+      inputId === 'state' ||
+      inputId === 'city' ||
+      inputId === 'additionalInfo' ||
       inputId === 'appartment' ||
       inputId === 'destination' ||
       inputId === 'ageRange' ||
@@ -35,12 +36,18 @@ import {
       return validateEmail(inputId, inputValue);
     } else if (
       inputId === 'password' || 
-      inputId === 'confirmPassword' || 
       inputId === 'currentPassword' || 
       inputId === 'newPassword' ||
       inputId === 'confirmNewPassword'
       ) {
       return validatePassword(inputId, inputValue);
+    } else if (inputId === 'confirmPassword') {
+      // Special handling for confirmPassword validation
+      if (password) {
+        return validateConfirmPassword(inputId, inputValue, password);
+      } else {
+        return validatePassword(inputId, inputValue);
+      }
     } else if (inputId === 'resetToken') {
       return validateString(inputId, inputValue);
     } else if(inputId === 'places') {

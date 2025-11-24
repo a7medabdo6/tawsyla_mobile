@@ -5,9 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
 import { ScrollView } from 'react-native-virtualized-view';
 import Button from '../components/Button';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { userAddresses } from '@/data';
 import UserAddressItem from '@/components/UserAddressItem';
+import { useLanguageContext } from '@/contexts/LanguageContext';
+import { useAddAddress, useAddress } from '@/data/useAddress';
 
 type Nav = {
     navigate: (value: string) => void
@@ -16,30 +18,40 @@ type Nav = {
 // user address location screen
 const Address = () => {
     const { navigate } = useNavigation<Nav>();
+    const { t, isRTL } = useLanguageContext();
+const {data,isLoading}=useAddress()
+const router = useRouter();
+
 
     return (
-        <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
+        <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white , direction: isRTL ? "rtl" : "ltr" }]}>
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                <Header title="Address" />
+                <Header title={t("Address")} />
                 <ScrollView
                     contentContainerStyle={{ marginVertical: 12 }}
                     showsVerticalScrollIndicator={false}>
                     <FlatList
-                        data={userAddresses}
+                        data={data}
                         keyExtractor={item => item.id}
                         renderItem={({ item }) => (
                             <UserAddressItem
-                                name={item.name}
-                                address={item.address}
-                                onPress={() => console.log("Clicked")}
-                            />
+                                name={`${item.city} - ${item.state}`}
+                                address={item.additionalInfo}
+                                isDefault={item?.isDefault}
+                                onPress={() => 	router.push({
+                                    pathname: "/addnewaddress",
+                                    params: {
+                                        id:item?.id
+                                    }
+                                })}
+                                />
                         )}
                     />
                 </ScrollView>
             </View>
             <View style={styles.btnContainer}>
                 <Button
-                    title="Add New Address"
+                    title={t("Add New Address")}
                     onPress={() => navigate("addnewaddress")}
                     filled
                     style={styles.btn}

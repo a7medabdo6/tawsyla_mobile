@@ -13,6 +13,7 @@ const ProductCardHorizintal = ({
 	rating,
 	style,
 	icon,
+	description,
 	iconColor,
 	itemId,
 	quantity,
@@ -27,7 +28,13 @@ const ProductCardHorizintal = ({
 	const isFavouritesMode = icon === "heart";
 
 	const handleProductPress = () => {
-		router.push("/productdetails");
+		
+	 router.push({
+      pathname: "/productdetails",
+      params: {
+        productId,
+      },
+    });
 	};
 
 	const handleQuantityChange = async (increment: boolean) => {
@@ -77,31 +84,39 @@ const ProductCardHorizintal = ({
 			>
 				<Image source={image} style={styles.image} />
 			</TouchableOpacity>
+<View style={{backgroundColor: COLORS.white,
+
+					width: "60%",
+					
+				}}>
+					
 			<View
 				style={{
 					display: "flex",
 					justifyContent: "space-between",
-
-					width: "60%",
-					marginTop: 10,
+width:'100%',
+paddingHorizontal:10,
+height:'100%',
+					
 				}}
 			>
+				
 				<View
 					style={{
 						display: "flex",
 						flexDirection: "row",
 						justifyContent: "space-between",
 						width: "100%",
-						// backgroundColor: "red",
+						//   backgroundColor: "red",
 						alignItems: "center",
 					}}
 				>
-					<Text style={styles.name}>{name}</Text>
-					<Text style={styles.price}>${price}/KG</Text>
+					<Text style={styles.name}   numberOfLines={1}
+    ellipsizeMode="tail">{name}</Text>
+					<Text style={styles.price}>{price} ج.م</Text>
 				</View>
 				<Text style={styles.descriptions}>
-					descriptions descriptions descriptions descriptions descriptions
-					descriptions descriptions
+				{description}
 				</Text>
 
 				<View style={styles.ratingContainer}>
@@ -115,13 +130,7 @@ const ProductCardHorizintal = ({
 					))}
 				</View>
 			</View>
-{!isFavouritesMode && <TouchableOpacity
-					style={styles.deleteCartButton}
-					onPress={handleDelete}
-					disabled={isDeletingFav}
-				>
-					<AntDesign name="delete" size={18} color="#fff" />
-				</TouchableOpacity>}
+
 			{isFavouritesMode ? (
 				<TouchableOpacity
 					style={styles.deleteButton}
@@ -151,6 +160,14 @@ const ProductCardHorizintal = ({
 					</TouchableOpacity>
 				</View>
 			)}
+							</View>
+{!isFavouritesMode && <TouchableOpacity
+					style={styles.deleteCartButton}
+					onPress={handleDelete}
+					disabled={isDeletingFav}
+				>
+					<AntDesign name="delete" size={18} color="#fff" />
+				</TouchableOpacity>}
 		</View>
 	);
 };
@@ -159,7 +176,7 @@ const styles = StyleSheet.create({
 	card: {
 		width: "95%",
 		height: 120,
-		backgroundColor: COLORS.white,
+		backgroundColor: COLORS.paleGreen,
 		borderRadius: 16,
 		paddingBottom: 10,
 		paddingTop: 5,
@@ -178,9 +195,9 @@ const styles = StyleSheet.create({
 		left: 12,
 	},
 	imageContainer: {
-		backgroundColor: COLORS.paleGreen,
+		// backgroundColor: COLORS.paleGreen,
 		// height: "50%",
-		borderRadius: 16,
+		// borderRadius: 16,
 
 		// flex: 1,
 		width: "40%",
@@ -188,20 +205,26 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		height: "100%",
+				marginHorizontal: 3,
+
 	},
 	image: {
-		width: 70,
-		height: 70,
-		resizeMode: "contain",
+		width: "100%",
+		height: "100%",
+		resizeMode: "cover",
 		marginVertical: 10,
 	},
 	name: {
 		fontWeight: "bold",
-		fontSize: 16,
+		fontSize: 13,
 		// marginBottom: 4,
 		// width: "100%",
 		paddingRight: 5,
 		color: COLORS.black,
+		width: "80%",
+		flex:1,
+		
+		
 	},
 	ratingContainer: {
 		flexDirection: "row",
@@ -210,10 +233,9 @@ const styles = StyleSheet.create({
 		paddingRight: 5,
 	},
 	price: {
-		color: "#4CAF50",
+		color: COLORS.primary,
 		fontWeight: "bold",
 		fontSize: 16,
-
 		// marginBottom: 10,
 		// width: "100%",
 		// paddingRight: 5,
@@ -229,7 +251,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		flexDirection: "row",
 		alignItems: "center",
-		backgroundColor: "#4CAF50",
+		backgroundColor:COLORS.primary,
 		borderTopRightRadius: 6,
 		borderBottomLeftRadius: 16,
 		paddingHorizontal: 8,

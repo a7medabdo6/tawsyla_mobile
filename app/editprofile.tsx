@@ -1,199 +1,482 @@
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Modal, TouchableWithoutFeedback, FlatList, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
-import { COLORS, SIZES, FONTS, icons, images } from '../constants';
+import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
 import { reducer } from '../utils/reducers/formReducers';
 import { validateInput } from '../utils/actions/formActions';
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { launchImagePicker } from '../utils/ImagePickerHelper';
 import Input from '../components/Input';
-import { getFormatedDate } from "react-native-modern-datepicker";
-import DatePickerModal from '../components/DatePickerModal';
 import Button from '../components/Button';
-import RNPickerSelect from 'react-native-picker-select';
 import { Image } from 'expo-image';
 import { useNavigation } from 'expo-router';
 import { NavigationProp } from '@react-navigation/native';
-
-interface Item {
-  flag: string;
-  item: string;
-  code: string
-}
-
-interface RenderItemProps {
-  item: Item;
-}
-
-const isTestMode = true;
-
-const initialState = {
-  inputValues: {
-    fullName: isTestMode ? 'John Doe' : '',
-    email: isTestMode ? 'example@gmail.com' : '',
-    nickname: isTestMode ? "" : "",
-    phoneNumber: ''
-  },
-  inputValidities: {
-    fullName: false,
-    email: false,
-    nickname: false,
-    phoneNumber: false,
-  },
-  formIsValid: false,
-}
+import { useUpdateProfile, useAuthStatus } from '@/data';
+import { useLanguageContext } from '@/contexts/LanguageContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfile = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const { t, isRTL } = useLanguageContext();
+  const { data: authData } = useAuthStatus();
+  const updateProfile = useUpdateProfile();
+  
   const [image, setImage] = useState<any>(null);
-  const [error, setError] = useState();
-  const [formState, dispatchFormState] = useReducer(reducer, initialState);
-  const [areas, setAreas] = useState([]);
-  const [selectedArea, setSelectedArea] = useState<any>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
-  const [selectedGender, setSelectedGender] = useState('');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(true);
 
-  const genderOptions = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Other', value: 'other' },
-  ];
+  // Form state for profile fields
+  const [profileFormState, dispatchProfileForm] = useReducer(reducer, {
+    inputValues: {
+      firstName: '',
+      email: '',
+      phone:""
+    },
+    inputValidities: {
+      firstName: false,
+      email: false,
+      phone:false
+    },
+    formIsValid: false,
+  });
 
-  const handleGenderChange = (value: any) => {
-    setSelectedGender(value);
-  };
+  // Form state for password change
+  const [passwordFormState, dispatchPasswordForm] = useReducer(reducer, {
+    inputValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmNewPassword: ''
+    },
+    inputValidities: {
+      oldPassword: false,
+      newPassword: false,
+      confirmNewPassword: false,
+    },
+    formIsValid: false,
+  });
 
-  const today = new Date();
-  const startDate = getFormatedDate(
-    new Date(today.setDate(today.getDate() + 1)),
-    "YYYY/MM/DD"
-  );
+  // Load user data from AsyncStorage
+  const loadUserDataFromStorage = useCallback(async () => {
+    setIsLoadingUserData(true);
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        
+        // Update profile form with stored user data
+        dispatchProfileForm({
+          inputId: 'firstName',
+          validationResult: undefined,
+          inputValue: user.firstName || '',
+        });
+        
+        dispatchProfileForm({
+          inputId: 'phone',
+          validationResult: undefined,
+          inputValue: user.phone || '',
+        });
+        dispatchProfileForm({
+          inputId: 'email',
+          validationResult: undefined,
+          inputValue: user.email || '',
+        });
+      } else {
+        // Fallback to authData if AsyncStorage is empty
+        if (authData?.user) {
+          dispatchProfileForm({
+            inputId: 'firstName',
+            validationResult: undefined,
+            inputValue: authData.user.firstName || '',
+          });
+          dispatchProfileForm({
+            inputId: 'phone',
+            validationResult: undefined,
+            inputValue: authData.user.phone || '',
+          });
+          dispatchProfileForm({
+            inputId: 'email',
+            validationResult: undefined,
+            inputValue: authData.user.email || '',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data from AsyncStorage:', error);
+      
+      // Fallback to authData on error
+      if (authData?.user) {
+        dispatchProfileForm({
+          inputId: 'firstName',
+          validationResult: undefined,
+          inputValue: authData.user.firstName || '',
+        });
+        dispatchProfileForm({
+          inputId: 'phone',
+          validationResult: undefined,
+          inputValue: authData.user.phone || '',
+        });
+        dispatchProfileForm({
+          inputId: 'email',
+          validationResult: undefined,
+          inputValue: authData.user.email || '',
+        });
+      }
+    } finally {
+      setIsLoadingUserData(false);
+    }
+  }, [authData]);
 
-  const [startedDate, setStartedDate] = useState("12/12/2023");
-  const handleOnPressStartDate = () => {
-    setOpenStartDatePicker(!openStartDatePicker);
-  };
+  // Refresh user data
+  const refreshUserData = useCallback(() => {
+    loadUserDataFromStorage();
+  }, [loadUserDataFromStorage]);
+
+  // Refresh form data after successful update
+  const refreshFormData = useCallback(async () => {
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        
+        // Update profile form with latest user data
+        dispatchProfileForm({
+          inputId: 'firstName',
+          validationResult: undefined,
+          inputValue: user.firstName || '',
+        });
+        
+        dispatchProfileForm({
+          inputId: 'email',
+          validationResult: undefined,
+          inputValue: user.email || '',
+        });
+        
+        console.log('Form data refreshed with updated values:', user);
+      }
+    } catch (error) {
+      console.error('Error refreshing form data:', error);
+    }
+  }, []);
+
+  // Validate AsyncStorage update
+  const validateAsyncStorageUpdate = useCallback(async (expectedData: any) => {
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const storedUser = JSON.parse(userData);
+        const isUpdated = Object.keys(expectedData).every(key => 
+          storedUser[key] === expectedData[key]
+        );
+        
+        if (isUpdated) {
+          console.log('AsyncStorage updated successfully with:', expectedData);
+          return true;
+        } else {
+          console.warn('AsyncStorage update validation failed');
+          return false;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Error validating AsyncStorage update:', error);
+      return false;
+    }
+  }, []);
+
+  // Load user data when component mounts
+  useEffect(() => {
+    loadUserDataFromStorage();
+  }, [loadUserDataFromStorage]);
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
-      const result = validateInput(inputId, inputValue)
-      dispatchFormState({
+      const result = validateInput(inputId, inputValue);
+      dispatchProfileForm({
         inputId,
         validationResult: result,
         inputValue,
-      })
-    }, [dispatchFormState]);
+      });
+    }, [dispatchProfileForm]);
+
+  const passwordInputChangedHandler = useCallback(
+    (inputId: string, inputValue: string) => {
+      let result;
+      
+      if (inputId === 'confirmNewPassword') {
+        // Pass the current newPassword value for confirmNewPassword validation
+        result = validateInput(inputId, inputValue, passwordFormState.inputValues.newPassword);
+      } else {
+        result = validateInput(inputId, inputValue);
+      }
+      
+      dispatchPasswordForm({
+        inputId,
+        validationResult: result,
+        inputValue,
+      });
+      
+      // If this is a newPassword change, also re-validate confirmNewPassword
+      if (inputId === 'newPassword' && passwordFormState.inputValues.confirmNewPassword) {
+        const confirmPasswordResult = validateInput('confirmNewPassword', passwordFormState.inputValues.confirmNewPassword, inputValue);
+        dispatchPasswordForm({
+          inputId: 'confirmNewPassword',
+          validationResult: confirmPasswordResult,
+          inputValue: passwordFormState.inputValues.confirmNewPassword,
+        });
+      }
+    },
+    [dispatchPasswordForm, passwordFormState.inputValues.newPassword, passwordFormState.inputValues.confirmNewPassword]);
 
   useEffect(() => {
-    if (error) {
-      Alert.alert('An error occured', error)
+    if (updateProfile.isSuccess) {
+      // Refresh form data to show updated values
+      refreshFormData();
+      
+      // Show success message
+      Alert.alert(t('editProfile.success'), t('editProfile.updateSuccess'), [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Navigate back after user acknowledges the success
+            navigation.goBack();
+          }
+        }
+      ]);
     }
-  }, [error]);
+  }, [updateProfile.isSuccess, navigation, t, refreshFormData]);
+
+  useEffect(() => {
+    if (updateProfile.error) {
+      Alert.alert(t('editProfile.error'), t('editProfile.updateError'));
+    }
+  }, [updateProfile.error, t]);
 
   const pickImage = async () => {
     try {
-      const tempUri = await launchImagePicker()
-
-      if (!tempUri) return
-
-      // Set the image
-      setImage({ uri: tempUri })
-    } catch (error) { }
+      const tempUri = await launchImagePicker();
+      if (!tempUri) return;
+      setImage({ uri: tempUri });
+    } catch (error) {
+      console.error('Error picking image:', error);
+    }
   };
 
-  // fectch codes from rescountries api
-  useEffect(() => {
-    fetch("https://restcountries.com/v2/all")
-      .then(response => response.json())
-      .then(data => {
-        let areaData = data.map((item: any) => {
-          return {
-            code: item.alpha2Code,
-            item: item.name,
-            callingCode: `+${item.callingCodes[0]}`,
-            flag: `https://flagsapi.com/${item.alpha2Code}/flat/64.png`
+  const handleUpdateProfile = async () => {
+    if (!profileFormState.formIsValid) {
+      Alert.alert(t('editProfile.validationError'), t('editProfile.validationErrorMessage'));
+      return;
+    }
+
+    try {
+      // Get current user data from AsyncStorage for comparison
+      const userData = await AsyncStorage.getItem('user');
+      if (!userData) {
+        Alert.alert(t('editProfile.error'), 'User data not found');
+        return;
+      }
+      
+      const currentUser = JSON.parse(userData);
+      const updateData: any = {};
+      
+      if (profileFormState.inputValues.firstName !== currentUser.firstName) {
+        updateData.firstName = profileFormState.inputValues.firstName;
+      }
+      
+      if (profileFormState.inputValues.phone !== currentUser.phone) {
+        updateData.phone = profileFormState.inputValues.phone;
+      }
+      if (profileFormState.inputValues.email !== currentUser.email) {
+        updateData.email = profileFormState.inputValues.email;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        // Store the updated data to update AsyncStorage after successful API call
+        const updatedUserData = {
+          ...currentUser,
+          ...updateData
+        };
+        
+        // Update profile via API
+        updateProfile.mutate(updateData, {
+          onSuccess: async () => {
+            try {
+              // Update AsyncStorage with new user data
+              await AsyncStorage.setItem('user', JSON.stringify(updatedUserData));
+              console.log('Updated user data in AsyncStorage:', updatedUserData);
+              
+              // Validate the update
+              const isValid = await validateAsyncStorageUpdate(updateData);
+              if (!isValid) {
+                console.warn('AsyncStorage update validation failed, attempting to refresh');
+                // Try to refresh from storage as fallback
+                await refreshUserData();
+              }
+            } catch (storageError) {
+              console.error('Error updating AsyncStorage:', storageError);
+              // Try to refresh from storage as fallback
+              await refreshUserData();
+            }
           }
         });
-
-        setAreas(areaData);
-        if (areaData.length > 0) {
-          let defaultData = areaData.filter((a: any) => a.code == "US");
-
-          if (defaultData.length > 0) {
-            setSelectedArea(defaultData[0])
-          }
-        }
-      })
-  }, [])
-
-  // render countries codes modal
-  function RenderAreasCodesModal() {
-
-    const renderItem = ({ item }: RenderItemProps) => {
-      return (
-        <TouchableOpacity
-          style={{
-            padding: 10,
-            flexDirection: "row"
-          }}
-          onPress={() => {
-            setSelectedArea(item),
-              setModalVisible(false)
-          }}
-        >
-          <Image
-            source={{ uri: item.flag }}
-            contentFit='contain'
-            style={{
-              height: 30,
-              width: 30,
-              marginRight: 10
-            }}
-          />
-          <Text style={{ fontSize: 16, color: "#fff" }}>{item.item}</Text>
-        </TouchableOpacity>
-      )
+      } else {
+        Alert.alert(t('editProfile.noChanges'), t('editProfile.noChangesMessage'));
+      }
+    } catch (error) {
+      console.error('Error checking user data:', error);
+      Alert.alert(t('editProfile.error'), 'Failed to check current user data');
     }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!passwordFormState.formIsValid) {
+      Alert.alert(t('editProfile.passwordValidationError'), t('editProfile.passwordValidationErrorMessage'));
+      return;
+    }
+
+    if (passwordFormState.inputValues.newPassword !== passwordFormState.inputValues.confirmNewPassword) {
+      Alert.alert('Password Mismatch', t('editProfile.passwordMismatch'));
+      return;
+    }
+
+    const updateData = {
+      oldPassword: passwordFormState.inputValues.oldPassword,
+      password: passwordFormState.inputValues.newPassword
+    };
+
+    // Update password via API
+    updateProfile.mutate(updateData, {
+      onSuccess: async () => {
+        try {
+          // Get current user data from AsyncStorage
+          const userData = await AsyncStorage.getItem('user');
+          if (userData) {
+            const currentUser = JSON.parse(userData);
+            
+            // If the API response includes updated user data, update AsyncStorage
+            // This depends on your API response structure
+            // For now, we'll just log that password was updated
+            console.log('Password updated successfully');
+            
+            // Clear password form
+            dispatchPasswordForm({
+              inputId: 'oldPassword',
+              validationResult: undefined,
+              inputValue: '',
+            });
+            
+            dispatchPasswordForm({
+              inputId: 'newPassword',
+              validationResult: undefined,
+              inputValue: '',
+            });
+            
+            dispatchPasswordForm({
+              inputId: 'confirmNewPassword',
+              validationResult: undefined,
+              inputValue: '',
+            });
+            
+            // Show success message
+            Alert.alert(t('editProfile.success'), t('editProfile.passwordUpdated'));
+          }
+        } catch (storageError) {
+          console.error('Error handling password update success:', storageError);
+        }
+      }
+    });
+    
+    setShowPasswordModal(false);
+  };
+
+  // Password change modal
+  function PasswordChangeModal() {
     return (
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}>
-        <TouchableWithoutFeedback
-          onPress={() => setModalVisible(false)}>
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <View
-              style={{
-                height: 400,
-                width: SIZES.width * 0.8,
-                backgroundColor: COLORS.primary,
-                borderRadius: 12
-              }}
-            >
-              <FlatList
-                data={areas}
-                renderItem={renderItem}
-                horizontal={false}
-                keyExtractor={(item) => item.code}
-                style={{
-                  padding: 20,
-                  marginBottom: 20
-                }}
+        visible={showPasswordModal}>
+        <TouchableWithoutFeedback onPress={() => setShowPasswordModal(false)}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <View style={{
+              width: SIZES.width * 0.9,
+              backgroundColor: COLORS.white,
+              borderRadius: 12,
+              padding: 20
+            }}>
+              <Text style={[styles.modalTitle, { textAlign: isRTL ? "right" : "left" }]}>
+                {t('editProfile.changePassword')}
+              </Text>
+              
+              <Input
+                id="oldPassword"
+                onInputChanged={passwordInputChangedHandler}
+                errorText={passwordFormState.inputValidities['oldPassword']}
+                placeholder={t('editProfile.currentPassword')}
+                placeholderTextColor={COLORS.black}
+                icon={icons.padlock}
+                secureTextEntry={true}
               />
+              
+              <Input
+                id="newPassword"
+                onInputChanged={passwordInputChangedHandler}
+                errorText={passwordFormState.inputValidities['newPassword']}
+                placeholder={t('editProfile.newPassword')}
+                placeholderTextColor={COLORS.black}
+                icon={icons.padlock}
+                secureTextEntry={true}
+              />
+              
+              <Input
+                id="confirmNewPassword"
+                onInputChanged={passwordInputChangedHandler}
+                errorText={passwordFormState.inputValidities['confirmNewPassword']}
+                placeholder={t('editProfile.confirmNewPassword')}
+                placeholderTextColor={COLORS.black}
+                icon={icons.padlock}
+                secureTextEntry={true}
+              />
+              
+              <View style={styles.modalButtons}>
+                <Button
+                  title={t('editProfile.cancel')}
+                  onPress={() => setShowPasswordModal(false)}
+                  style={[styles.modalButton, styles.cancelButton]}
+                />
+                <Button
+                  title={updateProfile.isPending ? t('editProfile.updating') : t('editProfile.updateButton')}
+                  filled
+                  onPress={handleUpdatePassword}
+                  style={styles.modalButton}
+                  disabled={updateProfile.isPending}
+                />
+              </View>
             </View>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    )
+    );
   }
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Personal Profile" />
+      <View style={[styles.container, { 
+        backgroundColor: COLORS.white,
+        direction: isRTL ? "rtl" : "ltr"
+      }]}>
+        <Header title={t('editProfile.personalProfile')} />
+        
+        {/* Refresh button */}
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={refreshUserData}
+          disabled={isLoadingUserData}>
+          <Text style={styles.refreshButtonText}>
+            {isLoadingUserData ? t('common.loading') : t('common.refreshData')}
+          </Text>
+        </TouchableOpacity>
+        
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ alignItems: "center", marginVertical: 12 }}>
             <View style={styles.avatarContainer}>
@@ -211,136 +494,67 @@ const EditProfile = () => {
               </TouchableOpacity>
             </View>
           </View>
+          
           <View>
             <Input
-              id="fullName"
+              id="firstName"
               onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities['fullName']}
-              placeholder="Full Name"
+              errorText={profileFormState.inputValidities['firstName']}
+              placeholder={t('editProfile.firstName')}
               placeholderTextColor={COLORS.black}
-            />
-            <Input
-              id="nickname"
-              onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities['nickname']}
-              placeholder="Nickname"
-              placeholderTextColor={COLORS.black}
-            />
+              editable={!isLoadingUserData}
+              value={profileFormState.inputValues.firstName}
+
+            /> 
+            
             <Input
               id="email"
               onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities['email']}
-              placeholder="Email"
+              errorText={profileFormState.inputValidities['email']}
+              placeholder={t('editProfile.email')}
               placeholderTextColor={COLORS.black}
-              keyboardType="email-address" />
-            <View style={{
-              width: SIZES.width - 32
-            }}>
-              <TouchableOpacity
-                style={[styles.inputBtn, {
-                  backgroundColor: COLORS.greyscale500,
-                  borderColor: COLORS.greyscale500,
-                }]}
-                onPress={handleOnPressStartDate}
-              >
-                <Text style={{ ...FONTS.body4, color: COLORS.grayscale400 }}>{startedDate}</Text>
-                <Feather name="calendar" size={24} color={COLORS.grayscale400} />
-              </TouchableOpacity>
-            </View>
-            <View style={[styles.inputContainer, {
-              backgroundColor: COLORS.greyscale500,
-              borderColor: COLORS.greyscale500,
-            }]}>
-              <TouchableOpacity
-                style={styles.selectFlagContainer}
-                onPress={() => setModalVisible(true)}>
-                <View style={{ justifyContent: "center" }}>
-                  <Image
-                    source={icons.down}
-                    contentFit='contain'
-                    style={styles.downIcon}
-                  />
-                </View>
-                <View style={{ justifyContent: "center", marginLeft: 5 }}>
-                  <Image
-                    source={{ uri: selectedArea?.flag }}
-                    contentFit="contain"
-                    style={styles.flagIcon}
-                  />
-                </View>
-                <View style={{ justifyContent: "center", marginLeft: 5 }}>
-                  <Text style={{ color: "#111", fontSize: 12 }}>{selectedArea?.callingCode}</Text>
-                </View>
-              </TouchableOpacity>
-              {/* Phone Number Text Input */}
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your phone number"
-                placeholderTextColor={COLORS.black}
-                selectionColor="#111"
-                keyboardType="numeric"
-              />
-            </View>
-            <View>
-              <RNPickerSelect
-                placeholder={{ label: 'Select', value: '' }}
-                items={genderOptions}
-                onValueChange={(value) => handleGenderChange(value)}
-                value={selectedGender}
-                style={{
-                  inputIOS: {
-                    fontSize: 16,
-                    paddingHorizontal: 10,
-                    borderRadius: 4,
-                    color: COLORS.greyscale600,
-                    paddingRight: 30,
-                    height: 52,
-                    width: SIZES.width - 32,
-                    alignItems: 'center',
-                    backgroundColor: COLORS.greyscale500,
-                  },
-                  inputAndroid: {
-                    fontSize: 16,
-                    paddingHorizontal: 10,
-                    borderRadius: 8,
-                    color: COLORS.greyscale600,
-                    paddingRight: 30,
-                    height: 52,
-                    width: SIZES.width - 32,
-                    alignItems: 'center',
-                    backgroundColor: COLORS.greyscale500,
-                  },
-                }}
-              />
-            </View>
-            <Input
-              id="occupation"
+              keyboardType="email-address"
+              value={profileFormState.inputValues.email}
+              editable={!isLoadingUserData} />
+
+<Input
+              id="phone"
               onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities['occupation']}
-              placeholder="Occupation"
+              errorText={profileFormState.inputValidities['phone']}
+              placeholder={t('editProfile.phone')}
               placeholderTextColor={COLORS.black}
-            />
+              value={profileFormState.inputValues.phone}
+              editable={!isLoadingUserData} />
+            
+            <TouchableOpacity
+              style={styles.changePasswordButton}
+              onPress={() => setShowPasswordModal(true)}
+              disabled={isLoadingUserData}>
+              <Text style={styles.changePasswordText}>{t('editProfile.changePassword')}</Text>
+            </TouchableOpacity>
+            
+            {isLoadingUserData && (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>{t('common.loadingUserData')}</Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </View>
-      <DatePickerModal
-        open={openStartDatePicker}
-        startDate={startDate}
-        selectedDate={startedDate}
-        onClose={() => setOpenStartDatePicker(false)}
-        onChangeStartDate={(date) => setStartedDate(date)}
-      />
-      {RenderAreasCodesModal()}
+      
+      {PasswordChangeModal()}
+      
       <View style={styles.bottomContainer}>
         <Button
-          title="Update"
+          title={updateProfile.isPending ? t('editProfile.updating') : t('editProfile.updateButton')}
           filled
           style={styles.continueButton}
-          onPress={() => navigation.goBack()}
+          onPress={handleUpdateProfile}
+          disabled={updateProfile.isPending}
         />
       </View>
     </SafeAreaView>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
@@ -376,60 +590,42 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
   },
-  inputContainer: {
-    flexDirection: "row",
-    borderColor: COLORS.greyscale500,
-    borderWidth: .4,
-    borderRadius: 6,
-    height: 52,
-    width: SIZES.width - 32,
-    alignItems: 'center',
-    marginVertical: 16,
-    backgroundColor: COLORS.greyscale500,
-  },
-  downIcon: {
-    width: 10,
-    height: 10,
-    tintColor: "#111"
-  },
-  selectFlagContainer: {
-    width: 90,
-    height: 50,
-    marginHorizontal: 5,
-    flexDirection: "row",
-  },
-  flagIcon: {
-    width: 30,
-    height: 30
-  },
-  input: {
-    flex: 1,
-    marginVertical: 10,
-    height: 40,
-    fontSize: 14,
-    color: "#111"
-  },
-  inputBtn: {
-    borderWidth: 1,
+  changePasswordButton: {
+    marginTop: 20,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.primary,
     borderRadius: 12,
-    borderColor: COLORS.greyscale500,
-    height: 50,
-    paddingLeft: 8,
-    fontSize: 18,
-    justifyContent: "space-between",
-    marginTop: 4,
-    backgroundColor: COLORS.greyscale500,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingRight: 8
+    borderColor: COLORS.primary,
   },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between"
+  changePasswordText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  cancelButton: {
+    backgroundColor: COLORS.greyscale500,
+    borderColor: COLORS.greyscale500,
   },
   bottomContainer: {
     position: "absolute",
-    bottom: 32,
+    bottom: 100,
     right: 16,
     left: 16,
     flexDirection: "row",
@@ -443,42 +639,35 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary
   },
-  genderContainer: {
-    flexDirection: "row",
+     loadingContainer: {
+     marginTop: 20,
+     alignSelf: 'center',
+     paddingVertical: 10,
+     paddingHorizontal: 20,
+     backgroundColor: COLORS.grayscale100,
+     borderRadius: 12,
+     borderColor: COLORS.greyscale500,
+   },
+  loadingText: {
+    color: COLORS.greyscale500,
+    fontSize: 14,
+  },
+  refreshButton: {
+    marginTop: 10,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.grayscale100,
+    borderRadius: 12,
     borderColor: COLORS.greyscale500,
-    borderWidth: .4,
-    borderRadius: 6,
-    height: 58,
-    width: SIZES.width - 32,
-    alignItems: 'center',
-    marginVertical: 16,
-    backgroundColor: COLORS.greyscale500,
-  }
+  },
+  refreshButtonText: {
+    color: COLORS.greyscale500,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
 
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    color: COLORS.greyscale600,
-    paddingRight: 30,
-    height: 58,
-    width: SIZES.width - 32,
-    alignItems: 'center',
-    backgroundColor: COLORS.greyscale500,
-    borderRadius: 16
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    color: COLORS.greyscale600,
-    paddingRight: 30,
-    height: 58,
-    width: SIZES.width - 32,
-    alignItems: 'center',
-    backgroundColor: COLORS.greyscale500,
-    borderRadius: 16
-  },
-});
+
 
 export default EditProfile

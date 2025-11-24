@@ -19,6 +19,7 @@ import { Image } from "expo-image";
 import HelpCenterItem from "@/components/HelpCenterItem";
 import { useNavigation } from "expo-router";
 import { useLanguageContext } from "@/contexts/LanguageContext";
+import Header from "@/components/Header";
 
 interface KeywordItemProps {
   item: {
@@ -301,16 +302,7 @@ const SettingsHelpCenter = () => {
         style={[styles.headerContainer, { direction: isRTL ? "rtl" : "ltr" }]}
       >
         <View style={styles.headerLeft}>
-          <Text
-            style={[
-              styles.headerTitle,
-              {
-                color: COLORS.greyscale900,
-              },
-            ]}
-          >
-            مركز المساعدة
-          </Text>
+         
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
               source={icons.back}
@@ -336,7 +328,11 @@ const SettingsHelpCenter = () => {
       ]}
     >
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        {renderHeader()}
+        <Header
+          title="مركز المساعدة"
+          // isRTL={isRTL}
+          // onBackPress={() => navigation.goBack()}
+        />
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}

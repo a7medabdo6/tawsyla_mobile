@@ -3,6 +3,7 @@ import React from 'react';
 import { COLORS, SIZES, icons } from '@/constants';
 import { Image } from 'expo-image';
 import { getTimeAgo } from '@/utils/date';
+import { useLanguageContext } from '@/contexts/LanguageContext';
 
 type NotificationCardProps = {
   title: string;
@@ -21,6 +22,8 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   type,
   isNew
 }) => {
+  const { t, isRTL } = useLanguageContext();
+
   const getIcon = (type: NotificationCardProps['type']) => {
     switch (type) {
       case 'Security':
@@ -73,10 +76,14 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
       <View style={styles.headerContainer}>
         <View style={styles.headerLeftContainer}>
-          <View style={[styles.iconContainer, { backgroundColor: getIconBackgroundColor(type) }]}>
+          <View style={[styles.iconContainer, { 
+            backgroundColor: getIconBackgroundColor(type),
+            marginRight: isRTL ? 0 : 16,
+            marginLeft: isRTL ? 16 : 0
+          }]}>
             <Image
               source={getIcon(type)}
               contentFit='contain'
@@ -95,13 +102,14 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
         {
           isNew && (
             <View style={styles.headerRightContainer}>
-              <Text style={styles.headerText}>New</Text>
+              <Text style={styles.headerText}>{t('notifications.new')}</Text>
             </View>
           )
         }
       </View>
       <Text style={[styles.description, {
-        color: COLORS.grayscale700
+        color: COLORS.grayscale700,
+        marginRight: 20,
       }]}>{description}</Text>
     </View>
   )
@@ -141,7 +149,6 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16
   },
   icon: {
     height: 28,
@@ -161,7 +168,8 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     fontFamily: "regular",
-    color: COLORS.grayscale700
+    color: COLORS.grayscale700,
+
   }
 });
 

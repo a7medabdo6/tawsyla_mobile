@@ -1,9 +1,19 @@
-import { View, Text, TouchableOpacity, Image, useWindowDimensions, StatusBar, ImageSourcePropType, StyleSheet } from 'react-native';
-import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { COLORS, icons, images } from '@/constants';
-import { FromMeRoute, ToMeRoute } from '@/tabs';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  useWindowDimensions,
+  StatusBar,
+  ImageSourcePropType,
+  StyleSheet,
+} from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { COLORS, icons, images } from "@/constants";
+import { FromMeRoute, ToMeRoute } from "@/tabs";
+import { OrderStatus } from "./myordertrack";
 
 const renderScene = SceneMap({
   first: FromMeRoute,
@@ -16,63 +26,76 @@ const MyOrder = () => {
   const [index, setIndex] = React.useState(0);
 
   const [routes] = React.useState([
-    { key: 'first', title: 'From Me' },
-    { key: 'second', title: 'To Me' },
-  ])
+    { key: "first", title: "From Me" },
+    { key: "second", title: "To Me" },
+  ]);
 
-  const renderTabBar = (props:any) => (
+  const renderTabBar = (props: any) => (
     <TabBar
       {...props}
       indicatorStyle={{
-        backgroundColor: COLORS.primary
+        backgroundColor: COLORS.primary,
       }}
       style={{
         backgroundColor: COLORS.white,
       }}
       renderLabel={({ route, focused }) => (
-        <Text style={[{ 
-          color: focused ? COLORS.primary : 'gray',
-          fontSize: 16,
-          fontFamily: "bold"
-          }]}>
+        <Text
+          style={[
+            {
+              color: focused ? COLORS.primary : "gray",
+              fontSize: 16,
+              fontFamily: "bold",
+            },
+          ]}
+        >
           {route.title}
         </Text>
       )}
     />
   );
 
-   /**
+  /**
    * render header
    */
-    const renderHeader = () => {
-      return (
-        <View style={styles.headerContainer}>
-          <View style={styles.headerLeft}>
-            <Image
-              source={images.logo as ImageSourcePropType}
-              resizeMode='contain'
-              style={styles.headerLogo}
-            />
-            <Text style={[styles.headerTitle, {
-              color: COLORS.greyscale900
-            }]}>My Orders</Text>
-          </View>
-          <View style={styles.headerRight}>
-            <TouchableOpacity>
-              <Image
-                source={icons.moreCircle as ImageSourcePropType}
-                resizeMode='contain'
-                style={[styles.moreCircleIcon, {
-                  tintColor: COLORS.greyscale900
-                }]}
-              />
-            </TouchableOpacity>
-          </View>
+  const renderHeader = () => {
+    return (
+      <View style={styles.headerContainer}>
+        <View style={styles.headerLeft}>
+          <Image
+            source={images.logo as ImageSourcePropType}
+            resizeMode="contain"
+            style={styles.headerLogo}
+          />
+          <Text
+            style={[
+              styles.headerTitle,
+              {
+                color: COLORS.greyscale900,
+              },
+            ]}
+          >
+            My Orders
+          </Text>
         </View>
-      )
-    }
+        <View style={styles.headerRight}>
+          {/* <TouchableOpacity>
+            <Image
+              source={icons.moreCircle as ImageSourcePropType}
+              resizeMode="contain"
+              style={[
+                styles.moreCircleIcon,
+                {
+                  tintColor: COLORS.greyscale900,
+                },
+              ]}
+            />
+          </TouchableOpacity> */}
+        </View>
+      </View>
+    );
+  };
 
-    
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar hidden={true} />
@@ -89,8 +112,8 @@ const MyOrder = () => {
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -98,37 +121,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     justifyContent: "space-between",
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
   },
   headerLeft: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary
+    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,
     fontFamily: "bold",
     color: COLORS.black,
-    marginLeft: 12
+    marginLeft: 12,
   },
   headerRight: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   searchIcon: {
     width: 24,
     height: 24,
-    tintColor: COLORS.black
+    tintColor: COLORS.black,
   },
   moreCircleIcon: {
     width: 24,
     height: 24,
     tintColor: COLORS.black,
-    marginLeft: 12
+    marginLeft: 12,
   },
-})
-export default MyOrder
+});
+export default MyOrder;

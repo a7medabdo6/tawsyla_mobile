@@ -13,16 +13,15 @@ export const useAppStatus = () => {
 					fetchCart(),
 					fetchFavourites(),
 				]);
-console.log(favouritesResponse,'favouritesResponsefavouritesResponse');
 
 				// Extract cart item IDs
 				const cartItems = cartResponse?.items || [];
 				const cartProductIds = cartItems.map((item: any) => item.productId);
-console.log(cartItems,"cartItemscartItems");
 
 				// Extract favourite product IDs
 				const favouritesItems = favouritesResponse?.items || favouritesResponse?.data || favouritesResponse || [];
-				const favouriteProductIds = favouritesItems.map((item: any) => 
+			// console.log(favouritesItems,'favouritesItemssssss');
+				const favouriteProductIds =favouritesItems?.length>0 && favouritesItems?.map((item: any) => 
 					item.productId || item.product?.id || item.id
 				);
 

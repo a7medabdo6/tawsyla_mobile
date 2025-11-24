@@ -1,18 +1,35 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageSourcePropType } from 'react-native';
-import { COLORS } from '../constants';
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ImageSourcePropType,
+} from "react-native";
+import { COLORS } from "../constants";
 
 interface ServiceItemProps {
   pkgIcon: ImageSourcePropType;
   title: string;
   duration: string;
   price: string;
+  phone?: string;
   onPress: () => void;
   isSelected: boolean;
   onSelect: (selected: boolean) => void;
 }
 
-const ServiceItem: React.FC<ServiceItemProps> = ({ pkgIcon, title, duration, price, onPress, isSelected, onSelect }) => {
+const ServiceItem: React.FC<ServiceItemProps> = ({
+  pkgIcon,
+  title,
+  duration,
+  price,
+  onPress,
+  isSelected,
+  onSelect,
+  phone,
+}) => {
   const borderColor = isSelected ? COLORS.primary : COLORS.grayscale100;
 
   return (
@@ -21,51 +38,79 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ pkgIcon, title, duration, pri
         onSelect(!isSelected);
         onPress();
       }}
-      style={[styles.container, { borderColor }]}>
+      style={[styles.container, { borderColor }]}
+    >
       <View style={styles.leftContainer}>
         <View style={styles.pkgContainer}>
-          <Image
-            source={pkgIcon}
-            resizeMode='cover'
-            style={styles.pkgIcon}
-          />
+          <Image source={pkgIcon} resizeMode="cover" style={styles.pkgIcon} />
         </View>
         <View>
-          <Text style={[styles.title, { 
-            color: COLORS.black,
-          }]}>{title}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: COLORS.black,
+                  marginHorizontal: 20,
+                },
+              ]}
+            >
+              {title}
+            </Text>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: COLORS.black,
+                  marginHorizontal: 20,
+                },
+              ]}
+            >
+              {phone}
+            </Text>
+          </View>
           <Text style={styles.duration}>{duration}</Text>
         </View>
       </View>
-      <Text style={{
-        color: COLORS.black,
-      }}>{price}</Text>
+      <Text
+        style={{
+          color: COLORS.black,
+        }}
+      >
+        {price}
+      </Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 70,
     borderWidth: 1,
     borderColor: COLORS.grayscale100,
     paddingHorizontal: 9,
     paddingVertical: 6,
     borderRadius: 8,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   leftContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   pkgContainer: {
     width: 50,
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: COLORS.tansparentPrimary,
     borderRadius: 6,
     marginRight: 16,
@@ -73,22 +118,23 @@ const styles = StyleSheet.create({
   pkgIcon: {
     width: 24,
     height: 24,
-    tintColor: COLORS.primary
+    tintColor: COLORS.primary,
   },
   title: {
     fontSize: 14,
-    fontFamily: 'medium',
+    fontFamily: "medium",
     color: COLORS.black,
     marginBottom: 6,
   },
   duration: {
     fontSize: 14,
-    fontFamily: 'regular',
-    color: 'gray',
+    fontFamily: "regular",
+    color: "gray",
+    marginHorizontal: 20,
   },
   price: {
     fontSize: 12,
-    fontFamily: 'bold',
+    fontFamily: "bold",
     color: COLORS.black,
   },
 });

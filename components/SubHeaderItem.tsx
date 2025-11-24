@@ -5,7 +5,7 @@ import { COLORS, SIZES } from '../constants';
 interface SubHeaderItemProps {
   title: string;
   onPress: (event: GestureResponderEvent) => void;
-  navTitle: string;
+  navTitle?: string;
 }
 
 const SubHeaderItem: React.FC<SubHeaderItemProps> = ({ title, onPress, navTitle }) => {
@@ -15,9 +15,11 @@ const SubHeaderItem: React.FC<SubHeaderItemProps> = ({ title, onPress, navTitle 
       <Text style={[styles.title, {
         color: COLORS.greyscale900
       }]}>{title}</Text>
-      <TouchableOpacity onPress={onPress}>
-        <Text style={styles.navTitle}>{navTitle}</Text>
-      </TouchableOpacity>
+      {navTitle && (
+        <TouchableOpacity onPress={onPress}>
+          <Text style={styles.navTitle}>{navTitle}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -31,13 +33,12 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   title: {
-    fontSize: 20,
-    fontFamily: "bold",
+    fontSize: 14,
+     fontFamily: "bold",
     color: COLORS.black,
   },
   navTitle: {
     fontSize: 16,
-    fontFamily: "medium",
     color: COLORS.primary,
     marginLeft: 12,
   },

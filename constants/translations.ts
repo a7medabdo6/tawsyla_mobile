@@ -5,27 +5,30 @@ export const translations = {
       screen1: {
         title: "Enjoy hassle-free shipping",
         subtitle: "HASSLE-FREE",
-        description: "Send packages, receive deliveries, and track your shipments without worrying about hidden fees or complications."
+        description:
+          "Send packages, receive deliveries, and track your shipments without worrying about hidden fees or complications.",
       },
       screen2: {
         title: "Manage all your deliveries in",
         subtitle: "ONE PLACE",
-        description: "Track your packages, schedule pickups, and monitor deliveries. With just a few taps, you're in control of your shipping needs."
+        description:
+          "Track your packages, schedule pickups, and monitor deliveries. With just a few taps, you're in control of your shipping needs.",
       },
       screen3: {
         title: "Customized Delivery",
         subtitle: "SOLUTIONS",
-        description: "Personalize your delivery preferences for maximum convenience and efficiency."
+        description:
+          "Personalize your delivery preferences for maximum convenience and efficiency.",
       },
       next: "Next",
-      skip: "Skip"
+      skip: "Skip",
     },
     // Tab Navigation
     tabs: {
       home: "Home",
       myOrder: "My Order",
       inbox: "Inbox",
-      profile: "Profile"
+      profile: "Profile",
     },
     // Common
     common: {
@@ -36,7 +39,9 @@ export const translations = {
       save: "Save",
       delete: "Delete",
       edit: "Edit",
-      back: "Back"
+      back: "Back",
+      refreshData: "Refresh Data",
+      loadingUserData: "Loading user data...",
     },
     // Authentication
     auth: {
@@ -49,21 +54,24 @@ export const translations = {
         loginButton: "Login",
         loggingIn: "Logging in...",
         noAccount: "Don't have an account?",
-        signUp: "Sign Up"
+        signUp: "Sign Up",
+        phone: "Phone Number",
       },
       signup: {
         title: "Create Your Account",
         fullName: "Full Name",
         email: "Email",
         phoneNumber: "Phone Number",
+        phone: "Phone Number",
+
         password: "Password",
         confirmPassword: "Confirm Password",
         privacyPolicy: "By continuing you accept our Privacy Policy",
         signUpButton: "Sign Up",
         creatingAccount: "Creating Account...",
         hasAccount: "Already have an account?",
-        signIn: "Sign In"
-      }
+        signIn: "Sign In",
+      },
     },
     // Profile
     profile: {
@@ -90,8 +98,114 @@ export const translations = {
       guestSubtitle: "Sign in to access your profile",
       // User data placeholders
       userName: "Nathalie Erneson",
-      userEmail: "nathalie_erneson@gmail.com"
-    }
+      userEmail: "nathalie_erneson@gmail.com",
+      lastUpdated: "Last updated",
+    },
+    // Edit Profile
+    editProfile: {
+      title: "Edit Profile",
+      personalProfile: "Personal Profile",
+      firstName: "First Name",
+      phone: "Phone Number",
+
+      email: "Email",
+      updateButton: "Update",
+      updating: "Updating...",
+      updateSuccess: "Profile updated successfully",
+      updateError: "Failed to update profile",
+      cancel: "Cancel",
+      noChanges: "No Changes",
+      noChangesMessage: "No changes detected to update",
+      validationError: "Validation Error",
+      validationErrorMessage: "Please fill in all required fields correctly",
+      passwordValidationError: "Password Validation Error",
+      passwordValidationErrorMessage:
+        "Please fill in all password fields correctly",
+      success: "Success",
+      error: "Error",
+      // Password change
+      changePassword: "Change Password",
+      currentPassword: "Current Password",
+      newPassword: "New Password",
+      confirmNewPassword: "Confirm New Password",
+      passwordMismatch: "New passwords do not match",
+      passwordUpdated: "Password updated successfully",
+    },
+    // Notifications
+    notifications: {
+      title: "Notifications",
+      settings: "Settings",
+      noNotifications: "No notifications yet",
+      markAllAsRead: "Mark all as read",
+      clearAll: "Clear all",
+      new: "New",
+      markAsRead: "Mark as read",
+      delete: "Delete",
+      today: "Today",
+      yesterday: "Yesterday",
+      thisWeek: "This Week",
+      older: "Older",
+      // Notification types
+      security: "Security",
+      card: "Card",
+      payment: "Payment",
+      update: "Update",
+      account: "Account",
+      // Actions
+      enable: "Enable",
+      disable: "Disable",
+      mute: "Mute",
+      unmute: "Unmute",
+      customize: "Customize",
+    },
+
+    "Add New Address": "Add New Address",
+    city: "city",
+    state: "state",
+    additionalInfo: "additionalInfo",
+    phone: "phone",
+    setAsDefault: "setAsDefault",
+    "SAVE LOCATION": "SAVE LOCATION",
+    Address: "Address",
+    "Edit Address": "Edit Address",
+    "Share E-Receipt": "Share E-Receipt",
+    "Download E-Receipt": "Download E-Receipt",
+    Print: "Print",
+    "Copied!": "Copied!",
+    "Transaction ID copied to clipboard.":
+      "Transaction ID copied to clipboard.",
+    Name: "Name",
+    "Daniel Austion": "Daniel Austion",
+    "6993 Meadow Valley Terrace": "6993 Meadow Valley Terrace",
+    "Package Type": "Package Type",
+    "Detroit-style pizza": "Detroit-style pizza",
+    Phone: "Phone",
+    "+1 111 467 378 399": "+1 111 467 378 399",
+    Category: "Category",
+    Shipping: "Shipping",
+    ID: "ID",
+    "PIZZA XT134": "PIZZA XT134",
+    Amount: "Amount",
+    $60: "$60",
+    "Delivery Fee": "Delivery Fee",
+    "$5.55": "$5.55",
+    Discount: "Discount",
+    "5": "5",
+    Total: "Total",
+    "$605.55": "$605.55",
+    "Payment Methods": "Payment Methods",
+    "Cash on Delivery": "Cash on Delivery",
+    Date: "Date",
+    "Dec 16, 2026 | 12:23:45 PM": "Dec 16, 2026 | 12:23:45 PM",
+    "Transaction ID": "Transaction ID",
+    Status: "Status",
+    Paid: "Paid",
+    Checkout: "Checkout",
+    "Complete Order": "Complete Order",
+    Apply: "Apply",
+    "coupon code": "Coupon Code",
+    Login: "Login",
+    "You must login to view your cart": "You must login to view your cart",
   },
   ar: {
     // Onboarding
@@ -99,27 +213,30 @@ export const translations = {
       screen1: {
         title: "استمتع بشحن خالٍ من المتاعب",
         subtitle: "خالٍ من المتاعب",
-        description: "أرسل الطرود، واستلم التوصيلات، وتتبع شحناتك دون القلق من الرسوم الخفية أو التعقيدات."
+        description:
+          "أرسل الطرود، واستلم التوصيلات، وتتبع شحناتك دون القلق من الرسوم الخفية أو التعقيدات.",
       },
       screen2: {
         title: "ادفع جميع توصيلاتك في",
         subtitle: "مكان واحد",
-        description: "تتبع طرودك، وحدد مواعيد الاستلام، وراقب التوصيلات. بنقرة قليلة، أنت تتحكم في احتياجات الشحن الخاصة بك."
+        description:
+          "تتبع طرودك، وحدد مواعيد الاستلام، وراقب التوصيلات. بنقرة قليلة، أنت تتحكم في احتياجات الشحن الخاصة بك.",
       },
       screen3: {
         title: "حلول التوصيل المخصصة",
         subtitle: "حلول",
-        description: "خصص تفضيلات التوصيل الخاصة بك للحصول على أقصى راحة وكفاءة."
+        description:
+          "خصص تفضيلات التوصيل الخاصة بك للحصول على أقصى راحة وكفاءة.",
       },
       next: "التالي",
-      skip: "تخطي"
+      skip: "تخطي",
     },
     // Tab Navigation
     tabs: {
       home: "الرئيسية",
       myOrder: "طلبي",
       inbox: "صندوق الوارد",
-      profile: "الملف الشخصي"
+      profile: "الملف الشخصي",
     },
     // Common
     common: {
@@ -130,24 +247,30 @@ export const translations = {
       save: "حفظ",
       delete: "حذف",
       edit: "تعديل",
-      back: "رجوع"
+      back: "رجوع",
+      refreshData: "تحديث البيانات",
+      loadingUserData: "جاري تحميل بيانات المستخدم...",
     },
     // Authentication
     auth: {
       login: {
         title: "تسجيل الدخول إلى حسابك",
         email: "البريد الإلكتروني",
+        phone: "رقم الهاتف",
+
         password: "كلمة المرور",
         rememberMe: "تذكرني",
         forgotPassword: "نسيت كلمة المرور؟",
         loginButton: "تسجيل الدخول",
         loggingIn: "جاري تسجيل الدخول...",
         noAccount: "ليس لديك حساب؟",
-        signUp: "إنشاء حساب"
+        signUp: "إنشاء حساب",
       },
       signup: {
         title: "إنشاء حساب جديد",
         fullName: "الاسم الكامل",
+        phone: "رقم الهاتف",
+
         email: "البريد الإلكتروني",
         phoneNumber: "رقم الهاتف",
         password: "كلمة المرور",
@@ -156,8 +279,8 @@ export const translations = {
         signUpButton: "إنشاء حساب",
         creatingAccount: "جاري إنشاء الحساب...",
         hasAccount: "لديك حساب بالفعل؟",
-        signIn: "تسجيل الدخول"
-      }
+        signIn: "تسجيل الدخول",
+      },
     },
     // Profile
     profile: {
@@ -184,10 +307,152 @@ export const translations = {
       guestSubtitle: "سجل دخولك للوصول إلى ملفك الشخصي",
       // User data placeholders
       userName: "ناتالي إرنيسون",
-      userEmail: "nathalie_erneson@gmail.com"
-    }
-  }
+      userEmail: "nathalie_erneson@gmail.com",
+      lastUpdated: "آخر تحديث",
+    },
+    // Edit Profile
+    editProfile: {
+      title: "تعديل الملف الشخصي",
+      personalProfile: "الملف الشخصي ",
+      firstName: "الاسم الأول",
+      email: "البريد الإلكتروني",
+      phone: "رقم الهاتف",
+
+      updateButton: "تحديث",
+      updating: "جاري التحديث...",
+      updateSuccess: "تم تحديث الملف الشخصي بنجاح",
+      updateError: "فشل تحديث الملف الشخصي",
+      cancel: "إلغاء",
+      noChanges: "لا توجد تغييرات",
+      noChangesMessage: "لم يكتشف أي تغييرات لتحديث",
+      validationError: "خطأ في التحقق",
+      validationErrorMessage: "يرجى ملء جميع الحقول المطلوبة بشكل صحيح",
+      passwordValidationError: "خطأ في التحقق من كلمة المرور",
+      passwordValidationErrorMessage:
+        "يرجى ملء جميع حقول كلمة المرور بشكل صحيح",
+      success: "نجح",
+      error: "خطأ",
+      // Password change
+      changePassword: "تغيير كلمة المرور",
+      currentPassword: "كلمة المرور الحالية",
+      newPassword: "كلمة المرور الجديدة",
+      confirmNewPassword: "تأكيد كلمة المرور الجديدة",
+      passwordMismatch: "كلمتا المرور غير متطابقتين",
+      passwordUpdated: "تم تغيير كلمة المرور بنجاح",
+    },
+    // Notifications
+    notifications: {
+      title: "الإشعارات",
+      settings: "الإعدادات",
+      noNotifications: "لا توجد إشعارات بعد",
+      markAllAsRead: "إشعارات جميعها قراءة",
+      clearAll: "مسح كل شيء",
+      new: "جديد",
+      markAsRead: "تحديد كمقروء",
+      delete: "حذف",
+      today: "اليوم",
+      yesterday: "الأمس",
+      thisWeek: "هذا الأسبوع",
+      older: "الأقدم",
+      // Notification types
+      security: "الأمان",
+      card: "البطاقة",
+      payment: "الدفع",
+      update: "التحديث",
+      account: "الحساب",
+      // Actions
+      enable: "تفعيل",
+      disable: "تعطيل",
+      mute: "إلغاء الصمت",
+      unmute: "تفعيل الصمت",
+      customize: "تخصيص",
+    },
+
+    "Add New Address": "أضف عنوانًا جديدًا",
+    city: "المدينة",
+    state: "الولاية",
+    additionalInfo: "معلومات إضافية",
+    phone: "الهاتف",
+    setAsDefault: "تعيين كافتراضي",
+    "SAVE LOCATION": "حفظ الموقع",
+    Address: "عنواني",
+    "Edit Address": "تعديل العنوان",
+
+    "Email is not a valid email": "البريد الإلكتروني غير صالح",
+    "Password must be at least 6 characters":
+      "كلمة المرور يجب أن تكون على الأقل 6 أحرف",
+    "Passwords do not match": "كلمتا المرور غير متطابقتين",
+    "Full name is required": "الاسم الكامل مطلوب",
+    "Email is required": "البريد الإلكتروني مطلوب",
+    "Password is required": "كلمة المرور مطلوبة",
+    "Confirm password is required": "تأكيد كلمة المرور مطلوب",
+    "Confirm password is not a valid confirm password":
+      "تأكيد كلمة المرور غير صالح",
+    "Share E-Receipt": "مشاركة الإيصال الإلكتروني",
+    "Download E-Receipt": "تحميل الإيصال الإلكتروني",
+    Print: "طباعة",
+    "Copied!": "تم النسخ!",
+    "Transaction ID copied to clipboard.": "تم نسخ رقم المعاملة إلى الحافظة.",
+    Name: "الاسم",
+    "Daniel Austion": "دانيال أوستيون",
+    "6993 Meadow Valley Terrace": "6993 تراس ميدو فالي",
+    "Package Type": "نوع الطرد",
+    "Detroit-style pizza": "بيتزا على طريقة ديترويت",
+    Phone: "رقم الهاتف",
+    "+1 111 467 378 399": "+1 111 467 378 399",
+    Category: "الفئة",
+    Shipping: "الشحن",
+    ID: "المعرف",
+    "PIZZA XT134": "بيتزا XT134",
+    Amount: "المبلغ",
+    $60: "٦٠ دولار",
+    "Delivery Fee": "رسوم التوصيل",
+    "$5.55": "٥٫٥٥ دولار",
+    Discount: "الخصم",
+    "5": "٥",
+    Total: "الإجمالي",
+    "$605.55": "٦٠٥٫٥٥ دولار",
+    "Payment Methods": "طرق الدفع",
+    "Cash on Delivery": "الدفع عند الاستلام",
+    Date: "التاريخ",
+    "Dec 16, 2026 | 12:23:45 PM": "١٦ ديسمبر ٢٠٢٦ | ١٢:٢٣:٤٥ م",
+    "Transaction ID": "رقم المعاملة",
+    Status: "الحالة",
+    Paid: "مدفوع",
+    Checkout: "الدفع",
+    "Complete Order": "إتمام الطلب",
+    Apply: "تطبيق",
+    "coupon code": "رمز القسيمة",
+    Login: "تسجيل الدخول",
+    "You must login to view your cart":
+      "يجب عليك تسجيل الدخول لعرض سلة التسوق الخاصة بك",
+    "Invalid coupon code": "رمز القسيمة غير صالح",
+    "Please login to make this Action": "يرجى تسجيل الدخول للقيام بهذا الإجراء",
+    "You must login to view your Favourite":
+      "يجب عليك تسجيل الدخول لعرض المفضلة",
+    "Error please try again!": "حدث خطأ، يرجى المحاولة مرة أخرى!",
+    Close: "إغلاق",
+    EGP: "ج. م",
+    Items: "عنصر",
+    View: "عرض",
+    "Track Order": "تتبع الطلب",
+    pending: "قيد الانتظار",
+    Estimatation: "الوقت",
+    Min: "دقيقة",
+    "Order Num": " رقم الطلب",
+    "Payment Method": "الدفع",
+    cash: "عند الاستلام",
+    Item: "اسم المنتج",
+    Qty: "الكمية",
+    Image: "الصورة",
+    "Order Details": "تفاصيل الطلب",
+    "You must login to view your Orders": "You must login to view your Orders",
+    "Select Address": "حدد العنوان",
+    "Confirm": "تأكيد",
+    "Go to my order": "طلباتي",
+    "My Orders": "طلباتي",
+  },
 };
 
-export type Language = 'en' | 'ar';
-export type TranslationKey = keyof typeof translations.en; 
+export type Language = "en" | "ar";
+export type TranslationKey = keyof typeof translations.en;
