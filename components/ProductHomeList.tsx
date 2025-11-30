@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import ProductCard from "./Product";
+import Skeleton from "./Skeleton";
 
 const { width } = Dimensions.get("window");
 
@@ -26,16 +27,42 @@ const ProductHomeList = () => {
   const { data, isLoading, error } = useProducts(1, 10); // Show first 8 products on home
   // console.log(data, "datadatadatadataaaaa");
 
-  if (isLoading) return <ActivityIndicator size="large" />;
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+          }}
+        >
+          {[1, 2, 3, 4].map((key) => (
+            <View key={key} style={{ width: "48%", marginBottom: 16 }}>
+              <Skeleton height={180} borderRadius={16} />
+              <View style={{ marginTop: 8 }}>
+                <Skeleton width="80%" height={16} />
+                <Skeleton width="40%" height={16} style={{ marginTop: 4 }} />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
   if (error) return <Text>Error: {error.message}</Text>;
 
   const renderItem = ({ item }: any) => (
     <ProductCard
       name={item?.nameAr || item?.nameEn}
-      image={item.image?.path ? `http://159.65.75.17:3000/api/v1/files${item.image.path}` : undefined}
+      image={
+        item.image?.path
+          ? `http://159.65.75.17:3000/api/v1/files${item.image.path}`
+          : undefined
+      }
       price="2.99"
       rating={item?.rating}
-      style={{width:"45%"}}
+      style={{ width: "45%" }}
       varints={item?.variants}
       productId={item?.id}
     />

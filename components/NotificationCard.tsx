@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
-import React from 'react';
-import { COLORS, SIZES, icons } from '@/constants';
-import { Image } from 'expo-image';
-import { getTimeAgo } from '@/utils/date';
-import { useLanguageContext } from '@/contexts/LanguageContext';
+import { View, Text, StyleSheet } from "react-native";
+import React from "react";
+import { COLORS, SIZES, icons } from "@/constants";
+import { Image } from "expo-image";
+import { getTimeAgo } from "@/utils/date";
+import { useLanguageContext } from "@/contexts/LanguageContext";
 
 type NotificationCardProps = {
   title: string;
@@ -20,55 +20,55 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   date,
   time,
   type,
-  isNew
+  isNew,
 }) => {
   const { t, isRTL } = useLanguageContext();
 
-  const getIcon = (type: NotificationCardProps['type']) => {
+  const getIcon = (type: NotificationCardProps["type"]) => {
     switch (type) {
-      case 'Security':
+      case "Security":
         return icons.squareCheckbox2;
-      case 'Card':
+      case "Card":
         return icons.ticket;
-      case 'Payment':
+      case "Payment":
         return icons.wallet2;
-      case 'Update':
+      case "Update":
         return icons.infoSquare2;
-      case 'Account':
+      case "Account":
         return icons.profile2;
       default:
         return icons.squareCheckbox2;
     }
   };
 
-  const getIconBackgroundColor = (type: NotificationCardProps['type']) => {
+  const getIconBackgroundColor = (type: NotificationCardProps["type"]) => {
     switch (type) {
-      case 'Security':
+      case "Security":
         return COLORS.transparentSecurity;
-      case 'Card':
+      case "Card":
         return COLORS.transparentCard;
-      case 'Payment':
+      case "Payment":
         return COLORS.transparentPayment;
-      case 'Update':
+      case "Update":
         return COLORS.transparentUpdate;
-      case 'Account':
+      case "Account":
         return COLORS.transparentAccount;
       default:
         return COLORS.transparentPrimary;
     }
   };
 
-  const getIconColor = (type: NotificationCardProps['type']) => {
+  const getIconColor = (type: NotificationCardProps["type"]) => {
     switch (type) {
-      case 'Security':
+      case "Security":
         return COLORS.security;
-      case 'Card':
+      case "Card":
         return COLORS.card;
-      case 'Payment':
+      case "Payment":
         return COLORS.payment;
-      case 'Update':
+      case "Update":
         return COLORS.update;
-      case 'Account':
+      case "Account":
         return COLORS.account;
       default:
         return COLORS.primary;
@@ -79,69 +79,93 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
     <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
       <View style={styles.headerContainer}>
         <View style={styles.headerLeftContainer}>
-          <View style={[styles.iconContainer, { 
-            backgroundColor: getIconBackgroundColor(type),
-            marginRight: isRTL ? 0 : 16,
-            marginLeft: isRTL ? 16 : 0
-          }]}>
+          <View
+            style={[
+              styles.iconContainer,
+              {
+                backgroundColor: getIconBackgroundColor(type),
+                marginRight: isRTL ? 16 : 0,
+                marginLeft: isRTL ? 0 : 16,
+              },
+            ]}
+          >
             <Image
               source={getIcon(type)}
-              contentFit='contain'
+              contentFit="contain"
               style={[styles.icon, { tintColor: getIconColor(type) }]}
             />
           </View>
           <View>
-            <Text style={[styles.title, {
-              color: COLORS.greyscale900,
-            }]}>{title}</Text>
-            <Text style={[styles.date, {
-              color: COLORS.grayscale700
-            }]}>{getTimeAgo(date)} | {time}</Text>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: COLORS.greyscale900,
+                },
+              ]}
+            >
+              {title}
+            </Text>
+            <Text
+              style={[
+                styles.date,
+                {
+                  color: COLORS.grayscale700,
+                },
+              ]}
+            >
+              {getTimeAgo(date)} | {time}
+            </Text>
           </View>
         </View>
-        {
-          isNew && (
-            <View style={styles.headerRightContainer}>
-              <Text style={styles.headerText}>{t('notifications.new')}</Text>
-            </View>
-          )
-        }
+        {isNew && (
+          <View style={styles.headerRightContainer}>
+            <Text style={styles.headerText}>{t("notifications.new")}</Text>
+          </View>
+        )}
       </View>
-      <Text style={[styles.description, {
-        color: COLORS.grayscale700,
-        marginRight: 20,
-      }]}>{description}</Text>
+      <Text
+        style={[
+          styles.description,
+          {
+            color: COLORS.grayscale700,
+            marginRight: 20,
+          },
+        ]}
+      >
+        {description}
+      </Text>
     </View>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     width: SIZES.width - 32,
-    marginBottom: 12
+    marginBottom: 12,
   },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12
+    marginBottom: 12,
   },
   headerRightContainer: {
     width: 41,
     height: 24,
     borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.primary,
   },
   headerText: {
     fontSize: 10,
     fontFamily: "semiBold",
-    color: COLORS.white
+    color: COLORS.white,
   },
   headerLeftContainer: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   iconContainer: {
     height: 60,
@@ -152,25 +176,24 @@ const styles = StyleSheet.create({
   },
   icon: {
     height: 28,
-    width: 28
+    width: 28,
   },
   title: {
     fontSize: 18,
     fontFamily: "bold",
     color: COLORS.greyscale900,
-    marginBottom: 6
+    marginBottom: 6,
   },
   date: {
     fontSize: 14,
     fontFamily: "regular",
-    color: COLORS.grayscale700
+    color: COLORS.grayscale700,
   },
   description: {
     fontSize: 14,
     fontFamily: "regular",
     color: COLORS.grayscale700,
-
-  }
+  },
 });
 
 export default NotificationCard;

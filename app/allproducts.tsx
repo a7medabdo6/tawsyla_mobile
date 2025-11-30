@@ -20,6 +20,7 @@ import { NavigationProp } from "@react-navigation/native";
 import CategoryCarousel from "@/components/CategoryList";
 import { Drawer } from "react-native-drawer-layout";
 import DrawerFilter from "@/components/drawer";
+import Header from "@/components/Header";
 
 const AllProducts = () => {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -30,11 +31,11 @@ const AllProducts = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [priceRange, setPriceRange] = useState({ min: "10", max: "100" });
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("");
-const [open, setOpen] = useState(false);
-const [swipeEnabled, setSwipeEnabled] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [swipeEnabled, setSwipeEnabled] = useState(true);
 
   // Set initial category from params if passed
   React.useEffect(() => {
@@ -52,8 +53,6 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
           setSelectedCategory(filters.category); // Use first category for now
         }
         if (filters.priceRange) {
-          console.log(filters.priceRange,"priceRangepriceRange");
-          
           setPriceRange(filters.priceRange);
         }
         if (filters.rating) {
@@ -70,7 +69,6 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
       }
     }
   }, [params.filters]);
-
 
   // Debounce search query
   React.useEffect(() => {
@@ -101,48 +99,6 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
 
   // Flatten all pages data
   const allProducts = data?.pages.flatMap((page) => page.data) || [];
-
-  const renderHeader = () => {
-    const headerTitle = params.categoryName
-      ? (params.categoryName as string)
-      : "جميع المنتجات";
-
-    return (
-      <View style={styles.headerContainer}>
-        <View style={styles.headerLeft}>
-          <Image
-            source={images.logo}
-            contentFit="contain"
-            style={styles.headerLogo}
-          />
-          <Text
-            style={[
-              styles.headerTitle,
-              {
-                color: COLORS.greyscale900,
-              },
-            ]}
-          >
-            {headerTitle}
-          </Text>
-        </View>
-        <View style={styles.headerRight}>
-          {/* <TouchableOpacity>
-            <Image
-              source={icons.moreCircle}
-              contentFit="contain"
-              style={[
-                styles.moreCircleIcon,
-                {
-                  tintColor: COLORS.greyscale900,
-                },
-              ]}
-            />
-          </TouchableOpacity> */}
-        </View>
-      </View>
-    );
-  };
 
   const renderSearchBar = () => {
     return (
@@ -187,17 +143,16 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
     );
   };
 
-
-
   const renderProduct = ({ item }: any) => (
     <ProductCard
       name={item?.nameAr || item?.nameEn}
       image={
-        item.image?.path ? `http://159.65.75.17:3000/api/v1/files${item.image.path}` : undefined
+        item.image?.path
+          ? `http://159.65.75.17:3000/api/v1/files${item.image.path}`
+          : undefined
       }
       style={{
         width: "45%",
-     
       }}
       price="2.99"
       rating={item?.rating}
@@ -229,129 +184,147 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
   if (isLoading) {
     return (
       <Drawer
-      open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      renderDrawerContent={() => <DrawerFilter navigation={navigation} setSwipeEnabled={setSwipeEnabled}
-      searchQueryProp={searchQuery}
-      selectedCategoryProp={selectedCategory}
-      priceRangeProp={priceRange}
-      selectedRatingProp={selectedRating}
-      sortByProp={sortBy}
-      />}
-      drawerPosition="right"
-      drawerStyle={{ width: '80%' }}
-      swipeEnabled={swipeEnabled}
-      
-
-    >
-
-      <SafeAreaView style={styles.area}>
-        <View style={[styles.container,{ direction: isRTL ? "rtl" : "ltr" }]}>
-          {renderHeader()}
-
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.loadingText}>جاري تحميل المنتجات...</Text>
+        style={{
+          direction: "rtl",
+        }}
+        direction="rtl"
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        renderDrawerContent={() => (
+          <DrawerFilter
+            navigation={navigation}
+            setSwipeEnabled={setSwipeEnabled}
+            searchQueryProp={searchQuery}
+            selectedCategoryProp={selectedCategory}
+            priceRangeProp={priceRange}
+            selectedRatingProp={selectedRating}
+            sortByProp={sortBy}
+          />
+        )}
+        drawerPosition="right"
+        drawerStyle={{ width: "80%", paddingTop: 50 }}
+        swipeEnabled={swipeEnabled}
+      >
+        <SafeAreaView style={styles.area}>
+          <View
+            style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}
+          >
+            {/* {renderHeader()} */}
+            <Header title="جميع المنتجات" />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+              <Text style={styles.loadingText}>جاري تحميل المنتجات...</Text>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
-          </Drawer>
-
+        </SafeAreaView>
+      </Drawer>
     );
   }
 
   if (error) {
     return (
-        <Drawer
-      open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      renderDrawerContent={() => <DrawerFilter navigation={navigation} setSwipeEnabled={setSwipeEnabled}
-      searchQueryProp={searchQuery}
-      selectedCategoryProp={selectedCategory}
-      priceRangeProp={priceRange}
-      selectedRatingProp={selectedRating}
-      sortByProp={sortBy}
-      />}
-      drawerPosition="right"
-      drawerStyle={{ width: '80%' }}
-      swipeEnabled={swipeEnabled}
-      
-
-    >
-
-      <SafeAreaView style={styles.area}>
-        <View style={[styles.container,{ direction: isRTL ? "rtl" : "ltr" }]}>
-          {renderHeader()}
-          <View style={styles.errorContainer}>
-
-            <Text style={styles.errorText}>حدث خطأ في تحميل المنتجات</Text>
-            <TouchableOpacity
-              style={styles.retryButton}
-              onPress={handleRefresh}
-            >
-              <Text style={styles.retryButtonText}>إعادة المحاولة</Text>
-            </TouchableOpacity>
+      <Drawer
+        style={{
+          direction: "rtl",
+        }}
+        direction="rtl"
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        renderDrawerContent={() => (
+          <DrawerFilter
+            navigation={navigation}
+            setSwipeEnabled={setSwipeEnabled}
+            searchQueryProp={searchQuery}
+            selectedCategoryProp={selectedCategory}
+            priceRangeProp={priceRange}
+            selectedRatingProp={selectedRating}
+            sortByProp={sortBy}
+          />
+        )}
+        drawerPosition="right"
+        drawerStyle={{ width: "80%", paddingTop: 50 }}
+        swipeEnabled={swipeEnabled}
+      >
+        <SafeAreaView style={styles.area}>
+          <View
+            style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}
+          >
+            {/* {renderHeader()} */}
+            <Header title="جميع المنتجات" />
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>حدث خطأ في تحميل المنتجات</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={handleRefresh}
+              >
+                <Text style={styles.retryButtonText}>إعادة المحاولة</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
-    </Drawer>
+        </SafeAreaView>
+      </Drawer>
     );
   }
 
   return (
     <Drawer
+      style={{
+        direction: "rtl",
+      }}
+      direction="rtl"
       open={open}
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
-      renderDrawerContent={() => <DrawerFilter navigation={navigation} setSwipeEnabled={setSwipeEnabled}
-      searchQueryProp={searchQuery}
-      selectedCategoryProp={selectedCategory}
-      priceRangeProp={priceRange}
-      selectedRatingProp={selectedRating}
-      sortByProp={sortBy}
-      />}
-      drawerPosition="right"
-      drawerStyle={{ width: '80%' }}
-      swipeEnabled={swipeEnabled}
-      
-
-    >
-
-    <SafeAreaView style={styles.area}>
-      <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
-        {renderHeader()}
-        {renderSearchBar()}
-
-        <FlatList
-          data={allProducts}
-          renderItem={renderProduct}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.1}
-          ListFooterComponent={renderFooter}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={handleRefresh}
-              colors={[COLORS.primary]}
-              tintColor={COLORS.primary}
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>لا توجد منتجات متاحة</Text>
-            </View>
-          }
+      renderDrawerContent={() => (
+        <DrawerFilter
+          navigation={navigation}
+          setSwipeEnabled={setSwipeEnabled}
+          searchQueryProp={searchQuery}
+          selectedCategoryProp={selectedCategory}
+          priceRangeProp={priceRange}
+          selectedRatingProp={selectedRating}
+          sortByProp={sortBy}
         />
-      </View>
-    </SafeAreaView>
-        </Drawer>
+      )}
+      drawerPosition="right"
+      drawerStyle={{ width: "80%", paddingTop: 50 }}
+      swipeEnabled={swipeEnabled}
+    >
+      <SafeAreaView style={styles.area}>
+        <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
+          {/* {renderHeader()} */}
+          <Header title="جميع المنتجات" />
+          {renderSearchBar()}
 
+          <FlatList
+            data={allProducts}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={renderFooter}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetching}
+                onRefresh={handleRefresh}
+                colors={[COLORS.primary]}
+                tintColor={COLORS.primary}
+              />
+            }
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>لا توجد منتجات متاحة</Text>
+              </View>
+            }
+          />
+        </View>
+      </SafeAreaView>
+    </Drawer>
   );
 };
 

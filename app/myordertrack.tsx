@@ -2,20 +2,19 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Image,
   ImageSourcePropType,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-virtualized-view";
-import { COLORS, SIZES, icons, images } from "@/constants";
-import { NavigationProp } from "@react-navigation/native";
+import { COLORS, SIZES, icons } from "@/constants";
 import { Fontisto } from "@expo/vector-icons";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useLanguageContext } from "@/contexts/LanguageContext";
 import { useOneOrder, useOrderHistory } from "@/data/useOrders";
 import moment from "moment";
+import Header from "@/components/Header";
 
 // Order status enum
 export enum OrderStatus {
@@ -67,127 +66,115 @@ const ORDER_STATUS_STEPS = [
 ];
 
 const MyOrderTrack = () => {
-  const navigation = useNavigation<NavigationProp<any>>();
   const { t, isRTL } = useLanguageContext();
   const params = useLocalSearchParams();
 
   const orderId = params.orderId as string;
   const { data } = useOneOrder(orderId);
   const { data: history } = useOrderHistory(orderId);
-  console.log(orderId, "orderIdorderIdorderId");
 
   const currentStatus = data?.status;
 
-  /**
-   * Render header
-   */
-      const renderHeader = () => {
-     return (
-       <View style={styles.headerContainer}>
-         <View style={styles.headerLeft}>
-           <Image
-             source={images.logo as ImageSourcePropType}
-             resizeMode="contain"
-             style={styles.headerLogo}
-           />
-           <Text
-             style={[
-               styles.headerTitle,
-               {
-                 color: COLORS.greyscale900,
-               },
-             ]}
-           >
-             {t("Track Order")}
-           </Text>
-         </View>
-         <View style={styles.headerRight}>
-           {/* <TouchableOpacity>
-             <Image
-               source={icons.moreCircle as ImageSourcePropType}
-               resizeMode="contain"
-               style={[
-                 styles.moreCircleIcon,
-                 {
-                   tintColor: COLORS.greyscale900,
-                 },
-               ]}
-             />
-           </TouchableOpacity> */}
-         </View>
-       </View>
-     );
-   };
+  const getStatusColor = (status: OrderStatus) => {
+    switch (status) {
+      case OrderStatus.PENDING:
+        return COLORS.card;
+      case OrderStatus.CONFIRMED:
+      case OrderStatus.PROCESSING:
+      case OrderStatus.SHIPPED:
+      case OrderStatus.DELIVERED:
+      case OrderStatus.REFUNDED:
+        return COLORS.primary;
+      case OrderStatus.CANCELLED:
+        return COLORS.red;
+      default:
+        return COLORS.primary;
+    }
+  };
+
+  const getStatusLabel = (status: OrderStatus) => {
+    const statusStep = ORDER_STATUS_STEPS.find((step) => step.key === status);
+    if (!statusStep) return "";
+    return isRTL ? statusStep.label.ar : statusStep.label.en;
+  };
+
+  const getStatusEstimation = (status: OrderStatus) => {
+    const statusStep = ORDER_STATUS_STEPS.find((step) => step.key === status);
+    if (!statusStep) return "";
+    return isRTL ? statusStep.estimation.ar : statusStep.estimation.en;
+  };
 
   /**
    * Render order status steps
    */
 
   const renderOrderStatusSteps = () => {
-    // Find the index of the current status
-    const currentIndex = ORDER_STATUS_STEPS.findIndex(
-      (s) => s.key === currentStatus
-    );
-
-    // If delivered, filter out cancelled and refunded steps
-    let stepsToShow = ORDER_STATUS_STEPS;
-    if (
-      currentStatus != OrderStatus.CANCELLED &&
-      currentStatus != OrderStatus.REFUNDED
-    ) {
-      stepsToShow = ORDER_STATUS_STEPS.filter(
-        (step) =>
-          step.key !== OrderStatus.CANCELLED &&
-          step.key !== OrderStatus.REFUNDED
+    if (!history || history.length === 0) {
+      return (
+        <View style={styles.noHistoryContainer}>
+          <Text style={styles.noHistoryText}>
+            {isRTL ? "لا يوجد تاريخ حالة متاح" : "No status history available"}
+          </Text>
+        </View>
       );
     }
 
-    return (
-      <View style={{ marginVertical: 24 }}>
-        {history?.reverse()?.map((step: any, idx: any) => {
-          return (
-            <View key={step.key} style={styles.orderDetailsContainer}>
-              <View style={styles.orderViewContainer}>
-                <Fontisto
-                  name={"radio-btn-active"}
-                  size={24}
-                  color={COLORS.primary}
-                />
-                <View style={styles.orderView}>
-                  <View style={[styles.orderDetailsTitle]}>
-                    <Text
-                      style={[
-                        {
-                          fontSize: 18,
-                          fontFamily: "bold",
-                          marginHorizontal: 5,
-                          color: COLORS.primary,
-                        },
-                      ]}
-                    >
-                      {isRTL
-                        ? ORDER_STATUS_STEPS?.find(
-                            (item) => item.key == step?.newStatus
-                          )?.label?.ar
-                        : ORDER_STATUS_STEPS?.find(
-                            (item) => item.key == step?.newStatus
-                          )?.label?.en}
-                    </Text>
+    const reversedHistory = [...(history || [])].reverse();
 
-                    <Text style={{ color: COLORS?.gray, fontSize: 12 }}>
-                      {moment(step?.createdAt).format("YYYY-MM-DD")}
-                    </Text>
-                  </View>
-                  <Text style={styles.orderDetailsSubtitle}>
+    return (
+      <View style={styles.timelineContainer}>
+        {reversedHistory.map((step: any, idx: number) => {
+          const statusColor = getStatusColor(step?.newStatus || currentStatus);
+          const isLast = idx === reversedHistory.length - 1;
+
+          return (
+            <View key={step?.id || idx} style={styles.timelineItem}>
+              <View style={styles.timelineLeft}>
+                <View
+                  style={[
+                    styles.timelineIconContainer,
+                    { backgroundColor: statusColor + "20" },
+                  ]}
+                >
+                  <Fontisto
+                    name="radio-btn-active"
+                    size={20}
+                    color={statusColor}
+                  />
+                </View>
+                {!isLast && <View style={styles.timelineLine} />}
+              </View>
+              <View style={styles.timelineContent}>
+                <View style={styles.timelineHeaderRow}>
+                  <Text
+                    style={[styles.timelineStatusLabel, { color: statusColor }]}
+                  >
                     {isRTL
                       ? ORDER_STATUS_STEPS?.find(
-                          (item) => item.key == step?.newStatus
-                        )?.estimation?.ar
+                          (item) => item.key === step?.newStatus
+                        )?.label?.ar
                       : ORDER_STATUS_STEPS?.find(
-                          (item) => item.key == step?.newStatus
-                        )?.estimation?.en}{" "}
+                          (item) => item.key === step?.newStatus
+                        )?.label?.en}
+                  </Text>
+                  <Text style={styles.timelineDate}>
+                    {moment(step?.createdAt).format("YYYY-MM-DD")}
                   </Text>
                 </View>
+                <Text style={styles.timelineDescription}>
+                  {isRTL
+                    ? ORDER_STATUS_STEPS?.find(
+                        (item) => item.key === step?.newStatus
+                      )?.estimation?.ar
+                    : ORDER_STATUS_STEPS?.find(
+                        (item) => item.key === step?.newStatus
+                      )?.estimation?.en}
+                </Text>
+                {step?.createdAt && (
+                  <Text style={styles.timelineTime}>
+                    {moment(step.createdAt).format("HH:mm")}
+                  </Text>
+                )}
               </View>
             </View>
           );
@@ -203,72 +190,193 @@ const MyOrderTrack = () => {
         { backgroundColor: COLORS.white, direction: isRTL ? "rtl" : "ltr" },
       ]}
     >
+      <Header title={t("Track Order")} />
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        {renderHeader()}
+        {/* {renderHeader()} */}
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={[styles.bottomContainer]}>
-            <View style={styles.separateLine} />
-            <View style={styles.summaryViewContainer}>
-              <View style={styles.viewItemContainer}>
-                <View style={styles.viewIconContainer}>
-                  <Image
-                    source={icons.document2 as ImageSourcePropType}
-                    resizeMode="contain"
-                    style={styles.viewIcon}
-                  />
+            {/* Main Order Card - Combined */}
+            <View style={styles.mainOrderCard}>
+              {/* Current Status */}
+              {currentStatus && (
+                <View style={styles.currentStatusSection}>
+                  <View style={styles.currentStatusHeader}>
+                    <View style={styles.statusIndicatorContainer}>
+                      <View
+                        style={[
+                          styles.statusIndicator,
+                          {
+                            backgroundColor:
+                              getStatusColor(currentStatus) + "20",
+                          },
+                        ]}
+                      >
+                        <View
+                          style={[
+                            styles.statusDot,
+                            { backgroundColor: getStatusColor(currentStatus) },
+                          ]}
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.currentStatusInfo}>
+                      <Text style={styles.currentStatusLabel}>
+                        {getStatusLabel(currentStatus)}
+                      </Text>
+                      <Text style={styles.currentStatusEstimation}>
+                        {getStatusEstimation(currentStatus)}
+                      </Text>
+                    </View>
+                  </View>
+                  {data?.createdAt && (
+                    <Text style={styles.orderDate}>
+                      {moment(data.createdAt).format("YYYY-MM-DD")}
+                    </Text>
+                  )}
                 </View>
-                <Text
-                  style={[styles.viewTitle, { color: COLORS.greyscale900 }]}
-                >
-                  {data?.orderNumber}
-                </Text>
-                <Text
-                  style={[styles.viewSubtitle, { color: COLORS.grayscale700 }]}
-                >
-                  {t("Order Num")}
-                </Text>
-              </View>
-              <View style={styles.viewItemContainer}>
-                <View style={styles.viewIconContainer}>
-                  <Image
-                    source={icons.clockTime as ImageSourcePropType}
-                    resizeMode="contain"
-                    style={styles.viewIcon}
-                  />
+              )}
+
+              {/* Order Summary Icons */}
+              <View style={styles.summaryViewContainer}>
+                <View style={styles.viewItemContainer}>
+                  <View style={styles.viewIconContainer}>
+                    <Image
+                      source={icons.document2 as ImageSourcePropType}
+                      resizeMode="contain"
+                      style={styles.viewIcon}
+                    />
+                  </View>
+                  <Text
+                    style={[styles.viewTitle, { color: COLORS.greyscale900 }]}
+                  >
+                    {data?.orderNumber || "N/A"}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.viewSubtitle,
+                      { color: COLORS.grayscale700 },
+                    ]}
+                  >
+                    {t("Order Num")}
+                  </Text>
                 </View>
-                <Text
-                  style={[styles.viewTitle, { color: COLORS.greyscale900 }]}
-                >
-                  15 - 30 {t("Min")}
-                </Text>
-                <Text
-                  style={[styles.viewSubtitle, { color: COLORS.grayscale700 }]}
-                >
-                  {t("Estimatation")}
-                </Text>
-              </View>
-              <View style={styles.viewItemContainer}>
-                <View style={styles.viewIconContainer}>
-                  <Image
-                    source={icons.payment as ImageSourcePropType}
-                    resizeMode="contain"
-                    style={styles.viewIcon}
-                  />
+                <View style={styles.viewItemContainer}>
+                  <View style={styles.viewIconContainer}>
+                    <Image
+                      source={icons.clockTime as ImageSourcePropType}
+                      resizeMode="contain"
+                      style={styles.viewIcon}
+                    />
+                  </View>
+                  <Text
+                    style={[styles.viewTitle, { color: COLORS.greyscale900 }]}
+                  >
+                    15 - 30 {t("Min")}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.viewSubtitle,
+                      { color: COLORS.grayscale700 },
+                    ]}
+                  >
+                    {t("Estimatation")}
+                  </Text>
                 </View>
-                <Text
-                  style={[styles.viewTitle, { color: COLORS.greyscale900 }]}
-                >
-                  {t(data?.paymentMethod)}
-                </Text>
-                <Text
-                  style={[styles.viewSubtitle, { color: COLORS.grayscale700 }]}
-                >
-                  {t("Payment Method")}
-                </Text>
+                <View style={styles.viewItemContainer}>
+                  <View style={styles.viewIconContainer}>
+                    <Image
+                      source={icons.payment as ImageSourcePropType}
+                      resizeMode="contain"
+                      style={styles.viewIcon}
+                    />
+                  </View>
+                  <Text
+                    style={[styles.viewTitle, { color: COLORS.greyscale900 }]}
+                  >
+                    {data?.paymentMethod
+                      ? t(data.paymentMethod)
+                      : t("Cash on Delivery")}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.viewSubtitle,
+                      { color: COLORS.grayscale700 },
+                    ]}
+                  >
+                    {t("Payment Method")}
+                  </Text>
+                </View>
               </View>
+
+              {/* Divider */}
+              <View style={styles.cardDivider} />
+
+              {/* Additional Order Information */}
+              <View style={styles.additionalInfoSection}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t("Total")}</Text>
+                  <Text style={styles.infoValue}>
+                    {data?.total || data?.totalPrice || 0} {t("EGP")}
+                  </Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t("Items")}</Text>
+                  <Text style={styles.infoValue}>
+                    {data?.items?.length || data?.orderItems?.length || 0}{" "}
+                    {t("Items")}
+                  </Text>
+                </View>
+                {data?.createdAt && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>{t("Date")}</Text>
+                    <Text style={styles.infoValue}>
+                      {moment(data.createdAt).format("YYYY-MM-DD HH:mm")}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Shipping Address */}
+              {data?.shippingAddress && (
+                <>
+                  <View style={styles.cardDivider} />
+                  <View style={styles.addressSection}>
+                    <View style={styles.addressHeader}>
+                      <Image
+                        source={icons.location as ImageSourcePropType}
+                        resizeMode="contain"
+                        style={styles.addressIcon}
+                      />
+                      <Text style={styles.addressTitle}>{t("Address")}</Text>
+                    </View>
+                    <Text style={styles.addressText}>
+                      {data.shippingAddress.street || ""}
+                      {data.shippingAddress.street && data.shippingAddress.city
+                        ? ", "
+                        : ""}
+                      {data.shippingAddress.city || ""}
+                      {data.shippingAddress.city && data.shippingAddress.state
+                        ? " - "
+                        : ""}
+                      {data.shippingAddress.state || ""}
+                    </Text>
+                    {data.shippingAddress.phone && (
+                      <Text style={styles.addressPhone}>
+                        {t("Phone")}: {data.shippingAddress.phone}
+                      </Text>
+                    )}
+                  </View>
+                </>
+              )}
             </View>
-            <View style={styles.separateLine} />
-            {renderOrderStatusSteps()}
+
+            {/* Order Status Timeline */}
+            <View style={styles.timelineSection}>
+              <Text style={styles.timelineTitle}>
+                {isRTL ? "حالة الطلب" : "Order Status"}
+              </Text>
+              {renderOrderStatusSteps()}
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -306,7 +414,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   headerTitle: {
-     fontSize: 20,
+    fontSize: 20,
     fontFamily: "bold",
     color: COLORS.black,
     marginHorizontal: 12,
@@ -316,7 +424,34 @@ const styles = StyleSheet.create({
     height: 24,
     tintColor: COLORS.black,
   },
-  bottomContainer: {},
+  bottomContainer: {
+    paddingBottom: 20,
+  },
+  mainOrderCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: COLORS.greyscale300,
+  },
+  currentStatusSection: {
+    marginBottom: 20,
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: COLORS.greyscale300,
+    marginVertical: 16,
+  },
+  additionalInfoSection: {
+    marginTop: 4,
+  },
+  addressSection: {
+    marginTop: 4,
+  },
+  timelineSection: {
+    marginTop: 8,
+  },
   btn: {
     width: SIZES.width - 32,
     marginTop: 12,
@@ -385,7 +520,7 @@ const styles = StyleSheet.create({
   },
   separateLine: {
     height: 0.4,
-    width: SIZES.width - 32,
+    width: "100%",
     backgroundColor: COLORS.greyscale300,
     marginVertical: 12,
   },
@@ -646,10 +781,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: SIZES.width - 32,
+    width: "100%",
+    marginTop: 8,
+    marginBottom: 4,
   },
   viewItemContainer: {
     alignItems: "center",
+    flex: 1,
   },
   viewIconContainer: {
     height: 64,
@@ -676,15 +814,175 @@ const styles = StyleSheet.create({
     fontFamily: "medium",
     color: COLORS.grayscale700,
   },
-    headerRight: {
+  headerRight: {
     flexDirection: "row",
     alignItems: "center",
   },
-    headerLogo: {
+  headerLogo: {
     height: 36,
     width: 36,
     tintColor: COLORS.primary,
-  }
+  },
+  currentStatusHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  statusIndicatorContainer: {
+    marginEnd: 12,
+  },
+  statusIndicator: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statusDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  currentStatusInfo: {
+    flex: 1,
+  },
+  currentStatusLabel: {
+    fontSize: 18,
+    fontFamily: "bold",
+    color: COLORS.greyscale900,
+    marginBottom: 4,
+  },
+  currentStatusEstimation: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.grayscale700,
+  },
+  orderDate: {
+    fontSize: 12,
+    fontFamily: "regular",
+    color: COLORS.gray,
+    marginTop: 4,
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    paddingVertical: 4,
+  },
+  infoLabel: {
+    fontSize: 14,
+    fontFamily: "medium",
+    color: COLORS.grayscale700,
+  },
+  infoValue: {
+    fontSize: 16,
+    fontFamily: "bold",
+    color: COLORS.greyscale900,
+  },
+  addressHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  addressIcon: {
+    width: 20,
+    height: 20,
+    tintColor: COLORS.primary,
+    marginEnd: 8,
+  },
+  addressTitle: {
+    fontSize: 16,
+    fontFamily: "bold",
+    color: COLORS.greyscale900,
+  },
+  addressText: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.greyscale900,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  addressPhone: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.grayscale700,
+  },
+  timelineHeader: {
+    marginBottom: 12,
+  },
+  timelineTitle: {
+    fontSize: 18,
+    fontFamily: "bold",
+    color: COLORS.greyscale900,
+  },
+  timelineContainer: {
+    marginTop: 8,
+  },
+  timelineItem: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  timelineLeft: {
+    alignItems: "center",
+    marginEnd: 16,
+  },
+  timelineIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  timelineLine: {
+    width: 2,
+    flex: 1,
+    backgroundColor: COLORS.greyscale300,
+    marginTop: 4,
+    minHeight: 30,
+  },
+  timelineContent: {
+    flex: 1,
+    paddingTop: 2,
+  },
+  timelineHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  timelineStatusLabel: {
+    fontSize: 16,
+    fontFamily: "bold",
+    flex: 1,
+  },
+  timelineDate: {
+    fontSize: 12,
+    fontFamily: "regular",
+    color: COLORS.gray,
+  },
+  timelineDescription: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.grayscale700,
+    marginBottom: 4,
+  },
+  timelineTime: {
+    fontSize: 12,
+    fontFamily: "regular",
+    color: COLORS.gray,
+  },
+  noHistoryContainer: {
+    padding: 20,
+    alignItems: "center",
+    marginLeft: 12,
+  },
+  noHistoryText: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.gray,
+    textAlign: "center",
+  },
 });
 
 export default MyOrderTrack;

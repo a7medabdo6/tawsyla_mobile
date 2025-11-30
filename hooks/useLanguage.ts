@@ -1,20 +1,9 @@
-import { useState, useEffect } from "react";
-import { I18nManager } from "react-native";
+import { useState } from "react";
 import { translations, Language } from "../constants/translations";
 
 export const useLanguage = () => {
   const [currentLanguage, setCurrentLanguage] = useState<Language>("ar");
   const [isRTL, setIsRTL] = useState(true);
-
-  useEffect(() => {
-    // Set RTL based on language
-    const shouldBeRTL = currentLanguage === "ar";
-    if (shouldBeRTL !== isRTL) {
-      setIsRTL(shouldBeRTL);
-      // Force RTL layout change
-      I18nManager.forceRTL(shouldBeRTL);
-    }
-  }, [currentLanguage, isRTL]);
 
   const t = (key: string) => {
     const keys = key?.split(".") || [];

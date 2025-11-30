@@ -206,6 +206,15 @@ export const translations = {
     "coupon code": "Coupon Code",
     Login: "Login",
     "You must login to view your cart": "You must login to view your cart",
+    "You must login to view your Cart": "You must login to view your Cart",
+    "Order Failed": "Order Failed",
+    "Order Successful": "Order Successful",
+    "Something went wrong, please try again later":
+      "Something went wrong, please try again later",
+    "Order confirmed successfully, we will notify you when it is ready for shipping or pickup. Thank you for shopping with us!":
+      "Order confirmed successfully, we will notify you when it is ready for shipping or pickup. Thank you for shopping with us!",
+    "Try Again": "Try Again",
+    Continue: "Continue",
   },
   ar: {
     // Onboarding
@@ -426,6 +435,8 @@ export const translations = {
     Login: "تسجيل الدخول",
     "You must login to view your cart":
       "يجب عليك تسجيل الدخول لعرض سلة التسوق الخاصة بك",
+    "You must login to view your Cart":
+      "يجب عليك تسجيل الدخول لعرض سلة التسوق الخاصة بك",
     "Invalid coupon code": "رمز القسيمة غير صالح",
     "Please login to make this Action": "يرجى تسجيل الدخول للقيام بهذا الإجراء",
     "You must login to view your Favourite":
@@ -446,11 +457,23 @@ export const translations = {
     Qty: "الكمية",
     Image: "الصورة",
     "Order Details": "تفاصيل الطلب",
-    "You must login to view your Orders": "You must login to view your Orders",
+    "You must login to view your Orders": "يجب عليك تسجيل الدخول لعرض طلباتك",
     "Select Address": "حدد العنوان",
-    "Confirm": "تأكيد",
+    Confirm: "تأكيد",
     "Go to my order": "طلباتي",
     "My Orders": "طلباتي",
+    "Order Success": "تم الطلب بنجاح",
+    "Order Failed": "فشل الطلب",
+    "Add New": "أضف جديد",
+    "Confirm Selection": "تأكيد اختيار",
+    "Enter Promo Code": "أدخل رمز القسيمة",
+    "Order Successful": "تم الطلب بنجاح",
+    "Something went wrong, please try again later":
+      "حدث خطأ ما، يرجى المحاولة مرة أخرى لاحقاً",
+    "Order confirmed successfully, we will notify you when it is ready for shipping or pickup. Thank you for shopping with us!":
+      "تم تأكيد الطلب بنجاح، سنقوم بإعلامك عندما يكون جاهزاً للشحن أو الاستلام. شكراً لتسوقك معنا!",
+    "Try Again": "حاول مرة أخرى",
+    Continue: "استمرار",
   },
 };
 

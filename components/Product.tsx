@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { AntDesign, FontAwesome } from "@expo/vector-icons"; // You can also use other icon libraries
 import { COLORS } from "@/constants";
 import { useRouter } from "expo-router";
@@ -103,7 +110,7 @@ const ProductCard = ({
 
   const toggleDropdown = () => {
     if (isAdded) return;
-    
+
     // Close any other open dropdown
     if (currentOpenDropdown && currentOpenDropdown !== productId) {
       const closeOther = dropdownCallbacks.get(currentOpenDropdown);
@@ -121,11 +128,11 @@ const ProductCard = ({
 
     Animated.parallel([
       Animated.spring(dropdownTranslateY, {
-    toValue: toValue === 1 ? 0 : -50, // slide down from above
-    useNativeDriver: true,
-    tension: 50,
-    friction: 7,
-  }),
+        toValue: toValue === 1 ? 0 : -50, // slide down from above
+        useNativeDriver: true,
+        tension: 50,
+        friction: 7,
+      }),
 
       // Animated.spring(dropdownHeight, {
       //   toValue: toValue * 120,
@@ -160,8 +167,7 @@ const ProductCard = ({
         variantId: firstVariantId,
         quantity,
       });
-      
-      
+
       // setIsAdded(true);
       // currentOpenDropdown = null;
       // closeDropdown();
@@ -169,7 +175,7 @@ const ProductCard = ({
       console.log(error);
       if (error?.response?.status === 401) {
         // Redirect to login page when unauthorized
-        router.push('/login');
+        router.push("/login");
       }
     }
   };
@@ -193,7 +199,14 @@ const ProductCard = ({
 
   return (
     <View style={[styles.card, style]}>
-      <TouchableOpacity style={styles.heartIcon} onPress={toggleFavourite}>
+      <TouchableOpacity
+        style={styles.heartIcon}
+        onPress={
+          authStatus?.isAuthenticated
+            ? () => toggleFavourite()
+            : () => router.push("/login")
+        }
+      >
         <AntDesign
           name={isFav ? "heart" : "hearto"}
           size={22}
@@ -214,7 +227,9 @@ const ProductCard = ({
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleProductPress}>
-        <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">{name}</Text>
+        <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+          {name}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.ratingContainer}>
@@ -229,11 +244,14 @@ const ProductCard = ({
       </View>
 
       <Text style={styles.price}>{getFirstVariantPrice(varints)} ج.م</Text>
-      
+
       <TouchableOpacity
         style={styles.addButton}
-        onPress={authStatus?.isAuthenticated ?        ()=>      handleAddToCart(1)
- :()=> router.push("/login")}
+        onPress={
+          authStatus?.isAuthenticated
+            ? () => handleAddToCart(1)
+            : () => router.push("/login")
+        }
         disabled={isPending || isAdded}
       >
         <AntDesign name={isAdded ? "check" : "plus"} size={18} color="#fff" />
@@ -245,37 +263,52 @@ const ProductCard = ({
           styles.dropdown,
           {
             opacity: dropdownOpacity,
-                transform: [{ translateY: dropdownTranslateY }],
-
+            transform: [{ translateY: dropdownTranslateY }],
           },
         ]}
         pointerEvents={showDropdown ? "auto" : "none"}
       >
-        <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center"}}>  
-            <TouchableOpacity
-              onPress={() => {
-                setQty(qty+1);
-              handleAddToCart(qty+1);
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              setQty(qty + 1);
+              handleAddToCart(qty + 1);
             }}
-            style={{backgroundColor:COLORS.primary,padding:5,borderRadius:50}}
-      >
-        <AntDesign name={ "plus"} size={18} color="#fff" />
-      </TouchableOpacity>
-      <Text style={{fontSize:16,fontWeight:"bold",color:COLORS.primary}}>{qty}</Text>
-      <TouchableOpacity
-      disabled={qty==0}
-       onPress={() => {
-                setQty(qty-1);
-              handleAddToCart(qty-1);
+            style={{
+              backgroundColor: COLORS.primary,
+              padding: 5,
+              borderRadius: 50,
             }}
-            style={{backgroundColor:COLORS.primary,padding:5,borderRadius:50,opacity:qty==0?0.5:1}}
-      >
-        <AntDesign name={"minus"} size={18} color="#fff" />
-      </TouchableOpacity>
-
-          
+          >
+            <AntDesign name={"plus"} size={18} color="#fff" />
+          </TouchableOpacity>
+          <Text
+            style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}
+          >
+            {qty}
+          </Text>
+          <TouchableOpacity
+            disabled={qty == 0}
+            onPress={() => {
+              setQty(qty - 1);
+              handleAddToCart(qty - 1);
+            }}
+            style={{
+              backgroundColor: COLORS.primary,
+              padding: 5,
+              borderRadius: 50,
+              opacity: qty == 0 ? 0.5 : 1,
+            }}
+          >
+            <AntDesign name={"minus"} size={18} color="#fff" />
+          </TouchableOpacity>
         </View>
-        
       </Animated.View>
     </View>
   );
@@ -302,7 +335,7 @@ const styles = StyleSheet.create({
   heartIcon: {
     position: "absolute",
     top: 12,
-    left: 12,
+    end: 12,
     zIndex: 222222,
   },
   imageContainer: {
@@ -347,8 +380,8 @@ const styles = StyleSheet.create({
   name: {
     fontWeight: "bold",
     fontSize: 14,
-    marginBottom: 4,
-    marginTop:3,
+    marginBottom: 20,
+    marginTop: 10,
     // width: "100%",
     // paddingRight: 5,
     color: COLORS.black,
@@ -360,7 +393,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     width: "100%",
     paddingRight: 5,
-    display:"none"
+    display: "none",
   },
   price: {
     color: COLORS.primary,
@@ -370,13 +403,13 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   addButton: {
-    backgroundColor:COLORS.primary,
+    backgroundColor: COLORS.primary,
     padding: 8,
     position: "absolute",
     bottom: 0,
-    left: 0,
-    borderTopRightRadius: 6,
-    borderBottomLeftRadius: 16,
+    end: 0,
+    borderTopEndRadius: 6,
+    borderBottomStartRadius: 16,
     zIndex: 10,
   },
   dropdown: {
@@ -398,8 +431,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     minWidth: 130,
-    paddingHorizontal:12,
-    paddingVertical:8
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   dropdownTitle: {
     fontSize: 12,

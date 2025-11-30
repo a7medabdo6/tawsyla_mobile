@@ -4,47 +4,98 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  FlatList,
   Dimensions,
-  ActivityIndicator,
-  ImageBackground,
 } from "react-native";
-import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useEffect, useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import { COLORS, SIZES, icons, images } from "@/constants";
 import { Image } from "expo-image";
 import { NavigationProp } from "@react-navigation/native";
 import SubHeaderItem from "@/components/SubHeaderItem";
-import { transactionHistory, useAuthStatus } from "@/data";
-import TransactionHistoryCard from "@/components/TransactionHistoryCard";
+import { useAuthStatus } from "@/data";
+import TabScreenWrapper from "@/components/TabScreenWrapper";
 import { useNavigation, useFocusEffect } from "expo-router";
 import Carousel from "react-native-reanimated-carousel";
 import { useLanguageContext } from "@/contexts/LanguageContext";
 import CategoryCarousel from "@/components/CategoryList";
 import Spinner from "react-native-loading-spinner-overlay";
-import ProductCard from "@/components/Product";
-import { useBanners, useProducts } from "@/data/useHome";
+import { useBanners } from "@/data/useHome";
 import ProductHomeList from "@/components/ProductHomeList";
 import { useAppStatus } from "@/data/useAppStatus";
-import { useQueryClient } from "@tanstack/react-query";
 import MasterCategory from "@/components/MasterCategory";
 import DrawerFilter from "@/components/drawer";
 import { Drawer } from "react-native-drawer-layout";
-const orange = require("../../assets/images/orange.png");
+import Skeleton from "@/components/Skeleton";
+
+const { width } = Dimensions.get("window");
+
+const RenderWalletCard = ({ item }: any) => {
+  return (
+    <View style={styles.item}>
+      <Image
+        style={styles.cardContainer}
+        source={{ uri: `http://159.65.75.17:3000${item.image?.path}` }}
+        resizeMode="cover"
+      />
+    </View>
+  );
+};
+
+const CarouselExample = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const { data, isLoading } = useBanners();
+
+  if (isLoading) {
+    return (
+      <View style={styles.containerCar}>
+        <Skeleton width={width - 32} height={180} borderRadius={10} />
+      </View>
+    );
+  }
+
+  return (
+    <View
+      style={{
+        ...styles.containerCar,
+        display: data?.length > 0 ? "flex" : "flex",
+      }}
+    >
+      <Carousel
+        loop
+        width={width}
+        height={180}
+        onSnapToItem={(index) => setCurrentIndex(index)}
+        autoPlay={false}
+        data={data}
+        autoPlayReverse={true}
+        pagingEnabled
+        scrollAnimationDuration={1000}
+        renderItem={({ index, item }) => <RenderWalletCard item={item} />}
+      />
+      <View style={styles.pagination}>
+        {data?.map((_: any, index: any) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              currentIndex === index ? styles.activeDot : null,
+            ]}
+          />
+        ))}
+      </View>
+    </View>
+  );
+};
 
 const Home = () => {
   const navigation = useNavigation<NavigationProp<any>>();
-  const { t, isRTL } = useLanguageContext();
-  const [loader, setLoader] = useState(false);
-  const queryClient = useQueryClient();
-  const { data: authStatus, isLoading } = useAuthStatus();
+  const { isRTL } = useLanguageContext();
+  const [loader] = useState(false);
+  const { data: authStatus } = useAuthStatus();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const { data: appStatus, refetch } = useAppStatus();
+  const { refetch } = useAppStatus();
   const [open, setOpen] = useState(false);
-const [swipeEnabled, setSwipeEnabled] = useState(true);
+  const [swipeEnabled, setSwipeEnabled] = useState(true);
 
   // Refetch app status each time the screen is focused
   useFocusEffect(
@@ -57,68 +108,22 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
    * Render header
    */ // CarouselExample.tsx
 
-  const { width } = Dimensions.get("window");
-
-  const colors = ["#FF6B6B", "#4ECDC4", "#1A535C", "#FFFCB9"];
-  const RenderWalletCard = ({ item }: any) => {
-    // console.log(item.image?.path,'itemitem');
-    return (
-      <View style={styles.item}>
-        <Image
-          style={styles.cardContainer}
-          source={{ uri: `http://159.65.75.17:3000${item.image?.path}` }}
-           resizeMode="cover"
-        />
-
-         
-        {/* </ImageBackground> */}
-      </View>
-    );
-  };
-  const CarouselExample = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const { data } = useBanners();
-
-    return (
-      <View style={{...styles.containerCar,display:data?.length > 0 ? "flex" : "flex"}}>
-        <Carousel
-          loop
-          width={width}
-          height={180}
-          onSnapToItem={(index) => setCurrentIndex(index)}
-          autoPlay={false}
-          data={data}
-          autoPlayReverse={true}
-          pagingEnabled
-          scrollAnimationDuration={1000}
-          renderItem={({ index, item }) => <RenderWalletCard item={item} />}
-        />
-        <View style={styles.pagination}>
-          {data?.map((_: any, index: any) => (
-            <View
-              key={index}
-              style={[
-                styles.dot,
-                currentIndex === index ? styles.activeDot : null,
-              ]}
-            />
-          ))}
-        </View>
-      </View>
-    );
-  };
-
   const renderHeader = () => {
     return (
-      <View style={styles.headerContainer}>
+      <View
+        style={[styles.headerContainer, { direction: isRTL ? "rtl" : "ltr" }]}
+      >
         {authStatus?.user ? (
           <View style={styles.viewLeft}>
-            <Image
-              source={images.user1}
-              contentFit="contain"
-              style={styles.userIcon}
-            />
+            <View style={styles.userIconWrapper}>
+              <Image
+                source={images.user1}
+                contentFit="cover"
+                style={styles.userIcon}
+              />
+            </View>
             <View style={styles.viewNameContainer}>
+              <Text style={styles.greeting}>مرحباً بك 👋</Text>
               <Text
                 style={[
                   styles.title,
@@ -133,12 +138,21 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
           </View>
         ) : (
           <View style={styles.viewLeft}>
-            <TouchableOpacity onPress={() => navigation.navigate("login")}>
-              <Image
-                source={images.user1}
-                contentFit="contain"
-                style={styles.userIcon}
-              />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("login")}
+              style={styles.loginPromptContainer}
+            >
+              <View style={styles.userIconWrapper}>
+                <Image
+                  source={images.user1}
+                  contentFit="cover"
+                  style={styles.userIcon}
+                />
+              </View>
+              <View style={styles.viewNameContainer}>
+                <Text style={styles.greeting}>مرحباً! 👋</Text>
+                <Text style={styles.loginPromptText}>سجل دخولك الآن</Text>
+              </View>
             </TouchableOpacity>
           </View>
         )}
@@ -146,6 +160,7 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
         <View style={styles.viewRight}>
           <TouchableOpacity
             onPress={() => navigation.navigate("notifications")}
+            style={styles.notificationButton}
           >
             <Image
               source={icons.notificationBell2}
@@ -159,18 +174,9 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
   };
 
   /**
-   * Render wallet card
-   */
-
-  /**
    * Render search bar
    */
   const renderSearchBar = () => {
-    const handleInputFocus = () => {
-      // Redirect to another screen
-      // navigation.navigate("trackidnumber");
-    };
-
     return (
       <View style={styles.searchContainer}>
         <TouchableOpacity
@@ -209,7 +215,6 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
         <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setOpen((prevOpen) => !prevOpen)}
-          // onPress={() => navigation.navigate("filters" as any)}
         >
           <Image
             source={icons.filter}
@@ -221,147 +226,28 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
     );
   };
 
-  // const renderServices = () => {
-  //   return (
-  //     <View>
-  //       <View style={styles.rowContainer}>
-  //         <TouchableOpacity
-  //           onPress={() => navigation.navigate("orderform")}
-  //           style={styles.serviceContainer}
-  //         >
-  //           <View style={styles.iconContainer}>
-  //             <Image
-  //               source={icons.editService2}
-  //               contentFit="contain"
-  //               style={styles.icon}
-  //             />
-  //           </View>
-  //           <Text
-  //             style={[
-  //               styles.serviceTitle,
-  //               {
-  //                 color: COLORS.black,
-  //               },
-  //             ]}
-  //           >
-  //             Make Order
-  //           </Text>
-  //         </TouchableOpacity>
-  //         <TouchableOpacity
-  //           onPress={() => navigation.navigate("checkrates")}
-  //           style={styles.serviceContainer}
-  //         >
-  //           <View style={styles.iconContainer}>
-  //             <Image
-  //               source={icons.dollarSymbol}
-  //               contentFit="contain"
-  //               style={styles.icon}
-  //             />
-  //           </View>
-  //           <Text
-  //             style={[
-  //               styles.serviceTitle,
-  //               {
-  //                 color: COLORS.black,
-  //               },
-  //             ]}
-  //           >
-  //             Check Rates
-  //           </Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //       <View style={styles.rowContainer}>
-  //         <TouchableOpacity
-  //           onPress={() => navigation.navigate("nearbydrop")}
-  //           style={styles.serviceContainer}
-  //         >
-  //           <View style={styles.iconContainer}>
-  //             <Image
-  //               source={icons.pin}
-  //               contentFit="contain"
-  //               style={styles.icon}
-  //             />
-  //           </View>
-  //           <Text
-  //             style={[
-  //               styles.serviceTitle,
-  //               {
-  //                 color: COLORS.black,
-  //               },
-  //             ]}
-  //           >
-  //             Nearby Drop
-  //           </Text>
-  //         </TouchableOpacity>
-  //         <TouchableOpacity
-  //           onPress={() => navigation.navigate("settingshelpcenter")}
-  //           style={styles.serviceContainer}
-  //         >
-  //           <View style={styles.iconContainer}>
-  //             <Image
-  //               source={icons.dollarSymbol}
-  //               contentFit="contain"
-  //               style={styles.icon}
-  //             />
-  //           </View>
-  //           <Text
-  //             style={[
-  //               styles.serviceTitle,
-  //               {
-  //                 color: COLORS.black,
-  //               },
-  //             ]}
-  //           >
-  //             Help Center
-  //           </Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //     </View>
-  //   );
-  // };
-  /**
-   * render transaction history
-   */
-  // const renderTransactionHistory = () => {
-  //   return (
-  //     <View>
-  //       <SubHeaderItem
-  //         title="Transaction History"
-  //         navTitle="See All"
-  //         onPress={() => navigation.navigate("transactionhistory")}
-  //       />
-  //       <FlatList
-  //         data={transactionHistory.slice(0, 5)}
-  //         keyExtractor={(item) => item.id}
-  //         renderItem={({ item }) => (
-  //           <TransactionHistoryCard
-  //             title={item.title}
-  //             description={item.description}
-  //             date={item.date}
-  //             type={item.type}
-  //             onPress={() => console.log("Click")}
-  //           />
-  //         )}
-  //       />
-  //     </View>
-  //   );
-  // };
- 
-
   return (
     <Drawer
+      style={{
+        direction: "rtl",
+      }}
+      direction="rtl"
       open={open}
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
-      renderDrawerContent={() => <DrawerFilter navigation={navigation} setSwipeEnabled={setSwipeEnabled} />}
+      renderDrawerContent={() => (
+        <DrawerFilter
+          navigation={navigation}
+          setSwipeEnabled={setSwipeEnabled}
+        />
+      )}
       drawerPosition="right"
-      drawerStyle={{ width: '80%' }}
+      drawerStyle={{ width: "80%", paddingTop: 50 }}
       swipeEnabled={swipeEnabled}
-      
       // drawerLockMode={swipeEnabled ? "unlocked" : "locked-closed"}
-
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+      <TabScreenWrapper>
+        {renderHeader()}
         <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
           <Spinner
             visible={loader}
@@ -369,7 +255,6 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
             color={COLORS.white}
             textStyle={styles.spinnerTextStyle}
           />
-          {renderHeader()}
           <ScrollView showsVerticalScrollIndicator={false}>
             {renderSearchBar()}
             <CarouselExample />
@@ -394,38 +279,21 @@ const [swipeEnabled, setSwipeEnabled] = useState(true);
                 navTitle="عرض الكل"
                 onPress={() => navigation.navigate("allproducts")}
               />
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  width: "100%",
-                  justifyContent: "space-between",
-                }}
-              >
-                <ProductHomeList />
-              </View>
+              <ProductHomeList />
             </View>
-
-            {/* {renderWalletCard()} */}
-            {/* {renderServices()}
-            {renderTransactionHistory()} */}
           </ScrollView>
         </View>
-      </SafeAreaView>
+      </TabScreenWrapper>
     </Drawer>
   );
 };
 
 const styles = StyleSheet.create({
   searchContainer: {
-    // paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    // backgroundColor: COLORS.paleGreen,
-    // backgroundColor: "#ccc",
+    gap: 10,
   },
   searchBarContainer: {
     flexDirection: "row",
@@ -433,7 +301,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.paleGreenDark,
     borderWidth: 2,
     borderRadius: 14,
-    // paddingHorizontal: 16,
     height: 48,
     width: "100%",
   },
@@ -494,47 +361,89 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
     padding: 16,
   },
   headerContainer: {
     flexDirection: "row",
-    width: SIZES.width - 32,
+    width: "100%",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.paleGreenDark,
+  },
+  userIconWrapper: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.primary,
+    padding: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: COLORS.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
   userIcon: {
-    width: 35,
-    height: 35,
-    borderRadius: 32,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.white,
   },
   viewLeft: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
-  greeeting: {
-    fontSize: 12,
+  greeting: {
+    fontSize: 13,
     fontFamily: "regular",
-    color: "gray",
-    marginBottom: 4,
+    color: COLORS.gray,
+    marginBottom: 2,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: "bold",
     color: COLORS.greyscale900,
   },
   viewNameContainer: {
     marginHorizontal: 12,
+    flex: 1,
+  },
+  loginPromptContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  loginPromptText: {
+    fontSize: 16,
+    fontFamily: "semiBold",
+    color: COLORS.primary,
   },
   viewRight: {
     flexDirection: "row",
     alignItems: "center",
   },
+  notificationButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.paleGreen,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: COLORS.paleGreenDark,
+  },
   bellIcon: {
-    height: 24,
-    width: 24,
+    height: 22,
+    width: 22,
     tintColor: COLORS.black,
-    marginRight: 8,
   },
   bookmarkIcon: {
     height: 24,
@@ -549,9 +458,8 @@ const styles = StyleSheet.create({
     // backgroundColor: COLORS.primary,
     padding: 16,
     flex: 1,
-    justifyContent:"center",
-    alignItems:"center"
-
+    justifyContent: "center",
+    alignItems: "center",
   },
   topCardContainer: {
     flexDirection: "row",
@@ -662,19 +570,14 @@ const styles = StyleSheet.create({
   spinnerTextStyle: {
     color: COLORS.primary,
   },
-  productsSection: {
-    // marginVertical: 20,
-  },
-  categoriesSection: {
-    // marginVertical: 20,
-  },
+  productsSection: {},
+  categoriesSection: {},
   clearButton: {
     padding: 4,
   },
   clearIcon: {
     width: 16,
     height: 16,
-    // tintColor: COLORS.gray,
   },
 });
 

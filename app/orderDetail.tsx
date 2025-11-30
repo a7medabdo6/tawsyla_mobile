@@ -7,17 +7,10 @@ import {
   Alert,
   Modal,
   TouchableWithoutFeedback,
-  FlatList,
-  ImageSourcePropType,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { COLORS, SIZES, icons, images } from "../constants";
+import React, { useCallback, useRef, useState } from "react";
+import { COLORS, SIZES, icons } from "../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-virtualized-view";
-import Barcode from "@kichiyaki/react-native-barcode-generator";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { NavigationProp } from "@react-navigation/native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -25,11 +18,7 @@ import { useLanguageContext } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import moment from "moment";
-import RBSheet from "react-native-raw-bottom-sheet";
 import Button from "@/components/Button";
-import ServiceItem from "@/components/ServiceItem";
-import { useAddress } from "@/data/useAddress";
-import Input from "@/components/Input";
 import { useAuthStatus } from "@/data";
 import { useCart, useConfirmOrder, useValidateCoupon } from "@/data/useCart";
 import { useOneOrder } from "@/data/useOrders";
@@ -87,76 +76,32 @@ const OrderDetail = () => {
 
   const [showLoginCard, setShowLoginCard] = useState(false);
 
-  const [selectedItem, setSelectedItem] = useState(null);
   const { t, isRTL } = useLanguageContext();
-  const addressBottomSheet = useRef<any>(null);
-  const [couponCode, setCouponCode] = useState<string>("");
-  const { data: cartData, error } = useCart();
 
-  const [couponDetails, setCouponDetails] = useState<any>("");
   const params = useLocalSearchParams();
 
   const orderId = params.orderId as string;
   const { data } = useOneOrder(orderId);
-  const currentStatus = data?.status;
-  console.log(currentStatus, "currentStatuscurrentStatuscurrentStatus");
 
-  const { data: authStatus, refetch } = useAuthStatus();
-  const { mutate: validateCoupon, isPending } = useValidateCoupon();
-
-  const { mutate: confirmOrder, isPending: isPendingForConfirm } =
-    useConfirmOrder();
-
-  const handleDropdownSelect = (item: any) => {
-    setSelectedItem(item.value);
-    setModalVisible(false);
-
-    // Perform actions based on the selected item
-    switch (item.value) {
-      case "share":
-        setModalVisible(false);
-        navigation.navigate("(tabs)");
-        break;
-      case "downloadEReceipt":
-        setModalVisible(false);
-        navigation.navigate("(tabs)");
-        break;
-      case "print":
-        setModalVisible(false);
-        navigation.navigate("(tabs)");
-        break;
-      default:
-        break;
+  const statusColor = (status: OrderStatus) => {
+    switch (status) {
+      case OrderStatus.PENDING:
+        return COLORS.card;
+      case OrderStatus.CONFIRMED:
+        return COLORS.primary;
+      case OrderStatus.PROCESSING:
+        return COLORS.primary;
+      case OrderStatus.SHIPPED:
+        return COLORS.primary;
+      case OrderStatus.DELIVERED:
+        return COLORS.primary;
+      case OrderStatus.CANCELLED:
+        return COLORS.red;
+      case OrderStatus.REFUNDED:
+        return COLORS.primary;
     }
   };
 
-  const transactionId = "SKD354822747";
-
-  const handleCopyToClipboard = async () => {
-    await Clipboard.setStringAsync(transactionId);
-    Alert.alert(t("Copied!"), t("Transaction ID copied to clipboard."));
-  };
-  const handleInputChange = useCallback((id: string, text: string) => {
-    setCouponCode(text);
-  }, []);
-   const statusColor = (status: OrderStatus) => {
-      switch (status) {
-        case OrderStatus.PENDING:
-          return COLORS.card;
-        case OrderStatus.CONFIRMED:
-          return COLORS.primary;
-        case OrderStatus.PROCESSING:
-          return COLORS.primary;
-        case OrderStatus.SHIPPED:
-          return COLORS.primary;
-        case OrderStatus.DELIVERED:
-          return COLORS.primary;
-        case OrderStatus.CANCELLED:
-          return COLORS.red;
-        case OrderStatus.REFUNDED:
-          return COLORS.primary;
-      }
-    };
   return (
     <SafeAreaView
       style={[
@@ -164,40 +109,8 @@ const OrderDetail = () => {
         { backgroundColor: COLORS.white, direction: isRTL ? "rtl" : "ltr" },
       ]}
     >
+      <Header title={t("Order Details")} />
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <View style={styles.headerContainer}>
-          <View style={styles.headerLeft}>
-            <Image
-              source={images.logo as ImageSourcePropType}
-              resizeMode="contain"
-              style={styles.headerLogo}
-            />
-            <Text
-              style={[
-                styles.headerTitle,
-                {
-                  color: COLORS.greyscale900,
-                },
-              ]}
-            >
-              {t("Order Details")}
-            </Text>
-          </View>
-          <View style={styles.headerRight}>
-            {/* <TouchableOpacity>
-              <Image
-                source={icons.moreCircle as ImageSourcePropType}
-                resizeMode="contain"
-                style={[
-                  styles.moreCircleIcon,
-                  {
-                    tintColor: COLORS.greyscale900,
-                  },
-                ]}
-              />
-            </TouchableOpacity> */}
-          </View>
-        </View>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           <View style={{ marginVertical: 22 }}>
             {/* <Barcode ... /> */}
@@ -236,14 +149,6 @@ const OrderDetail = () => {
                   </Text>
                 </View>
               </View>
-              {/* <View style={styles.viewContainer}>
-            <Text style={[styles.viewLeft, { color: "gray" }]}>
-              {t("Package Type")}
-            </Text>
-            <Text style={[styles.viewRight, { color: COLORS.black }]}>
-              {t("Detroit-style pizza")}
-            </Text>
-          </View> */}
               <View style={styles.viewContainer}>
                 <Text style={[styles.viewLeft, { color: "gray" }]}>
                   {t("Phone")}
@@ -252,22 +157,6 @@ const OrderDetail = () => {
                   {data?.shippingAddress?.phone || data?.user?.phone}
                 </Text>
               </View>
-              {/* <View style={styles.viewContainer}>
-            <Text style={[styles.viewLeft, { color: "gray" }]}>
-              {t("Category")}
-            </Text>
-            <Text style={[styles.viewRight, { color: COLORS.black }]}>
-              {t("Shipping")}
-            </Text>
-          </View> */}
-              {/* <View style={styles.viewContainer}>
-            <Text style={[styles.viewLeft, { color: "gray" }]}>
-              {t("ID")}
-            </Text>
-            <Text style={[styles.viewRight, { color: COLORS.black }]}>
-              {t("PIZZA XT134")}
-            </Text>
-          </View> */}
             </View>
 
             <View
@@ -339,24 +228,6 @@ const OrderDetail = () => {
                   {moment(data?.createdAt).format("YYYY-MM-DD")}
                 </Text>
               </View>
-              {/* <View style={styles.viewContainer}>
-            <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-              {t("Transaction ID")}
-            </Text>
-            <View style={styles.copyContentContainer}>
-              <Text style={styles.viewRight}>{t(transactionId)}</Text>
-              <TouchableOpacity
-                style={{ marginLeft: 8 }}
-                onPress={handleCopyToClipboard}
-              >
-                <MaterialCommunityIcons
-                  name="content-copy"
-                  size={24}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
-            </View>
-          </View> */}
               <View style={styles.viewContainer}>
                 <Text style={[styles.viewLeft, { color: COLORS.black }]}>
                   {t("Status")}
@@ -369,14 +240,7 @@ const OrderDetail = () => {
                     },
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.statusBtnText,
-                      {
-                        color: COLORS.white,
-                      },
-                    ]}
-                  >
+                  <Text style={styles.statusBtnText}>
                     {isRTL
                       ? ORDER_STATUS_STEPS?.find(
                           (sub) => sub.key == data?.status
@@ -805,7 +669,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statusBtn: {
-    width: 72,
+    width: 86,
     height: 28,
     alignItems: "center",
     justifyContent: "center",
@@ -813,9 +677,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusBtnText: {
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: "bold",
     fontFamily: "medium",
-    color: COLORS.primary,
+    color: "#fff",
   },
   headerLogo: {
     height: 36,

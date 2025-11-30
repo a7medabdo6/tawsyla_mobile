@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/adaptive-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#22BB9C"
     },
@@ -18,11 +18,13 @@
     },
     "android": {
       "usesCleartextTraffic": true,
+      "supportsRTL": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#22BB9C"
       },
-      "package": "com.a7medabdo.tawsila"
+      "package": "com.a7medabdo.tawsila",
+      "networkSecurityConfig": "network_security_config"
     },
     "web": {
       "bundler": "metro",
@@ -40,14 +42,26 @@
           "defaultChannel": "default"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "networkSecurityConfig": "network_security_config"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "b725ce55-00cd-4897-acf5-8b43b5c79f2b"
+        "projectId": "2a257357-651d-4f79-a3b8-d45d97ad3ccc"
       }
     }
   }

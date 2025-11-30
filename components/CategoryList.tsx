@@ -6,7 +6,6 @@ import {
   View,
   Text,
   StyleSheet,
-  
   Dimensions,
   I18nManager,
   FlatList,
@@ -22,15 +21,29 @@ const { width } = Dimensions.get("window");
 const ITEM_WIDTH = 130;
 const SPACING = 12;
 
+import Skeleton from "./Skeleton";
+
 const CategoryCarousel = () => {
-  const [active, setActive] = useState('');
-  const { data, isLoading, error } = useCategories({limit:4});
+  const [active, setActive] = useState("");
+  const { data, isLoading, error } = useCategories({ limit: 4 });
   const navigation = useNavigation<any>();
   const router = useRouter();
 
-  if (isLoading) return <ActivityIndicator size="large" />;
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          {[1, 2, 3].map((key) => (
+            <View key={key} style={{ width: "32%", marginBottom: 16 }}>
+              <Skeleton height={210} borderRadius={16} />
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
   if (error) return <Text>Error: {error.message}</Text>;
- const renderCategory = ({ item }: any) => (
+  const renderCategory = ({ item }: any) => (
     <TouchableOpacity
       style={styles.categoryCard}
       onPress={() => {
@@ -47,7 +60,7 @@ const CategoryCarousel = () => {
       <View style={styles.categoryIconContainer}>
         {item.image?.path ? (
           <Image
-          source={{ uri: `http://159.65.75.17:3000${item.image?.path}` }}
+            source={{ uri: `http://159.65.75.17:3000${item.image?.path}` }}
             contentFit="cover"
             style={styles.categoryImage}
           />
@@ -66,13 +79,11 @@ const CategoryCarousel = () => {
     </TouchableOpacity>
   );
 
- 
   return (
     <View style={styles.container}>
-      <View >
+      <View>
         <FlatList
           data={data}
-          
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
             flexDirection: "row",
@@ -135,19 +146,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     textAlign: "center",
-    width:50
+    width: 50,
   },
-   categoryCard: {
-    flex: 1,          // Take all available space in the column
-    minWidth: 0,      // Fix text overflow issues
+  categoryCard: {
+    flex: 1, // Take all available space in the column
+    minWidth: 0, // Fix text overflow issues
     height: 210,
     // backgroundColor: COLORS.white,
     borderRadius: 16,
     paddingBottom: 10,
     paddingTop: 5,
     paddingHorizontal: 3,
-     marginLeft: 3,
-     marginVertical:5,
+    marginLeft: 3,
+    marginVertical: 5,
     alignItems: "center",
     position: "relative",
     // elevation: 2,
@@ -161,7 +172,7 @@ const styles = StyleSheet.create({
     // borderColor:COLORS.paleGreenDark,
     // borderWidth :1
   },
-   categoryIconContainer: {
+  categoryIconContainer: {
     backgroundColor: COLORS.paleGreen,
     borderRadius: 16,
     flex: 1,

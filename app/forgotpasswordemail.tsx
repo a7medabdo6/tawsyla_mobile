@@ -1,31 +1,38 @@
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SIZES, icons, images } from '../constants';
-import Header from '../components/Header';
-import { reducer } from '../utils/reducers/formReducers';
-import { validateInput } from '../utils/actions/formActions';
-import Checkbox from 'expo-checkbox';
-import Button from '../components/Button';
-import { Image } from 'expo-image';
-import { useNavigation } from 'expo-router';
-import Input from '@/components/Input';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { COLORS, SIZES, icons, images } from "../constants";
+import Header from "../components/Header";
+import { reducer } from "../utils/reducers/formReducers";
+import { validateInput } from "../utils/actions/formActions";
+import Checkbox from "expo-checkbox";
+import Button from "../components/Button";
+import { Image } from "expo-image";
+import { useNavigation } from "expo-router";
+import Input from "@/components/Input";
 
 type Nav = {
-  navigate: (value: string) => void
-}
+  navigate: (value: string) => void;
+};
 
 const isTestMode = true;
 
 const initialState = {
   inputValues: {
-    email: isTestMode ? 'example@gmail.com' : '',
+    email: isTestMode ? "example@gmail.com" : "",
   },
   inputValidities: {
-    email: false
+    email: false,
   },
   formIsValid: false,
-}
+};
 
 const ForgotPasswordEmail = () => {
   const { navigate } = useNavigation<Nav>();
@@ -35,46 +42,59 @@ const ForgotPasswordEmail = () => {
 
   const inputChangedHandler = useCallback(
     (inputId: string, inputValue: string) => {
-      const result = validateInput(inputId, inputValue)
+      const result = validateInput(inputId, inputValue);
       dispatchFormState({
         inputId,
         validationResult: result,
-        inputValue
-      })
-    }, [dispatchFormState])
+        inputValue,
+      });
+    },
+    [dispatchFormState]
+  );
 
   useEffect(() => {
     if (error) {
-      Alert.alert('An error occured', error)
+      Alert.alert("An error occured", error);
     }
   }, [error]);
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
+      <Header title="نسيت كلمة المرور" />
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Forgot Password" />
-        <ScrollView style={{ marginVertical: 54 }} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={{ marginVertical: 54 }}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.logoContainer}>
             <Image
               source={images.logo}
-              contentFit='contain'
+              contentFit="contain"
               style={styles.logo}
             />
           </View>
-          <Text style={[styles.title, {
-            color: COLORS.black
-          }]}>Enter to Your Email</Text>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: COLORS.black,
+                marginBottom: 16,
+              },
+            ]}
+          >
+            ادخل البريد الالكتروني
+          </Text>
           <Input
             id="email"
             onInputChanged={inputChangedHandler}
-            errorText={formState.inputValidities['email']}
-            placeholder="Email"
+            errorText={formState.inputValidities["email"]}
+            placeholder="البريد الالكتروني"
             placeholderTextColor={COLORS.black}
             icon={icons.email}
             keyboardType="email-address"
           />
           <View style={styles.checkBoxContainer}>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: "row" }}>
               <Checkbox
                 style={styles.checkbox}
                 value={isChecked}
@@ -82,64 +102,76 @@ const ForgotPasswordEmail = () => {
                 onValueChange={setChecked}
               />
               <View style={{ flex: 1 }}>
-                <Text style={[styles.privacy, {
-                  color: COLORS.black
-                }]}>Remenber me</Text>
+                <Text
+                  style={[
+                    styles.privacy,
+                    {
+                      color: COLORS.black,
+                    },
+                  ]}
+                >
+                  تذكرني
+                </Text>
               </View>
             </View>
           </View>
           <Button
-            title="Reset Password"
+            title="استعادة كلمة المرور"
             filled
             onPress={() => navigate("otpverification")}
             style={styles.button}
           />
-          <TouchableOpacity
-            onPress={() => navigate("login")}>
-            <Text style={styles.forgotPasswordBtnText}>Remenber the password?</Text>
+          <TouchableOpacity onPress={() => navigate("login")}>
+            <Text style={styles.forgotPasswordBtnText}>تتذكر كلمة المرور؟</Text>
           </TouchableOpacity>
-          <View>
-          </View>
+          <View></View>
         </ScrollView>
         <View style={styles.bottomContainer}>
-          <Text style={[styles.bottomLeft, {
-            color: COLORS.black
-          }]}>Don't have an account ?</Text>
-          <TouchableOpacity
-            onPress={() => navigate("signup")}>
-            <Text style={styles.bottomRight}>{"  "}Sign Up</Text>
+          <TouchableOpacity onPress={() => navigate("signup")}>
+            <Text style={styles.bottomRight}> انشاء حساب</Text>
           </TouchableOpacity>
+          <Text
+            style={[
+              styles.bottomLeft,
+              {
+                color: COLORS.black,
+              },
+            ]}
+          >
+            لا تمتلك حساباً؟
+          </Text>
         </View>
       </View>
     </SafeAreaView>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
+    direction: "rtl",
   },
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
   },
   logo: {
     width: 100,
     height: 100,
-    tintColor: COLORS.primary
+    tintColor: COLORS.primary,
   },
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 32
+    marginVertical: 32,
   },
   title: {
     fontSize: 24,
     fontFamily: "bold",
     color: COLORS.black,
-    textAlign: "center"
+    textAlign: "center",
   },
   center: {
     flex: 1,
@@ -148,12 +180,12 @@ const styles = StyleSheet.create({
   },
   checkBoxContainer: {
     flexDirection: "row",
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
     marginVertical: 18,
   },
   checkbox: {
-    marginRight: 8,
+    marginHorizontal: 8,
     height: 16,
     width: 16,
     borderRadius: 4,
@@ -170,7 +202,7 @@ const styles = StyleSheet.create({
     fontFamily: "medium",
     color: COLORS.black,
     textAlign: "center",
-    marginVertical: 26
+    marginVertical: 26,
   },
   socialBtnContainer: {
     flexDirection: "row",
@@ -178,9 +210,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   bottomContainer: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "center",
+    gap: 4,
     marginVertical: 18,
     position: "absolute",
     bottom: 12,
@@ -190,25 +223,25 @@ const styles = StyleSheet.create({
   bottomLeft: {
     fontSize: 14,
     fontFamily: "regular",
-    color: "black"
+    color: "black",
   },
   bottomRight: {
     fontSize: 16,
     fontFamily: "medium",
-    color: COLORS.primary
+    color: COLORS.primary,
   },
   button: {
     marginVertical: 6,
     width: SIZES.width - 32,
-    borderRadius: 30
+    borderRadius: 30,
   },
   forgotPasswordBtnText: {
     fontSize: 16,
     fontFamily: "semiBold",
     color: COLORS.primary,
     textAlign: "center",
-    marginTop: 12
-  }
-})
+    marginTop: 12,
+  },
+});
 
-export default ForgotPasswordEmail
+export default ForgotPasswordEmail;

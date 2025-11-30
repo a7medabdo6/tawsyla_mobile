@@ -11,23 +11,21 @@ function LoginCard({ text }: any) {
   const { t, isRTL } = useLanguageContext();
 
   return (
-    <View>
-      <View style={styles.loginCard}>
-        <Image
-          source={icons.userDefault as any}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-        <Text style={styles.loginText}>
-          {text ? t(`${text}`) : t("You must login to view your cart")}
-        </Text>
-        <Button
-          title={t("Login")}
-          filled
-          style={styles.loginBtn}
-          onPress={() => navigation.navigate("login")}
-        />
-      </View>
+    <View style={styles.loginCard}>
+      <Image
+        source={icons.userDefault as any}
+        style={styles.icon}
+        resizeMode="contain"
+      />
+      <Text style={styles.loginText}>
+        {text ? t(`${text}`) : t("You must login to view your cart")}
+      </Text>
+      <Button
+        title={t("Login")}
+        filled
+        style={styles.loginBtn}
+        onPress={() => navigation.navigate("login")}
+      />
     </View>
   );
 }

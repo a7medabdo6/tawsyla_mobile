@@ -18,8 +18,8 @@ export const COLORS = {
   tertiaryWhite: "#F7F7F7",
   greeen: "#0ABE75",
   lightGreen: "#A6E5D7",
-  paleGreenDark: "rgba(10, 190, 118, 0.1)"
-,  paleGreen: "rgba(10, 190, 118, 0.05)",
+  paleGreenDark: "rgba(10, 190, 118, 0.1)",
+  paleGreen: "rgba(10, 190, 118, 0.05)",
   red: "#f65554",
   gray: "#9E9E9E",
   gray2: "#35383F",
@@ -138,6 +138,48 @@ export const FONTS = {
   },
 };
 
-const appTheme = { COLORS, SIZES, FONTS };
+export const SPACING = {
+  xs: 4,
+  s: 8,
+  m: 12,
+  l: 16,
+  xl: 24,
+  xxl: 32,
+};
+
+export const SHADOWS = {
+  light: {
+    shadowColor: COLORS.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+    elevation: 2,
+  },
+  medium: {
+    shadowColor: COLORS.black,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 5.46,
+    elevation: 5,
+  },
+  dark: {
+    shadowColor: COLORS.black,
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 7.49,
+    elevation: 8,
+  },
+};
+
+const appTheme = { COLORS, SIZES, FONTS, SPACING, SHADOWS };
 
 export default appTheme;

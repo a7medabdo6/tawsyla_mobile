@@ -11,7 +11,7 @@ import InputLabel from '@/components/InputLabel';
 import { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from 'expo-router';
 
-const isTestMode = true
+const isTestMode = true;
 
 const initialState = {
     inputValues: {
@@ -27,7 +27,7 @@ const initialState = {
         detailLocation: false
     },
     formIsValid: false,
-}
+};
 
 const OrderForm = () => {
     /**
@@ -65,25 +65,25 @@ const OrderForm = () => {
      */
     const renderContent = () => {
         const navigation = useNavigation<NavigationProp<any>>();
-        const [formState, dispatchFormState] = useReducer(reducer, initialState)
-        const [isLoading, setIsLoading] = useState(false)
-        const [error, setError] = useState(null)
+        const [formState, dispatchFormState] = useReducer(reducer, initialState);
+        const [isLoading, setIsLoading] = useState(false);
+        const [error, setError] = useState(null);
 
         const inputChangedHandler = useCallback(
             (inputId: string, inputValue: string) => {
-              const result = validateInput(inputId, inputValue)
+              const result = validateInput(inputId, inputValue);
               dispatchFormState({
                 inputId,
                 validationResult: result,
                 inputValue,
-              })
-            }, [dispatchFormState])
+              });
+            }, [dispatchFormState]);
 
         useEffect(() => {
             if (error) {
-                Alert.alert('An error occured', error)
+                Alert.alert('An error occured', error);
             }
-        }, [error])
+        }, [error]);
 
         return (
             <View>
@@ -178,6 +178,6 @@ const styles = StyleSheet.create({
         marginVertical: 22,
         width: SIZES.width - 32
     }
-})
+});
 
 export default OrderForm

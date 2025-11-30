@@ -1,16 +1,27 @@
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Modal, TouchableWithoutFeedback, FlatList, TextInput } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SIZES, icons, images } from '../constants';
-import Header from '../components/Header';
-import Checkbox from 'expo-checkbox';
-import Button from '../components/Button';
-import { useNavigation } from 'expo-router';
-import { Image } from 'expo-image';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
+  FlatList,
+  TextInput,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { COLORS, SIZES, icons, images } from "../constants";
+import Header from "../components/Header";
+import Checkbox from "expo-checkbox";
+import Button from "../components/Button";
+import { useNavigation } from "expo-router";
+import { Image } from "expo-image";
 
 type Nav = {
-  navigate: (value: string) => void
-}
+  navigate: (value: string) => void;
+};
 
 const ForgotPasswordPhoneNumber = () => {
   const { navigate } = useNavigation<Nav>();
@@ -22,22 +33,22 @@ const ForgotPasswordPhoneNumber = () => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('An error occured', error)
+      Alert.alert("An error occured", error);
     }
   }, [error]);
 
   // fetch codes from rescountries api
   useEffect(() => {
     fetch("https://restcountries.com/v2/all")
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         let areaData = data.map((item: any) => {
           return {
             code: item.alpha2Code,
             item: item.name,
             callingCode: `+${item.callingCodes[0]}`,
-            flag: `https://flagsapi.com/${item.alpha2Code}/flat/64.png`
-          }
+            flag: `https://flagsapi.com/${item.alpha2Code}/flat/64.png`,
+          };
         });
 
         setAreas(areaData);
@@ -45,55 +56,52 @@ const ForgotPasswordPhoneNumber = () => {
           let defaultData = areaData.filter((a: any) => a.code == "US");
 
           if (defaultData.length > 0) {
-            setSelectedArea(defaultData[0])
+            setSelectedArea(defaultData[0]);
           }
         }
-      })
-  }, [])
+      });
+  }, []);
 
   // render countries codes modal
   function RenderAreasCodesModal() {
-
     const renderItem = ({ item }: { item: any }) => {
       return (
         <TouchableOpacity
           style={{
             padding: 10,
-            flexDirection: "row"
+            flexDirection: "row",
           }}
           onPress={() => {
-            setSelectedArea(item),
-              setModalVisible(false)
-          }}>
+            setSelectedArea(item), setModalVisible(false);
+          }}
+        >
           <Image
             source={{ uri: item.flag }}
-            contentFit='contain'
+            contentFit="contain"
             style={{
               height: 30,
               width: 30,
-              marginRight: 10
+              marginRight: 10,
             }}
           />
           <Text style={{ fontSize: 16, color: "#fff" }}>{item.item}</Text>
         </TouchableOpacity>
-      )
-    }
+      );
+    };
     return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}>
-        <TouchableWithoutFeedback
-          onPress={() => setModalVisible(false)}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
           <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
             <View
               style={{
                 height: 400,
                 width: SIZES.width * 0.8,
                 backgroundColor: COLORS.primary,
-                borderRadius: 12
-              }}>
+                borderRadius: 12,
+              }}
+            >
               <FlatList
                 data={areas}
                 renderItem={renderItem}
@@ -101,39 +109,61 @@ const ForgotPasswordPhoneNumber = () => {
                 keyExtractor={(item) => item.code}
                 style={{
                   padding: 20,
-                  marginBottom: 20
+                  marginBottom: 20,
                 }}
               />
             </View>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    )
+    );
   }
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
+      <View
+        style={{
+          direction: "rtl",
+        }}
+      >
+        <Header title="نسيت كلمة المرور" />
+      </View>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Forgot Password" />
-        <ScrollView style={{ marginVertical: 54 }} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={{ marginVertical: 54 }}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.logoContainer}>
             <Image
               source={images.logo}
-              contentFit='contain'
+              contentFit="contain"
               style={styles.logo}
             />
           </View>
-          <Text style={[styles.title, {
-            color: COLORS.black
-          }]}>Enter to Your Phone Number</Text>
-          <View style={[styles.inputContainer, { backgroundColor: COLORS.greyscale500 }]}>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: COLORS.black,
+              },
+            ]}
+          >
+            ادخل رقم هاتفك
+          </Text>
+          <View
+            style={[
+              styles.inputContainer,
+              { backgroundColor: COLORS.greyscale500 },
+            ]}
+          >
             <TouchableOpacity
               style={styles.selectFlagContainer}
-              onPress={() => setModalVisible(true)}>
+              onPress={() => setModalVisible(true)}
+            >
               <View style={{ justifyContent: "center" }}>
                 <Image
                   source={icons.down}
-                  contentFit='contain'
+                  contentFit="contain"
                   style={styles.downIcon}
                 />
               </View>
@@ -145,86 +175,100 @@ const ForgotPasswordPhoneNumber = () => {
                 />
               </View>
               <View style={{ justifyContent: "center", marginLeft: 5 }}>
-                <Text style={{ color: COLORS.black, fontSize: 12 }}>{selectedArea?.callingCode}</Text>
+                <Text style={{ color: COLORS.black, fontSize: 12 }}>
+                  {selectedArea?.callingCode}
+                </Text>
               </View>
             </TouchableOpacity>
             {/* Phone Number Text Input */}
             <TextInput
-              style={[styles.input, { color: COLORS.black }]}
-              placeholder="Enter your phone number"
+              style={[
+                styles.input,
+                { color: COLORS.black, textAlign: "right" },
+              ]}
+              placeholder="رقم هاتفك"
               placeholderTextColor={COLORS.gray}
               selectionColor="#111"
               keyboardType="numeric"
             />
           </View>
-          <View style={styles.checkBoxContainer}>
-            <View style={{ flexDirection: 'row' }}>
-              <Checkbox
-                style={styles.checkbox}
-                value={isChecked}
-                color={isChecked ? COLORS.primary : "gray"}
-                onValueChange={setChecked}
-              />
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.privacy, {
-                  color: COLORS.black
-                }]}>Remenber me</Text>
-              </View>
+          <View style={[styles.checkBoxContainer, { direction: "rtl" }]}>
+            <Checkbox
+              style={styles.checkbox}
+              value={isChecked}
+              color={isChecked ? COLORS.primary : "gray"}
+              onValueChange={setChecked}
+            />
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  styles.privacy,
+                  {
+                    color: COLORS.black,
+                  },
+                ]}
+              >
+                اتذكرني
+              </Text>
             </View>
           </View>
           <Button
-            title="Reset Password"
+            title="استعادة كلمة المرور"
             filled
             onPress={() => navigate("otpverification")}
             style={styles.button}
           />
-          <TouchableOpacity
-            onPress={() => navigate("login")}>
-            <Text style={styles.forgotPasswordBtnText}>Remenber the password?</Text>
+          <TouchableOpacity onPress={() => navigate("login")}>
+            <Text style={styles.forgotPasswordBtnText}>اتذكر كلمة المرور؟</Text>
           </TouchableOpacity>
-          <View>
-          </View>
+          <View></View>
         </ScrollView>
         <View style={styles.bottomContainer}>
-          <Text style={[styles.bottomLeft, {
-            color: COLORS.black
-          }]}>Don't have an account ?</Text>
-          <TouchableOpacity
-            onPress={() => navigate("signup")}>
-            <Text style={styles.bottomRight}>{" "}Sign Up</Text>
+          <Text
+            style={[
+              styles.bottomLeft,
+              {
+                color: COLORS.black,
+              },
+            ]}
+          >
+            لا تمتلك حساباً؟
+          </Text>
+          <TouchableOpacity onPress={() => navigate("signup")}>
+            <Text style={styles.bottomRight}> انشاء حساب</Text>
           </TouchableOpacity>
         </View>
       </View>
       {RenderAreasCodesModal()}
     </SafeAreaView>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
   },
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
   },
   logo: {
     width: 100,
     height: 100,
-    tintColor: COLORS.primary
+    tintColor: COLORS.primary,
   },
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 32
+    marginVertical: 32,
   },
   title: {
     fontSize: 24,
     fontFamily: "bold",
     color: COLORS.black,
-    textAlign: "center"
+    textAlign: "center",
   },
   center: {
     flex: 1,
@@ -233,12 +277,12 @@ const styles = StyleSheet.create({
   },
   checkBoxContainer: {
     flexDirection: "row",
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
     marginVertical: 18,
   },
   checkbox: {
-    marginRight: 8,
+    marginHorizontal: 8,
     height: 16,
     width: 16,
     borderRadius: 4,
@@ -255,7 +299,7 @@ const styles = StyleSheet.create({
     fontFamily: "medium",
     color: COLORS.black,
     textAlign: "center",
-    marginVertical: 26
+    marginVertical: 26,
   },
   socialBtnContainer: {
     flexDirection: "row",
@@ -263,8 +307,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   bottomContainer: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
+    gap: 4,
     justifyContent: "center",
     marginVertical: 18,
     position: "absolute",
@@ -275,40 +320,40 @@ const styles = StyleSheet.create({
   bottomLeft: {
     fontSize: 14,
     fontFamily: "regular",
-    color: "black"
+    color: "black",
   },
   bottomRight: {
     fontSize: 16,
     fontFamily: "medium",
-    color: COLORS.primary
+    color: COLORS.primary,
   },
   button: {
     marginVertical: 6,
     width: SIZES.width - 32,
-    borderRadius: 30
+    borderRadius: 30,
   },
   forgotPasswordBtnText: {
     fontSize: 16,
     fontFamily: "semiBold",
     color: COLORS.primary,
     textAlign: "center",
-    marginTop: 12
+    marginTop: 12,
   },
   inputContainer: {
     flexDirection: "row",
     borderColor: COLORS.greyscale500,
-    borderWidth: .4,
+    borderWidth: 0.4,
     borderRadius: 6,
     height: 58,
     width: SIZES.width - 32,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 16,
     backgroundColor: COLORS.greyscale500,
   },
   downIcon: {
     width: 10,
     height: 10,
-    tintColor: "#111"
+    tintColor: "#111",
   },
   selectFlagContainer: {
     width: 90,
@@ -318,15 +363,15 @@ const styles = StyleSheet.create({
   },
   flagIcon: {
     width: 30,
-    height: 30
+    height: 30,
   },
   input: {
     flex: 1,
     marginVertical: 10,
     height: 40,
     fontSize: 14,
-    color: "#111"
-  }
-})
+    color: "#111",
+  },
+});
 
-export default ForgotPasswordPhoneNumber
+export default ForgotPasswordPhoneNumber;

@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TextInput,
   TextInputProps,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 import { COLORS, SIZES } from "../constants";
 import { Image } from "expo-image";
@@ -16,6 +18,7 @@ interface InputProps extends TextInputProps {
   errorText?: string[];
   autoFocus?: boolean;
   onInputChanged: (id: string, text: string) => void;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const Input: FC<InputProps> = (props) => {
@@ -46,6 +49,7 @@ const Input: FC<InputProps> = (props) => {
               ? COLORS.tansparentPrimary
               : COLORS.greyscale500,
           },
+          props.containerStyle,
         ]}
       >
         <TextInput

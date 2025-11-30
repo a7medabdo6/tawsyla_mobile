@@ -1,15 +1,15 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../components/Header';
-import { COLORS } from '../constants';
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "../components/Header";
+import { COLORS } from "../constants";
 import { OtpInput } from "react-native-otp-entry";
 import Button from "../components/Button";
-import { useNavigation } from 'expo-router';
+import { useNavigation } from "expo-router";
 
 type Nav = {
-  navigate: (value: string) => void
-}
+  navigate: (value: string) => void;
+};
 
 // OTP Verification Screen
 const OTPVerification = () => {
@@ -28,12 +28,19 @@ const OTPVerification = () => {
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
+      <Header title="نسيت كلمة المرور" />
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Forgot Password" />
         <ScrollView>
-          <Text style={[styles.title, {
-            color: COLORS.black
-          }]}>Code has been send to +1 111 ******99</Text>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: COLORS.black,
+              },
+            ]}
+          >
+            تم ارسال رمز التحقق إلى +1 111 ******99
+          </Text>
           <OtpInput
             numberOfDigits={4}
             onTextChange={(text) => console.log(text)}
@@ -44,53 +51,70 @@ const OTPVerification = () => {
               pinCodeContainerStyle: {
                 backgroundColor: COLORS.secondaryWhite,
                 borderColor: COLORS.secondaryWhite,
-                borderWidth: .4,
+                borderWidth: 0.4,
                 borderRadius: 10,
                 height: 58,
                 width: 58,
               },
               pinCodeTextStyle: {
                 color: COLORS.black,
-              }
+              },
             }}
           />
           <View style={styles.codeContainer}>
-            <Text style={[styles.code, {
-              color:  COLORS.greyscale900
-            }]}>Resend code in</Text>
+            <Text
+              style={[
+                styles.code,
+                {
+                  color: COLORS.greyscale900,
+                },
+              ]}
+            >
+              إعادة ارسال الرمز
+            </Text>
             <Text style={styles.time}>{`  ${time} `}</Text>
-            <Text style={[styles.code, {
-              color: COLORS.greyscale900
-            }]}>s</Text>
+            <Text
+              style={[
+                styles.code,
+                {
+                  color: COLORS.greyscale900,
+                },
+              ]}
+            >
+              ثانية
+            </Text>
           </View>
         </ScrollView>
         <Button
-          title="Verify"
+          title="تحقق"
           filled
           style={styles.button}
-          onPress={() => { navigate("createnewpassword") }}
+          onPress={() => {
+            navigate("createnewpassword");
+          }}
         />
       </View>
     </SafeAreaView>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
+    direction: "rtl",
   },
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
   },
   title: {
     fontSize: 18,
     fontFamily: "medium",
     color: COLORS.greyscale900,
     textAlign: "center",
-    marginVertical: 54
+    marginVertical: 54,
   },
   OTPStyle: {
     borderRadius: 8,
@@ -98,30 +122,30 @@ const styles = StyleSheet.create({
     width: 58,
     backgroundColor: COLORS.white,
     borderBottomColor: "gray",
-    borderBottomWidth: .4,
-    borderWidth: .4,
-    borderColor: "gray"
+    borderBottomWidth: 0.4,
+    borderWidth: 0.4,
+    borderColor: "gray",
   },
   codeContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 24,
-    justifyContent: "center"
+    justifyContent: "center",
   },
   code: {
     fontSize: 18,
     fontFamily: "medium",
     color: COLORS.greyscale900,
-    textAlign: "center"
+    textAlign: "center",
   },
   time: {
     fontFamily: "medium",
     fontSize: 18,
-    color: COLORS.primary
+    color: COLORS.primary,
   },
   button: {
-    borderRadius: 32
-  }
-})
+    borderRadius: 32,
+  },
+});
 
-export default OTPVerification
+export default OTPVerification;

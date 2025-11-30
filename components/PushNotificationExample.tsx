@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { usePushNotifications } from '../hooks/usePushNotifications';
-import { COLORS } from '../constants';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { usePushNotifications } from "../hooks/usePushNotifications";
+import { COLORS } from "../constants";
 
 const PushNotificationExample: React.FC = () => {
   const {
@@ -16,38 +16,48 @@ const PushNotificationExample: React.FC = () => {
   const handleRegisterPushNotifications = async () => {
     const token = await registerForPushNotifications();
     if (token) {
-      Alert.alert('Success', 'Push notifications registered successfully!');
+      Alert.alert("Success", "Push notifications registered successfully!");
     } else {
-      Alert.alert('Error', 'Failed to register for push notifications');
+      Alert.alert("Error", "Failed to register for push notifications");
     }
   };
 
   const handleUpdateTokenOnServer = async () => {
     if (pushToken) {
-      const success = await updatePushTokenOnServer(pushToken);
+      // TODO: Pass actual user ID here
+      const success = await updatePushTokenOnServer("test-user-id", pushToken);
       if (success) {
-        Alert.alert('Success', 'Push token updated on server!');
+        Alert.alert("Success", "Push token updated on server!");
       } else {
-        Alert.alert('Error', 'Failed to update push token on server');
+        Alert.alert("Error", "Failed to update push token on server");
       }
     } else {
-      Alert.alert('Error', 'No push token available');
+      Alert.alert("Error", "No push token available");
     }
   };
 
   const handleClearToken = async () => {
     await clearPushToken();
-    Alert.alert('Success', 'Push token cleared!');
+    Alert.alert("Success", "Push token cleared!");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Push Notification Test</Text>
-      
+
       <View style={styles.statusContainer}>
         <Text style={styles.label}>Status:</Text>
-        <Text style={[styles.status, { color: pushToken ? COLORS.primary : COLORS.gray }]}>
-          {isLoading ? 'Loading...' : pushToken ? 'Registered' : 'Not Registered'}
+        <Text
+          style={[
+            styles.status,
+            { color: pushToken ? COLORS.primary : COLORS.gray },
+          ]}
+        >
+          {isLoading
+            ? "Loading..."
+            : pushToken
+            ? "Registered"
+            : "Not Registered"}
         </Text>
       </View>
 
@@ -108,25 +118,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.black,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.black,
     marginRight: 10,
   },
   status: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   tokenContainer: {
     marginBottom: 15,
@@ -134,14 +144,14 @@ const styles = StyleSheet.create({
   token: {
     fontSize: 12,
     color: COLORS.gray,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
     backgroundColor: COLORS.grayscale100,
     padding: 8,
     borderRadius: 5,
     marginTop: 5,
   },
   errorContainer: {
-    backgroundColor: COLORS.red + '20',
+    backgroundColor: COLORS.red + "20",
     padding: 10,
     borderRadius: 5,
     marginBottom: 15,
@@ -156,7 +166,7 @@ const styles = StyleSheet.create({
   button: {
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   primaryButton: {
     backgroundColor: COLORS.primary,
@@ -170,7 +180,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

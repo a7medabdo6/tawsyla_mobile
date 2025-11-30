@@ -3,18 +3,18 @@ import {
   View,
   Text,
   FlatList,
-  Image,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { COLORS, icons } from "../constants";
+import { COLORS } from "../constants";
 import { NavigationProp } from "@react-navigation/native";
 import { outgoingShipments } from "@/data";
 import { useNavigation } from "expo-router";
 import { useLanguageContext } from "@/contexts/LanguageContext";
 import { OrderStatus } from "@/app/myordertrack";
 import moment from "moment";
-import { SimpleLineIcons } from "@expo/vector-icons";
+import OrderCard from "@/components/OrderCard";
+
 const ORDER_STATUS_STEPS = [
   {
     key: OrderStatus.PENDING,
@@ -52,7 +52,8 @@ const ORDER_STATUS_STEPS = [
     estimation: { en: "Order refunded", ar: "تم استرداد الطلب" },
   },
 ];
-const OrderCard = ({ item }: any) => {
+
+const FromMeRoute = () => {
   const navigation = useNavigation<NavigationProp<any>>();
   const { t, isRTL } = useLanguageContext();
 
@@ -61,118 +62,75 @@ const OrderCard = ({ item }: any) => {
       case OrderStatus.PENDING:
         return COLORS.card;
       case OrderStatus.CONFIRMED:
-        return COLORS.primary;
       case OrderStatus.PROCESSING:
-        return COLORS.primary;
       case OrderStatus.SHIPPED:
-        return COLORS.primary;
       case OrderStatus.DELIVERED:
+      case OrderStatus.REFUNDED:
         return COLORS.primary;
       case OrderStatus.CANCELLED:
         return COLORS.red;
-      case OrderStatus.REFUNDED:
+      default:
         return COLORS.primary;
     }
   };
-  return (
-    <View style={styles.itemContainer}>
-      <View style={styles.statusContainer}></View>
-      <View style={styles.infoContainer}>
-        <View style={styles.infoLeft}>
-          {/* <Image
-            source={icons.package2}
-          /> */}
-          <SimpleLineIcons
-            style={[styles.itemImage]}
-            name="bag"
-            size={50}
-            color={COLORS.primary}
-          />
-          <View style={styles.itemDetails}>
-            <Text
-              style={[
-                styles.itemName,
-                {
-                  color: COLORS.black,
-                },
-              ]}
+
+  const renderItem = ({ item, index }: { item: any; index: number }) => {
+    const statusLabel = isRTL
+      ? ORDER_STATUS_STEPS?.find((sub) => sub.key === item?.status)?.label?.ar
+      : ORDER_STATUS_STEPS?.find((sub) => sub.key === item?.status)?.label?.en;
+
+    return (
+      <OrderCard
+        index={index}
+        title={item?.orderNumber}
+        subtitle={`${moment(item?.createdAt).format("YYYY-MM-DD")} • ${
+          item?.items?.length
+        } ${t("Items")}`}
+        price={`${item?.total} ${t("EGP")}`}
+        status={statusLabel}
+        statusColor={statusColor(item?.status)}
+        icon="bag"
+        onPress={() =>
+          navigation.navigate("orderDetail", {
+            orderId: item?.id,
+          })
+        }
+        actions={
+          <>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("orderDetail", {
+                  orderId: item?.id,
+                })
+              }
+              style={styles.outlineButton}
             >
-              {item?.orderNumber}
-            </Text>
-            <View style={styles.itemSubDetails}>
-              <View style={styles.itemPriceContainer}>
-              <Text style={styles.itemPrice}>
-                {item?.total} {t("EGP")}
-              </Text>
-                <Text
-                style={[
-                  styles.itemItems,
-                  {
-                    color: COLORS.grayscale700,
-                    marginHorizontal: 5,
-                  },
-                ]}
-              >
-                {" "}
-               ({ item?.items?.length}) {t("Items")}
-              </Text>
-              </View>
+              <Text style={styles.outlineButtonText}>{t("View")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("myordertrack", {
+                  orderId: item?.id,
+                })
+              }
+              style={styles.filledButton}
+            >
+              <Text style={styles.filledButtonText}>{t("Track Order")}</Text>
+            </TouchableOpacity>
+          </>
+        }
+      />
+    );
+  };
 
-
-             
-              <Text
-                style={[
-                  styles.itemDate,
-                  {
-                    color: COLORS.grayscale700,
-                  },
-                ]}
-              >
-                {" "}
-                {moment(item?.createdAt).format("YYYY-MM-DD")}
-              </Text>
-             
-            </View>
-          </View>
-        </View>
-        <Text
-          style={[
-            styles.statusText,
-            {
-              color: statusColor(item?.status),
-              // marginLeft: 12,
-            },
-          ]}
-        >
-          {isRTL
-            ? ORDER_STATUS_STEPS?.find((sub) => sub.key == item?.status)?.label
-                ?.ar
-            : ORDER_STATUS_STEPS?.find((sub) => sub.key == item?.status)?.label
-                ?.en}
-        </Text>
-      </View>
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("orderDetail", {
-              orderId: item?.id,
-            })
-          }
-          style={styles.rateButton}
-        >
-          <Text style={styles.rateButtonText}>{t("View")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("myordertrack", {
-              orderId: item?.id,
-            })
-          }
-          style={styles.reorderButton}
-        >
-          <Text style={styles.reorderButtonText}>{t("Track Order")}</Text>
-        </TouchableOpacity>
-      </View>
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={outgoingShipments}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingVertical: 16 }}
+      />
     </View>
   );
 };
@@ -180,116 +138,31 @@ const OrderCard = ({ item }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.secondaryWhite,
   },
-  itemContainer: {
-    flexDirection: "column",
-  },
-  statusContainer: {
-    borderBottomColor: COLORS.grayscale400,
-    borderBottomWidth: 0.4,
-    marginVertical: 12,
-    flexDirection: "row",
-    paddingBottom: 4,
-  },
-  itemPriceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    // marginHorizontal: 5,
-  },
-  typeText: {
-    fontSize: 14,
-    fontFamily: "bold",
-  },
-  statusText: {
-    fontSize: 14,
-    fontFamily: "bold",
-    // marginHorizontal: 5,
-  },
-  infoContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  infoLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "80%",
-  },
-  itemImage: {
-    height: 50,
-    width: 50,
-    borderRadius: 8,
-  },
-  itemDetails: {
-    marginHorizontal: 12,
-    width: "100%",
-    // backgroundColor: "red",
-  },
-  itemName: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  itemSubDetails: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  itemPrice: {
-    fontSize: 14,
-    fontFamily: "bold",
-    color: COLORS.primary,
-  },
-  itemDate: {
-    fontSize: 12,
-    fontFamily: "regular",
-    // marginHorizontal: 5,
-    
-  },
-  itemItems: {
-    fontSize: 12,
-    fontFamily: "regular",
-  },
-  receiptText: {
-    fontSize: 14,
-    textDecorationLine: "underline",
-    textDecorationColor: COLORS.gray,
-    fontFamily: "regular",
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 18,
-  },
-  rateButton: {
-    height: 38,
-    width: 140,
-    alignItems: "center",
-    justifyContent: "center",
+  outlineButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderColor: COLORS.primary,
     borderWidth: 1,
     borderRadius: 8,
   },
-  rateButtonText: {
+  outlineButtonText: {
     color: COLORS.primary,
-    fontSize: 14,
-    fontFamily: "regular",
+    fontSize: 12,
+    fontFamily: "bold",
   },
-  reorderButton: {
-    height: 38,
-    width: 140,
-    alignItems: "center",
-    justifyContent: "center",
+  filledButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     backgroundColor: COLORS.primary,
     borderRadius: 8,
   },
-  reorderButtonText: {
+  filledButtonText: {
     color: COLORS.white,
-    fontSize: 14,
-    fontFamily: "regular",
+    fontSize: 12,
+    fontFamily: "bold",
   },
 });
 
-export default OrderCard;
+export default FromMeRoute;

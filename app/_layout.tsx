@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -5,11 +6,13 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { FONTS } from "@/constants/fonts";
 import { CAIRO_FONTS } from "@/constants/cairoFonts";
-import { LogBox } from "react-native";
+import { LogBox, I18nManager } from "react-native";
 import { LanguageProvider } from "../contexts/LanguageContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAppStatus } from "@/data/useAppStatus";
 import PushNotificationService from "../utils/pushNotificationService";
+
+// Force RTL layout for Arabic - independent of device language
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -21,7 +24,7 @@ const queryClient = new QueryClient();
 function AppStatusChecker() {
   // Check cart and favourites status on app load
   useAppStatus();
-  
+
   // Initialize push notifications on app startup
   useEffect(() => {
     const initializePushNotifications = async () => {
@@ -29,13 +32,13 @@ function AppStatusChecker() {
         const pushNotificationService = PushNotificationService.getInstance();
         await pushNotificationService.initialize();
       } catch (error) {
-        console.error('Error initializing push notifications:', error);
+        console.error("Error initializing push notifications:", error);
       }
     };
-    
+
     initializePushNotifications();
   }, []);
-  
+
   return null;
 }
 
@@ -48,18 +51,21 @@ export default function RootLayout() {
   // Create font mapping for easy access
   const fontConfig = {
     cairo: {
-      light: 'Cairo-Light',
-      regular: 'Cairo-Regular',
-      medium: 'Cairo-Medium',
-      semiBold: 'Cairo-SemiBold',
-      bold: 'Cairo-Bold',
-      extraLight: 'Cairo-ExtraLight',
+      light: "Cairo-Light",
+      regular: "Cairo-Regular",
+      medium: "Cairo-Medium",
+      semiBold: "Cairo-SemiBold",
+      bold: "Cairo-Bold",
+      extraLight: "Cairo-ExtraLight",
     },
     // Keep existing fonts
-    ...Object.keys(FONTS).reduce((acc, key) => ({
-      ...acc,
-      [key]: key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(),
-    }), {}),
+    ...Object.keys(FONTS).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: key.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(),
+      }),
+      {}
+    ),
   };
 
   useEffect(() => {
@@ -79,6 +85,9 @@ export default function RootLayout() {
         <Stack
           initialRouteName="(tabs)"
           screenOptions={{
+            contentStyle: {
+              direction: "ltr",
+            },
             headerShown: false,
             headerTitleStyle: {
               fontFamily: fontConfig.cairo.regular,

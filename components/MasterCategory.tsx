@@ -17,20 +17,43 @@ import Carousel from "react-native-reanimated-carousel";
 
 const { width } = Dimensions.get("window");
 
-
+import Skeleton from "./Skeleton";
 
 const MasterCategory = () => {
-  const [active, setActive] = useState('');
+  const [active, setActive] = useState("");
   // Reverse data for RTL, because react-native-reanimated-carousel doesn't have inverted prop
   const { data, isLoading, error } = useMasterCategories();
   const navigation = useNavigation<any>();
 
-  if (isLoading) return <ActivityIndicator size="large" />;
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {[1, 2, 3, 4].map((key) => (
+            <View key={key} style={{ width: (width - 48) / 2, margin: 4 }}>
+              <Skeleton height={60} borderRadius={50} />
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
   if (error) return <Text>Error: {error.message}</Text>;
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
-      onPress={() =>  navigation.navigate("allcategories", { masterId: item?.id, masterName: item.nameAr || item.nameEn })}
+      onPress={() =>
+        navigation.navigate("allcategories", {
+          masterId: item?.id,
+          masterName: item.nameAr || item.nameEn,
+        })
+      }
       style={[
         styles.card,
         {
@@ -43,14 +66,17 @@ const MasterCategory = () => {
           styles.label,
           { color: active == item?.id ? COLORS.white : "" },
         ]}
-        numberOfLines={1} ellipsizeMode="tail"
+        numberOfLines={1}
+        ellipsizeMode="tail"
       >
         {item.nameAr || item.nameEn}
       </Text>
 
       <View style={styles.iconContainer}>
         <Image
-          source={{ uri: `http://159.65.75.17:3000/api/v1/files${item.image?.path}` }}
+          source={{
+            uri: `http://159.65.75.17:3000/api/v1/files${item.image?.path}`,
+          }}
           style={styles.icon}
           resizeMode="contain"
         />
@@ -59,7 +85,7 @@ const MasterCategory = () => {
   );
   return (
     <View style={styles.container}>
-      <View >
+      <View>
         <FlatList
           data={data}
           // showsHorizontalScrollIndicator={false}
@@ -91,7 +117,7 @@ const styles = StyleSheet.create({
     // marginBottom: 12,
   },
   card: {
-    width: (width - 48)/2,
+    width: (width - 48) / 2,
     backgroundColor: "#fff",
     // borderRadius: 16,
     borderTopRightRadius: 50,
@@ -105,7 +131,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     borderColor: COLORS?.paleGreenDark,
     borderWidth: 1,
-   margin: 4,
+    margin: 4,
   },
   iconContainer: {
     backgroundColor: "#E9F5EF",
@@ -122,6 +148,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     textAlign: "center",
-    width:100
+    width: 100,
   },
 });

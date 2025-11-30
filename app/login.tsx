@@ -166,6 +166,9 @@ const Login = () => {
         },
       ]}
     >
+      <View style={{ direction: isRTL ? "rtl" : "ltr" }}>
+        <Header title="تسجيل الدخول" />
+      </View>
       <View
         style={[
           styles.container,
@@ -175,7 +178,6 @@ const Login = () => {
           },
         ]}
       >
-        <Header title="" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.logoContainer}>
             <Image
@@ -202,9 +204,7 @@ const Login = () => {
               </Text>
             </View>
           )}
-          {loginError && (
-            <Text style={styles.errorText}>{loginError}</Text>
-          )}
+          {loginError && <Text style={styles.errorText}>{loginError}</Text>}
           <Input
             id="email"
             onInputChanged={inputChangedHandler}

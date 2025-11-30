@@ -15,6 +15,8 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCategories } from "@/data/useHome";
 import { useLanguageContext } from "@/contexts/LanguageContext";
+import Skeleton from "@/components/Skeleton";
+import Header from "@/components/Header";
 
 const AllCategories = () => {
   const router = useRouter();
@@ -23,7 +25,8 @@ const AllCategories = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const params = useLocalSearchParams();
   const [selectedMasterCategory, setSelectedMasterCategory] = useState("");
-  const [selectedMasterCategoryName, setSelectedMasterCategoryName] = useState("");
+  const [selectedMasterCategoryName, setSelectedMasterCategoryName] =
+    useState("");
 
   // Debounce search query
   React.useEffect(() => {
@@ -33,13 +36,14 @@ const AllCategories = () => {
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
- React.useEffect(() => {
-  console.log(params.masterId,"masterIdmasterId");
+
+  React.useEffect(() => {
     if (params.masterId) {
       setSelectedMasterCategory(params.masterId as string);
-      setSelectedMasterCategoryName(params.masterName as string)
+      setSelectedMasterCategoryName(params.masterName as string);
     }
   }, [params.masterId]);
+
   // Get categories
   const {
     data: categoriesData,
@@ -47,7 +51,7 @@ const AllCategories = () => {
     error,
     refetch,
     isRefetching,
-  } = useCategories({masterId:selectedMasterCategory});
+  } = useCategories({ masterId: selectedMasterCategory });
 
   const allCategories = categoriesData || [];
 
@@ -68,7 +72,9 @@ const AllCategories = () => {
               },
             ]}
           >
-           {selectedMasterCategory ? selectedMasterCategoryName : "جميع الاقسام"}
+            {selectedMasterCategory
+              ? selectedMasterCategoryName
+              : "جميع الاقسام"}
           </Text>
         </View>
         <View style={styles.headerRight}>
@@ -144,19 +150,65 @@ const AllCategories = () => {
             style={styles.categoryImage}
           />
         ) : (
-         <Image
-                     source={icons.sample}
-                     contentFit="cover"
-                     style={styles.categoryImage}
-                   />
+          <Image
+            source={icons.sample}
+            contentFit="cover"
+            style={styles.categoryImage}
+          />
         )}
       </View>
       <Text style={styles.categoryName}>{item.nameAr || item.nameEn}</Text>
-    
     </TouchableOpacity>
   );
 
+  const renderSkeletonCategory = () => (
+    <View style={styles.categoryCard}>
+      <View style={styles.categoryIconContainer}>
+        <Skeleton width="100%" height="100%" borderRadius={16} />
+      </View>
+      <Skeleton
+        width="80%"
+        height={14}
+        borderRadius={4}
+        style={{ marginTop: 8 }}
+      />
+    </View>
+  );
 
+  const renderSkeletonLoader = () => (
+    <SafeAreaView style={styles.area}>
+      <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
+        {/* Skeleton Header */}
+        <View style={styles.headerContainer}>
+          <View style={styles.headerLeft}>
+            <Skeleton width={36} height={36} borderRadius={8} />
+            <Skeleton
+              width={150}
+              height={20}
+              borderRadius={4}
+              style={{ marginRight: 12 }}
+            />
+          </View>
+        </View>
+
+        {/* Skeleton Search Bar */}
+        <View style={styles.searchContainer}>
+          <Skeleton width="100%" height={48} borderRadius={12} />
+        </View>
+
+        {/* Skeleton Category Grid */}
+        <View style={styles.listContainer}>
+          <View style={styles.skeletonGrid}>
+            {[...Array(9)].map((_, index) => (
+              <View key={index} style={styles.skeletonCategoryWrapper}>
+                {renderSkeletonCategory()}
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
 
   const handleRefresh = () => {
     refetch();
@@ -180,24 +232,17 @@ const AllCategories = () => {
   });
 
   if (isLoading) {
-    return (
-      <SafeAreaView style={styles.area}>
-      <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
-          {renderHeader()}
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.loadingText}>جاري تحميل التصنيفات...</Text>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
+    return renderSkeletonLoader();
   }
 
   if (error) {
     return (
       <SafeAreaView style={styles.area}>
-      <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
-          {renderHeader()}
+        <View style={{ direction: isRTL ? "rtl" : "ltr" }}>
+          <Header title="جميع الاقسام" />
+        </View>
+        <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
+          {/* {renderHeader()} */}
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>حدث خطأ في تحميل التصنيفات</Text>
             <TouchableOpacity
@@ -214,8 +259,11 @@ const AllCategories = () => {
 
   return (
     <SafeAreaView style={styles.area}>
+      <View style={{ direction: isRTL ? "rtl" : "ltr" }}>
+        <Header title="جميع الاقسام" />
+      </View>
       <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
-        {renderHeader()}
+        {/* {renderHeader()} */}
         {renderSearchBar()}
         <FlatList
           data={filteredCategories}
@@ -292,7 +340,6 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    // backgroundColor: COLORS.paleGreen,
   },
   searchBarContainer: {
     flexDirection: "row",
@@ -300,11 +347,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.paleGreenDark,
     borderWidth: 2,
     borderRadius: 12,
-    // paddingHorizontal: 16,
     height: 48,
     width: "100%",
   },
-
   searchIcon: {
     width: 20,
     height: 20,
@@ -316,7 +361,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.black,
     textAlign: "right",
-    
   },
   clearButton: {
     padding: 4,
@@ -330,29 +374,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 16,
   },
-    categoryCard: {
-    flex: 1,          // Take all available space in the column
-    minWidth: 0,      // Fix text overflow issues
+  categoryCard: {
+    flex: 1,
+    minWidth: 0,
     height: 210,
-    // backgroundColor: COLORS.white,
     borderRadius: 16,
-    // paddingBottom: 10,
-    // paddingTop: 5,
     paddingHorizontal: 3,
-     marginLeft: 3,
-    //  marginVertical:5,
+    marginLeft: 3,
     alignItems: "center",
     position: "relative",
-    // elevation: 2,
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // borderColor:COLORS.paleGreenDark,
-    // borderWidth :1
   },
   categoryIconContainer: {
     backgroundColor: COLORS.paleGreen,
@@ -370,7 +400,7 @@ const styles = StyleSheet.create({
     tintColor: COLORS.primary,
   },
   categoryImage: {
-     width: "100%",
+    width: "100%",
     height: "100%",
     resizeMode: "cover",
     marginVertical: 10,
@@ -395,6 +425,15 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingRight: 5,
     textAlign: "center",
+  },
+  skeletonGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  skeletonCategoryWrapper: {
+    width: "31%",
+    marginBottom: 16,
   },
   loadingContainer: {
     flex: 1,

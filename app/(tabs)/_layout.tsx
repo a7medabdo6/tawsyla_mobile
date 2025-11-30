@@ -1,232 +1,109 @@
 import { Tabs } from "expo-router";
-import { View, Text, Platform ,StyleSheet} from "react-native";
+import { View, Text, Platform, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import { COLORS, icons, FONTS, SIZES } from "../../constants";
-import { useLanguageContext } from "../../contexts/LanguageContext";
+import { COLORS, icons } from "../../constants";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCart } from "@/data/useCart";
+import CustomTabBar from "@/components/CustomTabBar";
+import { useFavourites } from "@/data/useFavourites";
 
 const TabLayout = () => {
-  const { t, isRTL } = useLanguageContext();
- const { data: cartItems } = useCart(); // Get cart items from your cart context
-//  console.log(cartItems,"cartItems");
- 
-  // const cartItemCount = cartItems?.reduce((total: number, item: any) => total + item.quantity, 0);
+  const { data: cartItems } = useCart();
+  const { data: favItems } = useFavourites();
 
   return (
     <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: Platform.OS !== "ios",
-        tabBarStyle: {
-          position: "absolute",
-          bottom: 0,
-          right: 0,
-          left: 0,
-          elevation: 0,
-          height: Platform.OS === "ios" ? 90 : 110,
-          // backgroundColor: COLORS.white,
-                  direction: isRTL ? "rtl" : "ltr",
-
-        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Image
-                  source={focused ? icons.home4 : icons.home4Outline}
-                  contentFit="contain"
-                  style={{
-                    width: 30,
-                    height: 30,
-                    tintColor: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                />
-                {/* <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                >
-                  {t("tabs.home")}
-                </Text> */}
-              </View>
-            );
-          },
+          title: "Home",
+          tabBarIcon: ({ focused, color }) => (
+            <Image
+              source={focused ? icons.home4 : icons.home4Outline}
+              contentFit="contain"
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: color,
+              }}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="fav"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Ionicons
-                  name="heart-outline"
-                  size={35}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                  color="black"
-                />
-                
-                {/* <Image
-                  source={focused ? icons.document : icons.documentOutline}
-                  contentFit="contain"
-                 
-                /> */}
-                {/* <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                >
-                  {t("tabs.myOrder")}
-                </Text> */}
-              </View>
-            );
-          },
+          title: "Favorites",
+          tabBarIcon: ({ focused, color }) => (
+            <View>
+              <Ionicons
+                name={focused ? "heart" : "heart-outline"}
+                size={24}
+                color={color}
+              />
+              {favItems?.length > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {favItems?.length > 9 ? "9+" : favItems?.length}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="createorder"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Ionicons
-                  style={{
-                    width: 35,
-                    height: 35,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                  name="add-circle-outline"
-                  size={35}
-                  color="black"
-                />
-                {/* <Image
-                  source={focused ? icons.document : icons.documentOutline}
-                  contentFit="contain"
-                /> */}
-                {/* <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                >
-                  {t("tabs.myOrder")}
-                </Text> */}
-              </View>
-            );
-          },
+          title: "Order",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "receipt" : "receipt-outline"}
+              size={24}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                  position: "relative",
-                }}
-              >
-                <Ionicons
-                  name="cart-outline"
-                  size={35}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                  color="black"
-                />
- {cartItems?.totalItems > 0 && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>
-                      {cartItems?.totalItems > 9 ? '9+' : cartItems?.totalItems}
-                    </Text>
-                  </View>
-                )}
-                {/* <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                >
-                  {t("tabs.inbox")}
-                </Text> */}
-              </View>
-            );
-          },
+          title: "Cart",
+          tabBarIcon: ({ focused, color }) => (
+            <View>
+              <Ionicons
+                name={focused ? "cart" : "cart-outline"}
+                size={24}
+                color={color}
+              />
+              {cartItems?.totalItems > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {cartItems?.totalItems > 9 ? "9+" : cartItems?.totalItems}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }: { focused: boolean }) => {
-            return (
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: 16,
-                  width: SIZES.width / 4,
-                }}
-              >
-                <Ionicons
-                  name="settings-outline"
-                  style={{
-                    width: 35,
-                    height: 35,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                  size={35}
-                  color="black"
-                />
-
-                {/* <Text
-                  style={{
-                    ...FONTS.body4,
-                    color: focused ? COLORS.primary : COLORS.gray3,
-                  }}
-                >
-                  {t("tabs.profile")}
-                </Text> */}
-              </View>
-            );
-          },
+          title: "Profile",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={24}
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>
@@ -235,20 +112,22 @@ const TabLayout = () => {
 
 const styles = StyleSheet.create({
   badge: {
-    position: 'absolute',
-    right: "30%",
-    top: 10,
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: "absolute",
+    right: -6,
+    top: -6,
+    backgroundColor: COLORS.error,
+    borderRadius: 8,
+    width: 16,
+    height: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: COLORS.white,
   },
   badgeText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: "white",
+    fontSize: 10,
+    fontWeight: "bold",
   },
 });
 
