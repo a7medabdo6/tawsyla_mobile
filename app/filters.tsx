@@ -367,7 +367,6 @@ const styles = StyleSheet.create({
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,
@@ -403,7 +402,7 @@ const styles = StyleSheet.create({
   sectionIcon: {
     width: 20,
     height: 20,
-    tintColor: COLORS.primary,
+
     marginHorizontal: 8,
   },
   sectionTitle: {

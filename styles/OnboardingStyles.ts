@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   nextButton: {
     width: 100,
     marginBottom: SIZES.padding,
-    backgroundColor: "#22BB9C",
+    backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
     // marginTop: 22,
   },

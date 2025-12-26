@@ -191,12 +191,7 @@ const Profile = () => {
               <Image
                 source={icons.userOutline}
                 contentFit="contain"
-                style={[
-                  styles.settingsIcon,
-                  {
-                    tintColor: COLORS.primary,
-                  },
-                ]}
+                style={[styles.settingsIcon, {}]}
               />
               <Text
                 style={[
@@ -215,7 +210,6 @@ const Profile = () => {
               style={[
                 styles.settingsArrowRight,
                 {
-                  tintColor: COLORS.primary,
                   transform: isRTL ? [{ scaleX: -1 }] : [],
                 },
               ]}
@@ -343,8 +337,8 @@ const Profile = () => {
       key={`profile-${authStatus?.isAuthenticated ? "auth" : "guest"}`}
     >
       {/* <Header title={t("profile.title")} /> */}
-      {renderHeader()}
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+        {renderHeader()}
         <ScrollView showsVerticalScrollIndicator={false}>
           {authStatus?.isAuthenticated && renderProfile()}
           {renderSettings()}
@@ -449,7 +443,6 @@ const styles = StyleSheet.create<any>({
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary,
   },
   headerRight: {
     flexDirection: "row",
@@ -461,7 +454,6 @@ const styles = StyleSheet.create<any>({
   logo: {
     height: 32,
     width: 32,
-    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 22,

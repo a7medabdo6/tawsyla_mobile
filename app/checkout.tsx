@@ -175,28 +175,8 @@ const Checkout = () => {
     >
       <Header title="إتمام الطلب" />
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        {/* <View style={styles.headerContainer}>
-          <View style={styles.headerLeft}>
-            <Image
-              source={images.logo as ImageSourcePropType}
-              resizeMode="contain"
-              style={styles.headerLogo}
-            />
-            <Text
-              style={[
-                styles.headerTitle,
-                {
-                  color: COLORS.greyscale900,
-                },
-              ]}
-            >
-              {t("Complete Order")}
-            </Text>
-          </View>
-        </View> */}
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           <View style={{ marginVertical: 22 }}>
-            {/* <Barcode ... /> */}
             <View
               style={[
                 styles.summaryContainer,

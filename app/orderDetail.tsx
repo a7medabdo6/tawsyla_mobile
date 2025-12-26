@@ -517,12 +517,7 @@ const OrderDetail = () => {
                   <Image
                     source={icons.ornament as any}
                     resizeMode="contain"
-                    style={[
-                      styles.icon,
-                      {
-                        tintColor: COLORS.primary,
-                      },
-                    ]}
+                    style={[styles.icon, { tintColor: COLORS.primary }]}
                   />
                   <Image
                     source={icons?.userDefault as any}
@@ -685,7 +680,6 @@ const styles = StyleSheet.create({
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,

@@ -218,7 +218,7 @@ const MyOrder = () => {
       <View
         style={{
           flex: 1,
-          backgroundColor: "#f8f9fa",
+          backgroundColor: "#fff",
           paddingHorizontal: 16,
           direction: isRTL ? "rtl" : "ltr",
         }}
@@ -322,7 +322,6 @@ const styles = StyleSheet.create({
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,

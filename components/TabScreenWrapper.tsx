@@ -16,7 +16,7 @@ interface TabScreenWrapperProps {
 const TabScreenWrapper: React.FC<TabScreenWrapperProps> = ({
   children,
   style,
-  backgroundColor = "#f8f9fa",
+  backgroundColor = "#fff",
 }) => {
   return (
     <SafeAreaView

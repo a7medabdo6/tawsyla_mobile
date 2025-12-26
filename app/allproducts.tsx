@@ -360,7 +360,6 @@ const styles = StyleSheet.create({
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,
@@ -481,7 +480,6 @@ const styles = StyleSheet.create({
   filterIcon: {
     width: 20,
     height: 20,
-    tintColor: COLORS.primary,
   },
   categoriesContainer: {
     paddingHorizontal: 16,

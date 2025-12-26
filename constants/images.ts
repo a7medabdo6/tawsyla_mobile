@@ -1,4 +1,4 @@
-const logo = require("../assets/images/logo.png") as string;
+const logo = require("../assets/images/waslha.png") as string;
 const onboardingSplash = require("../assets/images/onboarding_splash1.jpg");
 const onboardingSplashDark = require("../assets/images/onboarding_splash1_dark.jpg");
 const idAvatar = require("../assets/images/id_avatar.png");
@@ -29,35 +29,35 @@ const package6 = require("../assets/images/packages/package6.jpeg");
 const package7 = require("../assets/images/packages/package7.jpeg");
 
 const images = {
-    logo,
-    onboardingSplash,
-    onboardingSplashDark,
-    idAvatar,
-    avatar,
-    card,
-    face,
-    scanCard,
-    user1,
-    user2,
-    user3,
-    user4,
-    user5,
-    user6,
-    user7,
-    user8,
-    user9,
-    user10,
-    user11,
-    elipseCard,
-    rectangleCard,
-    orderSuccess,
-    package1,
-    package2,
-    package3,
-    package4,
-    package5,
-    package6,
-    package7
+  logo,
+  onboardingSplash,
+  onboardingSplashDark,
+  idAvatar,
+  avatar,
+  card,
+  face,
+  scanCard,
+  user1,
+  user2,
+  user3,
+  user4,
+  user5,
+  user6,
+  user7,
+  user8,
+  user9,
+  user10,
+  user11,
+  elipseCard,
+  rectangleCard,
+  orderSuccess,
+  package1,
+  package2,
+  package3,
+  package4,
+  package5,
+  package6,
+  package7,
 };
 
 export default images;

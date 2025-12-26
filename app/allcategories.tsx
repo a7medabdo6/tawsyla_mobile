@@ -55,46 +55,6 @@ const AllCategories = () => {
 
   const allCategories = categoriesData || [];
 
-  const renderHeader = () => {
-    return (
-      <View style={styles.headerContainer}>
-        <View style={styles.headerLeft}>
-          <Image
-            source={images.logo}
-            contentFit="contain"
-            style={styles.headerLogo}
-          />
-          <Text
-            style={[
-              styles.headerTitle,
-              {
-                color: COLORS.greyscale900,
-              },
-            ]}
-          >
-            {selectedMasterCategory
-              ? selectedMasterCategoryName
-              : "جميع الاقسام"}
-          </Text>
-        </View>
-        <View style={styles.headerRight}>
-          {/* <TouchableOpacity>
-            <Image
-              source={icons.moreCircle}
-              contentFit="contain"
-              style={[
-                styles.moreCircleIcon,
-                {
-                  tintColor: COLORS.greyscale900,
-                },
-              ]}
-            />
-          </TouchableOpacity> */}
-        </View>
-      </View>
-    );
-  };
-
   const renderSearchBar = () => {
     return (
       <View style={styles.searchContainer}>
@@ -319,7 +279,6 @@ const styles = StyleSheet.create({
   headerLogo: {
     height: 36,
     width: 36,
-    tintColor: COLORS.primary,
   },
   headerTitle: {
     fontSize: 20,
@@ -397,7 +356,6 @@ const styles = StyleSheet.create({
   categoryIcon: {
     width: 50,
     height: 50,
-    tintColor: COLORS.primary,
   },
   categoryImage: {
     width: "100%",

@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Saska",
-    "slug": "Saska",
+    "name": "وصلها",
+    "slug": "wasala",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/waslha.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/adaptive-icon.png",
+      "image": "./assets/images/waslha.png",
       "resizeMode": "contain",
-      "backgroundColor": "#22BB9C"
+      "backgroundColor": "#fff"
     },
     "ios": {
       "supportsTablet": true
@@ -20,8 +20,8 @@
       "usesCleartextTraffic": true,
       "supportsRTL": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#22BB9C"
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#fff"
       },
       "package": "com.a7medabdo.tawsila",
       "networkSecurityConfig": "network_security_config"
@@ -37,8 +37,8 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
-          "color": "#22BB9C",
+          "icon": "./assets/images/waslha.png",
+          "color": "#fff",
           "defaultChannel": "default"
         }
       ],
@@ -61,8 +61,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "2a257357-651d-4f79-a3b8-d45d97ad3ccc"
+        "projectId": "9e9b6108-0c01-4193-b5b0-699b08507bd4"
       }
-    }
+    },
+    "owner": "mramadan18"
   }
 }

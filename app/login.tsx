@@ -340,7 +340,6 @@ const createStyles = (isRTL: boolean) =>
     logo: {
       width: 100,
       height: 100,
-      tintColor: COLORS.primary,
     },
     logoContainer: {
       alignItems: "center",

@@ -394,7 +394,6 @@ const styles = StyleSheet.create({
   exchangeIcon: {
     width: 24,
     height: 24,
-    tintColor: COLORS.primary,
   },
   separateLine: {
     height: 0.6,

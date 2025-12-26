@@ -10,7 +10,9 @@ const OrderTable = ({ data }: any) => {
     <View style={styles.row}>
       <View style={styles.imageCell}>
         <Image
-          source={{ uri: `http://159.65.75.17:3000/api/v1/files${item.product?.image?.path}` }}
+          source={{
+            uri: `http://159.65.75.17:3000/api/v1/files${item.product?.image?.path}`,
+          }}
           style={styles.image}
         />
       </View>

@@ -59,6 +59,5 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     tintColor: COLORS.primary,
   },
-  // ...existing styles...
 });
 export default LoginCard;
