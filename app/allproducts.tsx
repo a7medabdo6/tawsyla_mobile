@@ -148,7 +148,7 @@ const AllProducts = () => {
       name={item?.nameAr || item?.nameEn}
       image={
         item.image?.path
-          ? `http://159.65.75.17:3000/api/v1/files${item.image.path}`
+          ? `https://api.waslha.net/api/v1/files${item.image.path}`
           : undefined
       }
       style={{

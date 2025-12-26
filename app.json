@@ -20,7 +20,7 @@
       "usesCleartextTraffic": true,
       "supportsRTL": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/waslha.png",
         "backgroundColor": "#fff"
       },
       "package": "com.a7medabdo.tawsila",

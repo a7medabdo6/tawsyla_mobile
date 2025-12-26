@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { Text, ImageBackground, StyleSheet } from "react-native";
-import { COLORS, images } from "../constants";
-import { LinearGradient } from "expo-linear-gradient";
+import { View, StyleSheet } from "react-native";
+import { Image } from "expo-image";
+import { images } from "../constants";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "expo-router";
 
@@ -21,54 +21,23 @@ const Onboarding1 = () => {
   }, []);
 
   return (
-    <ImageBackground
-      source={images.onboardingSplash}
-      style={[styles.area, { direction: "rtl" }]}
-    >
+    <View style={styles.area}>
       <StatusBar hidden />
-      <LinearGradient
-        // background linear gradient
-        colors={["transparent", "rgba(0,0,0,0.8)"]}
-        style={styles.background}
-      >
-        <Text style={styles.greetingText}>أهلًا وسهلًا بك في</Text>
-        <Text style={styles.logoName}>حالا!👋</Text>
-        <Text style={styles.subtitle}>
-          كل طلب توصله؟ حالا توصّله أسرع. تطبيق واحد، حلول شاملة للتوصيل والشحن،
-          بخدمة ولا أروع!
-        </Text>{" "}
-      </LinearGradient>
-    </ImageBackground>
+      <Image source={images.loading} style={styles.logo} contentFit="contain" />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   area: {
     flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  background: {
-    position: "absolute",
-    bottom: 20,
-    width: "100%",
-    height: 270,
-    paddingHorizontal: 16,
-  },
-  greetingText: {
-    fontSize: 40,
-    color: COLORS.white,
-    fontFamily: "bold",
-    marginVertical: 12,
-  },
-  logoName: {
-    fontSize: 76,
-    color: COLORS.primary,
-    fontFamily: "extraBold",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: COLORS.white,
-    marginVertical: 12,
-    fontFamily: "semiBold",
+  logo: {
+    width: 80,
+    height: 80,
   },
 });
 

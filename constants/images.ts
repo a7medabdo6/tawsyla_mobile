@@ -27,6 +27,7 @@ const package4 = require("../assets/images/packages/package4.jpeg");
 const package5 = require("../assets/images/packages/package5.jpeg");
 const package6 = require("../assets/images/packages/package6.jpeg");
 const package7 = require("../assets/images/packages/package7.jpeg");
+const loading = require("../assets/images/loading.gif");
 
 const images = {
   logo,
@@ -58,6 +59,7 @@ const images = {
   package5,
   package6,
   package7,
+  loading,
 };
 
 export default images;

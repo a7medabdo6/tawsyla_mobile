@@ -35,7 +35,7 @@ const renderItem = ({ item }: any) => {
     <ProductCard
       style={styles.relatedProduct}
       name={item?.nameAr}
-      image={`http://159.65.75.17:3000/api/v1/files${item?.image?.path}`}
+      image={`https://api.waslha.net/api/v1/files${item?.image?.path}`}
       price={item?.variants[0]?.price}
       productId={item?.id}
     />
@@ -238,7 +238,7 @@ const ProductDetails = () => {
         <View style={styles.imageContainer}>
           <Image
             source={{
-              uri: `http://159.65.75.17:3000/api/v1/files${product.image?.path}`,
+              uri: `https://api.waslha.net/api/v1/files${product.image?.path}`,
             }}
             style={styles.productImage}
           />

@@ -60,7 +60,7 @@ const CategoryCarousel = () => {
       <View style={styles.categoryIconContainer}>
         {item.image?.path ? (
           <Image
-            source={{ uri: `http://159.65.75.17:3000${item.image?.path}` }}
+            source={{ uri: `https://api.waslha.net${item.image?.path}` }}
             contentFit="cover"
             style={styles.categoryImage}
           />

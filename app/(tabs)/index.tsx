@@ -34,7 +34,7 @@ const RenderWalletCard = ({ item }: any) => {
     <View style={styles.item}>
       <Image
         style={styles.cardContainer}
-        source={{ uri: `http://159.65.75.17:3000${item.image?.path}` }}
+        source={{ uri: `https://api.waslha.net${item.image?.path}` }}
         resizeMode="cover"
       />
     </View>
@@ -258,13 +258,13 @@ const Home = () => {
           <ScrollView showsVerticalScrollIndicator={false}>
             {renderSearchBar()}
             <CarouselExample />
-            <View style={styles.categoriesSection}>
+            {/* <View style={styles.categoriesSection}>
               <SubHeaderItem
                 title="اكتشف وصلها"
                 onPress={() => navigation.navigate("allcategories")}
               />
               <MasterCategory />
-            </View>
+            </View> */}
             <View style={styles.categoriesSection}>
               <SubHeaderItem
                 title="جميع الاقسام"

@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handleGlobalLogout, useLogoutHandler } from "./useAuth";
 
 const api = axios.create({
-  baseURL: "http://159.65.75.17:3000/api/",
+  baseURL: "https://api.waslha.net/api/",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",

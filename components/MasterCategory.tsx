@@ -75,7 +75,7 @@ const MasterCategory = () => {
       <View style={styles.iconContainer}>
         <Image
           source={{
-            uri: `http://159.65.75.17:3000/api/v1/files${item.image?.path}`,
+            uri: `https://api.waslha.net/api/v1/files${item.image?.path}`,
           }}
           style={styles.icon}
           resizeMode="contain"

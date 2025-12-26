@@ -143,7 +143,7 @@ const Cart = () => {
                           const imagePath = item?.image?.path;
                           const imageSource = imagePath
                             ? {
-                                uri: `http://159.65.75.17:3000/api/v1/files${imagePath}`,
+                                uri: `https://api.waslha.net/api/v1/files${imagePath}`,
                               }
                             : orange;
                           return (
