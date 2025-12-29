@@ -22,7 +22,7 @@ export const addFavourite = async (payload: AddFavouritePayload) => {
     const response = await api.post("favourites", payload);
     return response.data;
   } catch (error: any) {
-    console.log(error?.response?.data, "errrr");
+    // console.log(error?.response?.data, "errrr");
   }
 };
 
@@ -59,7 +59,7 @@ export const useAddFavourite = () => {
           );
         }
       } catch (error) {
-        console.log("Error updating favourites AsyncStorage:", error);
+        // console.log("Error updating favourites AsyncStorage:", error);
       }
     },
   });
@@ -83,7 +83,7 @@ export const useDeleteFavourite = () => {
           JSON.stringify(updatedIds)
         );
       } catch (error) {
-        console.log("Error updating favourites AsyncStorage:", error);
+        // console.log("Error updating favourites AsyncStorage:", error);
       }
     },
   });

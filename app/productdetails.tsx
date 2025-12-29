@@ -27,20 +27,11 @@ import { useProduct, useProducts } from "@/data/useHome";
 import { isAuthenticated } from "@/data/useAuth";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Carousel from "react-native-reanimated-carousel";
+import Header from "@/components/Header";
 
 const { height, width } = Dimensions.get("window");
 
-const renderItem = ({ item }: any) => {
-  return (
-    <ProductCard
-      style={styles.relatedProduct}
-      name={item?.nameAr}
-      image={`https://api.waslha.net/api/v1/files${item?.image?.path}`}
-      price={item?.variants[0]?.price}
-      productId={item?.id}
-    />
-  );
-};
+
 
 const ProductDetails = () => {
   const { t, isRTL } = useLanguageContext();
@@ -65,7 +56,6 @@ const ProductDetails = () => {
     isLoading,
     error,
   } = useProducts(1, 10, product?.category?.id);
-
   const { mutateAsync: addToCart, isPending } = useAddToCart();
   const { mutateAsync: deleteItem } = useDeleteCartItem();
   const { mutateAsync: addFav } = useAddFavourite();
@@ -129,7 +119,7 @@ const ProductDetails = () => {
       });
       setIsAdded(true);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -144,7 +134,7 @@ const ProductDetails = () => {
         setIsFav(true);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -159,7 +149,7 @@ const ProductDetails = () => {
         setIsAdded(false);
         setQuantity(1);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     }
   };
@@ -179,7 +169,21 @@ const ProductDetails = () => {
   const totalPrice = (
     parseFloat(getFirstVariantPrice(product?.variants)) * quantity
   ).toFixed(2);
-
+  const renderItem = ({ item }: any) => {
+    // console.log(data?.items?.[0]?.productId,'dddddddddddddddddddata?.itemsdata?.itemsdata?.items');
+    
+    return (
+      <ProductCard
+        style={styles.relatedProduct}
+        name={item?.nameAr}
+        image={`https://api.waslha.net/api/v1/files${item?.image?.path}`}
+        price={item?.variants[0]?.price}
+        productId={item?.id}
+        varints={item?.variants}
+        cartItem={data?.items?.find((cartItem: any) => cartItem.productId === item?.id)}
+      />
+    );
+  };
   if (productLoading) {
     return (
       <View style={[styles.container, { direction: isRTL ? "rtl" : "ltr" }]}>
@@ -211,7 +215,9 @@ const ProductDetails = () => {
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
 
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top }]}>
+      {/* <Header title={isRTL ? "التفاصيل" : "Details"} /> */}
+      <View style={[styles.header, {    paddingVertical: 16,
+    paddingHorizontal: 6,}]}>
         <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
           <Ionicons
             name={isRTL ? "chevron-forward" : "chevron-back"}
@@ -280,8 +286,8 @@ const ProductDetails = () => {
               </Text>
               <Carousel
                 loop={false}
-                width={width * 0.4}
-                height={220}
+                width={width * 0.45}
+                height={265}
                 autoPlay={true}
                 data={relatedProducts?.data}
                 scrollAnimationDuration={1000}
@@ -487,9 +493,9 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   relatedProduct: {
-    width: width * 0.4,
+    width: width * 0.43,
     marginRight: 12,
-    marginLeft: 2,
+    marginHorizontal: 6,
     marginBottom: 10,
   },
   bottomBar: {

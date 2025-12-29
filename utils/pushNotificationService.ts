@@ -23,7 +23,7 @@ class PushNotificationService {
   private static instance: PushNotificationService;
   private pushToken: string | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): PushNotificationService {
     if (!PushNotificationService.instance) {
@@ -60,7 +60,7 @@ class PushNotificationService {
       // Check if permissions are granted
       const hasPermission = await this.requestPermissions();
       if (!hasPermission) {
-        console.log('Push notification permissions not granted');
+        // console.log('Push notification permissions not granted');
         return null;
       }
 
@@ -70,11 +70,11 @@ class PushNotificationService {
       });
 
       this.pushToken = tokenData.data;
-      
+
       // Store the token in AsyncStorage
       await this.storePushToken(this.pushToken);
-      
-      console.log('Push token registered:', this.pushToken);
+
+      // console.log('Push token registered:', this.pushToken);
       return this.pushToken;
     } catch (error) {
       console.error('Error registering for push notifications:', error);
@@ -158,9 +158,9 @@ class PushNotificationService {
     try {
       // Try to get stored token first
       const storedToken = await this.getStoredPushToken();
-      
+
       if (storedToken) {
-        console.log('Using stored push token:', storedToken);
+        // console.log('Using stored push token:', storedToken);
         return;
       }
 

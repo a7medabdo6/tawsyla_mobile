@@ -15,6 +15,7 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import ProductCard from "./Product";
 import Skeleton from "./Skeleton";
+import { useCart } from "@/data/useCart";
 
 const { width } = Dimensions.get("window");
 
@@ -23,11 +24,32 @@ const SPACING = 12;
 
 const ProductHomeList = () => {
   const [active, setActive] = useState("1");
-  // Reverse data for RTL, because react-native-reanimated-carousel doesn't have inverted prop
-  const { data, isLoading, error } = useProducts(1, 10); // Show first 8 products on home
-  // console.log(data, "datadatadatadataaaaa");
+  const [page, setPage] = useState(1);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  
+  const { data: cartItems } = useCart();
+  const { data, isLoading, error, isFetching } = useProducts(page, 10);
 
-  if (isLoading) {
+  // Update products list when new data arrives
+  React.useEffect(() => {
+    if (data?.data) {
+      if (page === 1) {
+        // Reset list for first page
+        setAllProducts(data.data);
+      } else {
+        // Append new products for subsequent pages
+        setAllProducts((prev) => [...prev, ...data.data]);
+      }
+      
+      // Check if there are more products to load
+      if (data.data.length < 10) {
+        setHasMore(false);
+      }
+    }
+  }, [data, page]);
+
+  if (isLoading && page === 1) {
     return (
       <View style={styles.container}>
         <View
@@ -50,7 +72,25 @@ const ProductHomeList = () => {
       </View>
     );
   }
+  
   if (error) return <Text>Error: {error.message}</Text>;
+
+  const handleLoadMore = () => {
+    if (!isFetching && hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!isFetching || page === 1) return null;
+    
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>جاري تحميل المزيد...</Text>
+      </View>
+    );
+  };
 
   const renderItem = ({ item }: any) => (
     <ProductCard
@@ -62,9 +102,10 @@ const ProductHomeList = () => {
       }
       price="2.99"
       rating={item?.rating}
-      style={{ width: "45%" }}
+      style={{ width: "48%" }}
       varints={item?.variants}
       productId={item?.id}
+      cartItem={cartItems?.items?.find((cartItem: any) => cartItem.productId === item?.id)}
     />
   );
   return (
@@ -72,16 +113,18 @@ const ProductHomeList = () => {
       <View style={{ direction: "ltr" }}>
         <FlatList
           numColumns={2}
-          data={data?.data || []}
+          data={allProducts}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
           contentContainerStyle={{
-            // paddingHorizontal: 16,
             flexDirection: "row",
             justifyContent: "space-between",
           }}
           inverted={false}
           renderItem={renderItem}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
         />
       </View>
     </View>
@@ -94,6 +137,18 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 20,
     // backgroundColor:"red"
+  },
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: COLORS.gray,
+    fontFamily: "medium",
   },
   heading: {
     fontSize: 18,

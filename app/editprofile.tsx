@@ -161,10 +161,10 @@ const EditProfile = () => {
           inputValue: user.email || "",
         });
 
-        console.log("Form data refreshed with updated values:", user);
+        // console.log("Form data refreshed with updated values:", user);
       }
     } catch (error) {
-      console.error("Error refreshing form data:", error);
+      // console.error("Error refreshing form data:", error);
     }
   }, []);
 
@@ -179,10 +179,10 @@ const EditProfile = () => {
         );
 
         if (isUpdated) {
-          console.log("AsyncStorage updated successfully with:", expectedData);
+          // console.log("AsyncStorage updated successfully with:", expectedData);
           return true;
         } else {
-          console.warn("AsyncStorage update validation failed");
+          // console.warn("AsyncStorage update validation failed");
           return false;
         }
       }
@@ -336,10 +336,10 @@ const EditProfile = () => {
                 "user",
                 JSON.stringify(updatedUserData)
               );
-              console.log(
-                "Updated user data in AsyncStorage:",
-                updatedUserData
-              );
+              // console.log(
+              //   "Updated user data in AsyncStorage:",
+              //   updatedUserData
+              // );
 
               // Validate the update
               const isValid = await validateAsyncStorageUpdate(updateData);
@@ -403,7 +403,7 @@ const EditProfile = () => {
             // If the API response includes updated user data, update AsyncStorage
             // This depends on your API response structure
             // For now, we'll just log that password was updated
-            console.log("Password updated successfully");
+            // console.log("Password updated successfully");
 
             // Clear password form
             dispatchPasswordForm({

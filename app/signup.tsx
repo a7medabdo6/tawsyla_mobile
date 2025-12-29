@@ -149,17 +149,17 @@ const Signup = () => {
 
   // implementing apple authentication
   const appleAuthHandler = () => {
-    console.log("Apple Authentication");
+    // console.log("Apple Authentication");
   };
 
   // implementing facebook authentication
   const facebookAuthHandler = () => {
-    console.log("Facebook Authentication");
+    // console.log("Facebook Authentication");
   };
 
   // Implementing google authentication
   const googleAuthHandler = () => {
-    console.log("Google Authentication");
+    // console.log("Google Authentication");
   };
 
   // Handle registration form submission

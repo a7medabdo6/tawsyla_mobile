@@ -52,7 +52,7 @@ const Profile = () => {
   // Refresh user data when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      console.log("Profile screen focused, refreshing user data...");
+      // console.log("Profile screen focused, refreshing user data...");
       refetch();
     }, [refetch])
   );
@@ -218,11 +218,11 @@ const Profile = () => {
         )}
 
         {/* These items are always visible */}
-        <SettingsItem
+        {/* <SettingsItem
           icon={icons.bell2}
           name={t("profile.notification")}
           onPress={() => navigate("notifications")}
-        />
+        /> */}
 
         <SettingsItem
           icon={icons.lockedComputerOutline}
@@ -336,7 +336,6 @@ const Profile = () => {
       ]}
       key={`profile-${authStatus?.isAuthenticated ? "auth" : "guest"}`}
     >
-      {/* <Header title={t("profile.title")} /> */}
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
         {renderHeader()}
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -428,7 +427,7 @@ const styles = StyleSheet.create<any>({
     flex: 1,
     backgroundColor: COLORS.white,
     padding: 16,
-    marginBottom: 32,
+    marginBottom: 60,
   },
   headerContainer: {
     flexDirection: "row",
@@ -632,14 +631,14 @@ const styles = StyleSheet.create<any>({
     backgroundColor: COLORS.grayscale400,
   },
   bottomTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontFamily: "semiBold",
     color: "red",
     textAlign: "center",
     marginTop: 12,
   },
   bottomSubtitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: "semiBold",
     color: COLORS.greyscale900,
     textAlign: "center",

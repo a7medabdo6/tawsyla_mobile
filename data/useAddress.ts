@@ -8,8 +8,8 @@ export const addAddress = async (payload: any) => {
 	try {
 		const response = await api.post("addresses", payload);
 		return response.data;
-	} catch (error:any) {
-		console.log(error?.response?.data);
+	} catch (error: any) {
+		// console.log(error?.response?.data);
 		throw error;
 	}
 };
@@ -21,7 +21,7 @@ export const useAddAddress = () => {
 		onSuccess: async (data, variables) => {
 			// Invalidate any cart-related queries if they exist
 			queryClient.invalidateQueries({ queryKey: ["address"] });
-			
+
 			// Update AsyncStorage
 			try {
 				const existingIds = await AsyncStorage.getItem('cartProductIds');
@@ -31,7 +31,7 @@ export const useAddAddress = () => {
 					await AsyncStorage.setItem('cartProductIds', JSON.stringify(cartIds));
 				}
 			} catch (error) {
-				console.log("Error updating cart AsyncStorage:", error);
+				// console.log("Error updating cart AsyncStorage:", error);
 			}
 		},
 	});
@@ -51,7 +51,7 @@ export const useAddress = () => {
 
 
 
-export const useGetOneAddress  = (id: string) => {
+export const useGetOneAddress = (id: string) => {
 	return useQuery({
 		queryKey: ["oneaddress", id],
 		queryFn: async () => {
@@ -70,7 +70,7 @@ export const updateAddress = async (payload: any) => {
 		const response = await api.put(`addresses/${payload.id}`, payload);
 		return response.data;
 	} catch (error) {
-		console.log(error);
+		// console.log(error);
 		throw error;
 	}
 };
@@ -90,7 +90,7 @@ export const deleteCartItem = async (itemId: string) => {
 		const response = await api.delete(`cart/items/${itemId}`);
 		return response.data;
 	} catch (error) {
-		console.log(error);
+		// console.log(error);
 		throw error;
 	}
 };
@@ -102,7 +102,7 @@ export const useDeleteCartItem = () => {
 		onSuccess: async (data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
 			queryClient.invalidateQueries({ queryKey: ["appStatus"] });
-			
+
 			// Note: We can't easily remove from AsyncStorage here since we don't have productId
 			// The appStatus query will refresh and update AsyncStorage on next load
 		},

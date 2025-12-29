@@ -96,7 +96,7 @@ const NearbyDrop = () => {
                             image={icons.map}
                             title={item.name}
                             description={item.description}
-                            onPress={() => console.log("Move to another screen")}
+                            // onPress={() => console.log("Move to another screen")}
                         >
                             <Callout tooltip>
                                 <View>

@@ -166,6 +166,7 @@ const Cart = () => {
                         style={{
                           alignItems: "center",
                           width: "100%",
+                          marginBlock:10
                         }}
                       >
                         <Button

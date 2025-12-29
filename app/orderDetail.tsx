@@ -7,6 +7,7 @@ import {
   Alert,
   Modal,
   TouchableWithoutFeedback,
+  ImageSourcePropType,
 } from "react-native";
 import React, { useCallback, useRef, useState } from "react";
 import { COLORS, SIZES, icons } from "../constants";
@@ -24,6 +25,7 @@ import { useCart, useConfirmOrder, useValidateCoupon } from "@/data/useCart";
 import { useOneOrder } from "@/data/useOrders";
 import OrderTable from "@/components/OrderTable";
 import { OrderStatus } from "./myordertrack";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 
 const ORDER_STATUS_STEPS = [
   {
@@ -106,141 +108,130 @@ const OrderDetail = () => {
     <SafeAreaView
       style={[
         styles.area,
-        { backgroundColor: COLORS.white, direction: isRTL ? "rtl" : "ltr" },
+        { backgroundColor: COLORS.grayscale100, direction: isRTL ? "rtl" : "ltr" },
       ]}
     >
       <Header title={t("Order Details")} />
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+      <View style={[styles.container, { backgroundColor: COLORS.grayscale100 }]}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ marginVertical: 22 }}>
-            {/* <Barcode ... /> */}
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.white,
-                  borderRadius: 6,
-                },
-              ]}
-            >
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Name")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+          <View style={{ marginVertical: 16 }}>
+            {/* Customer Information Card */}
+            <View style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconContainer}>
+                  <AntDesign name="user" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={styles.sectionTitle}>معلومات العميل</Text>
+              </View>
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Name")}</Text>
+                <Text style={styles.infoValue}>
                   {data?.user?.firstName}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Address")}
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Address")}</Text>
+                <Text style={styles.infoValue}>
+                  {`${data?.shippingAddress?.city} - ${data?.shippingAddress?.state}`}
                 </Text>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text
-                    style={[
-                      styles.viewRight,
-                      {
-                        color: COLORS.black,
-                        marginInline: 5,
-                      },
-                    ]}
-                  >
-                    {`${data?.shippingAddress?.city} - ${data?.shippingAddress?.state}`}
-                  </Text>
-                </View>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Phone")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Phone")}</Text>
+                <Text style={styles.infoValue}>
                   {data?.shippingAddress?.phone || data?.user?.phone}
                 </Text>
               </View>
             </View>
 
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.white,
-                  borderRadius: 6,
-                },
-              ]}
-            >
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Amount")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+            {/* Order Summary Card */}
+            <View style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconContainer}>
+                  <AntDesign name="filetext1" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={styles.sectionTitle}>ملخص الطلب</Text>
+              </View>
+              
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{t("Amount")}</Text>
+                <Text style={styles.summaryValue}>
                   {data?.subtotal} {t("EGP")}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-                  {t("Delivery Fee")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+              
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{t("Delivery Fee")}</Text>
+                <Text style={styles.summaryValue}>
                   {data?.shippingCost} {t("EGP")}
                 </Text>
               </View>
+              
               {data?.discountAmount && (
-                <View style={styles.viewContainer}>
-                  <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-                    {t("Discount")}
+                <View style={styles.summaryRow}>
+                  <Text style={styles.discountLabel}>
+                    <MaterialIcons name="discount" size={16} color="#00CC00" />
+                    {" "}{t("Discount")}
                   </Text>
-                  <Text style={[styles.viewRight, { color: COLORS.black }]}>
-                    {data?.discountAmount} {t("EGP")}
+                  <Text style={styles.discountValue}>
+                    - {data?.discountAmount} {t("EGP")}
                   </Text>
                 </View>
               )}
             </View>
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.white,
-                  borderRadius: 6,
-                },
-              ]}
-            >
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-                  {t("Total")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+            {/* Payment & Status Card */}
+            <View style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconContainer}>
+                  <AntDesign name="wallet" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={styles.sectionTitle}>تفاصيل الدفع والحالة</Text>
+              </View>
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Total")}</Text>
+                <Text style={styles.totalValue}>
                   {data?.total} {t("EGP")}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-                  {t("Payment Methods")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Payment Methods")}</Text>
+                <Text style={styles.infoValue}>
                   {t("Cash on Delivery")}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-                  {t("Date")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Date")}</Text>
+                <Text style={styles.infoValue}>
                   {moment(data?.createdAt).format("YYYY-MM-DD")}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: COLORS.black }]}>
-                  {t("Status")}
-                </Text>
-                <TouchableOpacity
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Status")}</Text>
+                <View
                   style={[
-                    styles.statusBtn,
+                    styles.statusBadge,
                     {
                       backgroundColor: statusColor(data?.status),
                     },
                   ]}
                 >
-                  <Text style={styles.statusBtnText}>
+                  <Text style={styles.statusBadgeText}>
                     {isRTL
                       ? ORDER_STATUS_STEPS?.find(
                           (sub) => sub.key == data?.status
@@ -249,310 +240,202 @@ const OrderDetail = () => {
                           (sub) => sub.key == data?.status
                         )?.label?.en}
                   </Text>
-                </TouchableOpacity>
+                </View>
               </View>
             </View>
+            
+            {/* Order Items Section */}
+            <View style={styles.orderItemsCard}>
+              <View style={styles.orderItemsHeaderSection}>
+                <View style={styles.orderItemsIconContainer}>
+                  <AntDesign name="shoppingcart" size={20} color={COLORS.primary} />
+                </View>
+                <Text style={styles.orderItemsTitle}>المنتجات المطلوبة</Text>
+              </View>
+              <OrderTable data={data?.items} />
+            </View>
           </View>
-          <OrderTable data={data?.items} />
         </KeyboardAwareScrollView>
       </View>
 
-      <Modal animationType="fade" transparent={true} visible={modalVisible}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              // opacity: 0.5,
-              backgroundColor: "#80808040",
-              left: 0,
-              bottom: 0,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                width: "80%",
-                padding: 16,
-                backgroundColor: COLORS.white,
-                borderRadius: 20,
-              }}
-            >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
               <View
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: couponError ? "#FFE5E5" : COLORS.tansparentPrimary,
                   alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 20,
                 }}
               >
-                <View
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    source={icons.ornament as any}
-                    resizeMode="contain"
-                    style={[
-                      styles.icon,
-                      {
-                        tintColor: couponError ? COLORS?.error : COLORS.primary,
-                      },
-                    ]}
-                  />
-                  <Image
-                    source={
-                      couponError ? icons?.infoCircle : (icons.check2 as any)
-                    }
-                    style={[styles.check, { tintColor: COLORS.white }]}
-                  />
-                </View>
-
-                <View
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginVertical: 20,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      color: couponError ? COLORS?.blackTie : COLORS.primary,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {couponError ? t(couponError) : " تم تطبيق القسيمة بنجاح!"}
-                  </Text>
-                  {!couponError && (
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        textAlign: "center",
-                        marginTop: 15,
-                      }}
-                    >
-                      تم تطبيق القسيمة بنجاح على طلبك. استمتع بتخفيضك!
-                    </Text>
-                  )}
-                </View>
-                <View style={{ alignItems: "center", marginVertical: 10 }}>
-                  <Button
-                    title={t("Close")}
-                    filled
-                    style={[styles.applyBtn]}
-                    onPress={() => setModalVisible(false)}
-                  />
-                </View>
+                <AntDesign
+                  name={couponError ? "closecircle" : "checkcircle"}
+                  size={40}
+                  color={couponError ? "#FF4D4D" : COLORS.primary}
+                />
               </View>
+
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: COLORS.black,
+                  fontFamily: "bold",
+                  marginBottom: 10,
+                  textAlign: "center",
+                }}
+              >
+                {couponError ? t(couponError) : "تم تطبيق القسيمة بنجاح!"}
+              </Text>
+              
+              {!couponError && (
+                <Text
+                  style={{
+                    fontSize: 14,
+                    textAlign: "center",
+                    color: COLORS.gray,
+                    marginBottom: 24,
+                    lineHeight: 22,
+                  }}
+                >
+                  تم تطبيق القسيمة بنجاح على طلبك. استمتع بتخفيضك!
+                </Text>
+              )}
+              
+              <Button
+                title={t("Close")}
+                filled
+                style={styles.applyBtn}
+                onPress={() => setModalVisible(false)}
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
       <Modal
-        animationType="fade"
+        animationType="slide"
         transparent={true}
         visible={modalVisibleForOrder}
       >
         <TouchableWithoutFeedback
           onPress={() => setModalVisibleForOrder(false)}
         >
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              // opacity: 0.5,
-              backgroundColor: "#80808040",
-              left: 0,
-              bottom: 0,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                width: "80%",
-                padding: 16,
-                backgroundColor: COLORS.white,
-                borderRadius: 20,
-              }}
-            >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
               <View
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: errorAtConfirmOrder ? "#FFE5E5" : COLORS.tansparentPrimary,
                   alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 20,
                 }}
               >
-                <View
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    source={icons.ornament as any}
-                    resizeMode="contain"
-                    style={[
-                      styles.icon,
-                      {
-                        tintColor: errorAtConfirmOrder
-                          ? COLORS?.error
-                          : COLORS.primary,
-                      },
-                    ]}
-                  />
-                  <Image
-                    source={
-                      errorAtConfirmOrder
-                        ? icons?.infoCircle
-                        : (icons.check2 as any)
-                    }
-                    style={[styles.check, { tintColor: COLORS.white }]}
-                  />
-                </View>
-
-                <View
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginVertical: 20,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      color: errorAtConfirmOrder
-                        ? COLORS?.blackTie
-                        : COLORS.primary,
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    {errorAtConfirmOrder
-                      ? t("Error please try again!")
-                      : "تم تاكيد الطلب بنجاح"}
-                  </Text>
-                  {!errorAtConfirmOrder && (
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        textAlign: "center",
-                        marginTop: 15,
-                      }}
-                    >
-                      تم تأكيد الطلب بنجاح، سنقوم بإعلامك عند جاهزيته للشحن أو
-                      الاستلام. شكرًا لتسوقك معنا!{" "}
-                    </Text>
-                  )}
-                </View>
-                <View style={{ alignItems: "center", marginVertical: 10 }}>
-                  <Button
-                    title={t("Close")}
-                    filled
-                    style={[styles.applyBtn]}
-                    onPress={() => setModalVisibleForOrder(false)}
-                  />
-                </View>
+                <AntDesign
+                  name={errorAtConfirmOrder ? "closecircle" : "checkcircle"}
+                  size={40}
+                  color={errorAtConfirmOrder ? "#FF4D4D" : COLORS.primary}
+                />
               </View>
+
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: COLORS.black,
+                  fontFamily: "bold",
+                  marginBottom: 10,
+                  textAlign: "center",
+                }}
+              >
+                {errorAtConfirmOrder
+                  ? t("Error please try again!")
+                  : "تم تاكيد الطلب بنجاح"}
+              </Text>
+              
+              {!errorAtConfirmOrder && (
+                <Text
+                  style={{
+                    fontSize: 14,
+                    textAlign: "center",
+                    color: COLORS.gray,
+                    marginBottom: 24,
+                    lineHeight: 22,
+                  }}
+                >
+                  تم تأكيد الطلب بنجاح، سنقوم بإعلامك عند جاهزيته للشحن أو
+                  الاستلام. شكرًا لتسوقك معنا!
+                </Text>
+              )}
+              
+              <Button
+                title={t("Close")}
+                filled
+                style={styles.applyBtn}
+                onPress={() => setModalVisibleForOrder(false)}
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
 
-      <Modal animationType="fade" transparent={true} visible={showLoginCard}>
+      <Modal animationType="slide" transparent={true} visible={showLoginCard}>
         <TouchableWithoutFeedback onPress={() => setShowLoginCard(false)}>
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              // opacity: 0.5,
-              backgroundColor: "#80808040",
-              left: 0,
-              bottom: 0,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                width: "80%",
-                padding: 30,
-                backgroundColor: COLORS.white,
-                borderRadius: 20,
-              }}
-            >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
               <View
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: COLORS.tansparentPrimary,
                   alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 20,
                 }}
               >
-                <View
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    source={icons.ornament as any}
-                    resizeMode="contain"
-                    style={[styles.icon, { tintColor: COLORS.primary }]}
-                  />
-                  <Image
-                    source={icons?.userDefault as any}
-                    style={[styles.check, { tintColor: COLORS.white }]}
-                  />
-                </View>
-
-                <View
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginVertical: 20,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      color: COLORS.primary,
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    {t("Please login to make this Action")}
-                  </Text>
-                </View>
-                <View style={{ alignItems: "center", marginVertical: 10 }}>
-                  <Button
-                    title={t("Login")}
-                    filled
-                    style={[[styles.applyBtn, { width: 200 }]]}
-                    onPress={() => navigation.navigate("login")}
-                  />
-                </View>
+                <AntDesign
+                  name="login"
+                  size={40}
+                  color={COLORS.primary}
+                />
               </View>
+
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: COLORS.black,
+                  fontFamily: "bold",
+                  marginBottom: 10,
+                  textAlign: "center",
+                }}
+              >
+                {t("Please login to make this Action")}
+              </Text>
+              
+              <Text
+                style={{
+                  fontSize: 14,
+                  textAlign: "center",
+                  color: COLORS.gray,
+                  marginBottom: 24,
+                  lineHeight: 22,
+                }}
+              >
+                يجب تسجيل الدخول للمتابعة
+              </Text>
+              
+              <Button
+                title={t("Login")}
+                filled
+                style={[styles.applyBtn, { width: 200 }]}
+                onPress={() => navigation.navigate("login")}
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -562,10 +445,192 @@ const OrderDetail = () => {
 };
 
 const styles = StyleSheet.create({
+  area: {
+    flex: 1,
+    backgroundColor: COLORS.grayscale100,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.grayscale100,
+    padding: 16,
+  },
+  
+  // Section Card Styles
+  sectionCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayscale200,
+  },
+  sectionIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.tansparentPrimary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontFamily: "bold",
+    color: COLORS.black,
+  },
+  
+  // Info Row Styles
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  infoLabel: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.gray,
+  },
+  infoValue: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    color: COLORS.black,
+    textAlign: "right",
+  },
+  totalValue: {
+    fontSize: 16,
+    fontFamily: "bold",
+    color: COLORS.primary,
+    textAlign: "right",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.grayscale200,
+    marginVertical: 8,
+  },
+  
+  // Summary Row Styles
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  summaryLabel: {
+    fontSize: 15,
+    fontFamily: "regular",
+    color: COLORS.gray,
+  },
+  summaryValue: {
+    fontSize: 15,
+    fontFamily: "semibold",
+    color: COLORS.black,
+  },
+  discountLabel: {
+    fontSize: 15,
+    fontFamily: "semibold",
+    color: "#00CC00",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  discountValue: {
+    fontSize: 15,
+    fontFamily: "bold",
+    color: "#00CC00",
+  },
+  
+  // Status Badge Styles
+  statusBadge: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 100,
+  },
+  statusBadgeText: {
+    fontSize: 13,
+    fontFamily: "bold",
+    color: COLORS.white,
+  },
+  
+  // Order Items Section
+  orderItemsCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  orderItemsHeaderSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayscale200,
+  },
+  orderItemsIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.tansparentPrimary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  orderItemsTitle: {
+    fontSize: 17,
+    fontFamily: "bold",
+    color: COLORS.black,
+  },
+  orderItemsSection: {
+    marginBottom: 12,
+  },
+  orderItemsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 4,
+    marginBottom: 12,
+  },
+  
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
   icon: {
     height: 200,
     width: 150,
-    // marginBottom: 15,
   },
   check: {
     width: 50,
@@ -577,18 +642,18 @@ const styles = StyleSheet.create({
   continueBtn: {
     borderRadius: 30,
     marginTop: 22,
-
     width: SIZES.width - 32,
   },
   applyBtn: {
     borderRadius: 10,
-    // marginTop: 22,
     width: 100,
     height: 48,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
+  
+  // Legacy styles kept for compatibility
   serviceSubtitle: {
     fontSize: 18,
     fontFamily: "bold",
@@ -598,15 +663,6 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
     tintColor: COLORS.primary,
-  },
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    padding: 16,
   },
   headerContainer: {
     flexDirection: "row",
@@ -627,7 +683,6 @@ const styles = StyleSheet.create({
     tintColor: COLORS.black,
     marginRight: 16,
   },
-
   moreIcon: {
     width: 24,
     height: 24,

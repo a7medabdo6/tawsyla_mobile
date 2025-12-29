@@ -66,6 +66,7 @@ const AddNewAddress = () => {
   const params = useLocalSearchParams();
 
   const addressId = params.id as string;
+  const totalPrice = params.totalPrice as string;
 
   const { data: address } = useGetOneAddress(addressId);
 
@@ -118,7 +119,11 @@ const AddNewAddress = () => {
           onSuccess: async () => {
             try {
               // Update AsyncStorage with new user data
-              navigate("address");
+              if(params.returnTo === "checkout"){
+                navigation.navigate("checkout",{totalPrice});
+              }else{
+                navigation.navigate("address");
+              }
             } catch (err) {
               console.error("Error adding address:", err);
               // Try to refresh from storage as fallback
@@ -241,6 +246,7 @@ const AddNewAddress = () => {
         >
           <View style={{ flexDirection: "row" }}>
             <View>
+             
               <View
                 style={{
                   marginTop: 0,

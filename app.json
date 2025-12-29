@@ -1,15 +1,15 @@
 {
   "expo": {
     "name": "وصلها",
-    "slug": "wasala",
+    "slug": "waslha",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/waslha.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/waslha-3.png",
+    "scheme": "waslha",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/waslha.png",
+      "image": "./assets/images/waslha-3.png",
       "resizeMode": "contain",
       "backgroundColor": "#fff"
     },
@@ -20,10 +20,10 @@
       "usesCleartextTraffic": true,
       "supportsRTL": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/waslha.png",
-        "backgroundColor": "#fff"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
       },
-      "package": "com.a7medabdo.tawsila",
+      "package": "com.a7medabdo.waslha",
       "networkSecurityConfig": "network_security_config"
     },
     "web": {
@@ -37,7 +37,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/waslha.png",
+          "icon": "./assets/images/waslha-3.png",
           "color": "#fff",
           "defaultChannel": "default"
         }
@@ -61,9 +61,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "9e9b6108-0c01-4193-b5b0-699b08507bd4"
+        "projectId": "4c9b2d26-2f21-4dc4-bc8e-1a4c23470d25"
       }
     },
-    "owner": "mramadan18"
+    "owner": "a7medabdo"
   }
 }

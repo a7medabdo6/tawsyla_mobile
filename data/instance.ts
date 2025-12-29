@@ -19,7 +19,7 @@ api.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-      console.log(token, "token");
+      // console.log(token, "token");
     } catch (error) {
       console.error("Error getting token for request:", error);
     }
@@ -38,7 +38,7 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       try {
-        console.log("User unauthorized, triggering global logout");
+        // console.log("User unauthorized, triggering global logout");
 
         // Call the global logout function
         await handleGlobalLogout();

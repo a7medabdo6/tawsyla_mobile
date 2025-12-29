@@ -42,7 +42,7 @@ const Fingerprint = () => {
       // Handle successful authentication here
     } else {
       // Handle authentication failure here
-      console.log('Authentication failed');
+      // console.log('Authentication failed');
     }
   };
 

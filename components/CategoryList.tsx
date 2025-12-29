@@ -1,7 +1,7 @@
 import { COLORS, icons } from "@/constants";
 import { useCategories } from "@/data/useHome";
 import { useNavigation } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -24,8 +24,18 @@ const SPACING = 12;
 import Skeleton from "./Skeleton";
 
 const CategoryCarousel = () => {
+  const bgColors = ["#f2fce4", "#fffceb", "#ecffec", "#feefea", "#fff3eb", "#fff3ff", "#f2fce4"];
+
+  const getBgColor = useCallback((categoryId: string) => {
+    // Use category ID to generate a deterministic color
+    const hash = categoryId.split("").reduce((a, b) => {
+      a = (a << 5) - a + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    return bgColors[Math.abs(hash) % bgColors.length];
+  }, []);
   const [active, setActive] = useState("");
-  const { data, isLoading, error } = useCategories({ limit: 4 });
+  const { data, isLoading, error } = useCategories({ limit: 6 });
   const navigation = useNavigation<any>();
   const router = useRouter();
 
@@ -45,7 +55,7 @@ const CategoryCarousel = () => {
   if (error) return <Text>Error: {error.message}</Text>;
   const renderCategory = ({ item }: any) => (
     <TouchableOpacity
-      style={styles.categoryCard}
+      style={[styles.categoryCard,]}
       onPress={() => {
         // Navigate to products filtered by this category
         router.push({
@@ -57,7 +67,7 @@ const CategoryCarousel = () => {
         });
       }}
     >
-      <View style={styles.categoryIconContainer}>
+      <View style={[styles.categoryIconContainer,{backgroundColor:getBgColor(item.id)}]}>
         {item.image?.path ? (
           <Image
             source={{ uri: `https://api.waslha.net${item.image?.path}` }}
@@ -151,14 +161,14 @@ const styles = StyleSheet.create({
   categoryCard: {
     flex: 1, // Take all available space in the column
     minWidth: 0, // Fix text overflow issues
-    height: 210,
+    height: 150,
     // backgroundColor: COLORS.white,
     borderRadius: 16,
-    paddingBottom: 10,
+    paddingBottom: 5,
     paddingTop: 5,
     paddingHorizontal: 3,
     marginLeft: 3,
-    marginVertical: 5,
+    marginVertical: 0,
     alignItems: "center",
     position: "relative",
     // elevation: 2,
@@ -180,7 +190,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 4,
   },
   categoryIcon: {
     width: 50,
@@ -190,9 +200,10 @@ const styles = StyleSheet.create({
   categoryImage: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover",
-    marginVertical: 10,
+    marginVertical: 5,
     borderRadius: 16,
+    resizeMode: "cover",
+
   },
   categoryName: {
     fontWeight: "bold",

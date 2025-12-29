@@ -6,7 +6,7 @@ import {
   TextInput,
   Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import { COLORS, SIZES, icons, images } from "@/constants";
 import { Image } from "expo-image";
@@ -27,15 +27,20 @@ import DrawerFilter from "@/components/drawer";
 import { Drawer } from "react-native-drawer-layout";
 import Skeleton from "@/components/Skeleton";
 
+
+
+
+
 const { width } = Dimensions.get("window");
 
 const RenderWalletCard = ({ item }: any) => {
+  
   return (
     <View style={styles.item}>
       <Image
         style={styles.cardContainer}
         source={{ uri: `https://api.waslha.net${item.image?.path}` }}
-        resizeMode="cover"
+        // resizeMode="cover"
       />
     </View>
   );
@@ -44,7 +49,7 @@ const RenderWalletCard = ({ item }: any) => {
 const CarouselExample = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { data, isLoading } = useBanners();
-
+// console.log(data,"datadata");
   if (isLoading) {
     return (
       <View style={styles.containerCar}>
@@ -158,7 +163,7 @@ const Home = () => {
         )}
 
         <View style={styles.viewRight}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => navigation.navigate("notifications")}
             style={styles.notificationButton}
           >
@@ -167,7 +172,7 @@ const Home = () => {
               contentFit="contain"
               style={[styles.bellIcon, { tintColor: COLORS.greyscale900 }]}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     );
@@ -242,7 +247,7 @@ const Home = () => {
         />
       )}
       drawerPosition="right"
-      drawerStyle={{ width: "80%", paddingTop: 50 }}
+      drawerStyle={{ width: "80%", paddingTop: 10 }}
       swipeEnabled={swipeEnabled}
       // drawerLockMode={swipeEnabled ? "unlocked" : "locked-closed"}
     >
@@ -290,10 +295,12 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   searchContainer: {
-    paddingVertical: 12,
+    paddingVertical: 0,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    width: "100%",
+    paddingHorizontal: 4,
   },
   searchBarContainer: {
     flexDirection: "row",
@@ -330,6 +337,7 @@ const styles = StyleSheet.create({
     tintColor: COLORS.primary,
   },
   containerCar: {
+    // backgroundColor:"red",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -343,7 +351,7 @@ const styles = StyleSheet.create({
   },
   pagination: {
     flexDirection: "row",
-    marginTop: 16,
+    marginTop: 10,
   },
   dot: {
     width: 10,
@@ -453,8 +461,8 @@ const styles = StyleSheet.create({
   cardContainer: {
     width: SIZES.width - 32,
     borderRadius: 12,
-    marginTop: 16,
-    height: 150,
+    marginTop: 10,
+    height: 170,
     // backgroundColor: COLORS.primary,
     padding: 16,
     flex: 1,

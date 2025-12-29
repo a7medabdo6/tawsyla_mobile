@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Animated } from "react-native";
 import { Image } from "expo-image";
 import { images } from "../constants";
 import { StatusBar } from "expo-status-bar";
@@ -11,20 +11,33 @@ type Nav = {
 
 const Onboarding1 = () => {
   const { navigate } = useNavigation<Nav>();
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  // Add useEffect
   useEffect(() => {
+    // Wait for 1.5 seconds, then animate out
     const timeout = setTimeout(() => {
-      navigate("(tabs)");
-    }, 2000);
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        navigate("(tabs)");
+      });
+    }, 1500);
+
     return () => clearTimeout(timeout);
   }, []);
 
   return (
-    <View style={styles.area}>
+    <Animated.View
+      style={[
+        styles.area,
+        { opacity: fadeAnim },
+      ]}
+    >
       <StatusBar hidden />
       <Image source={images.loading} style={styles.logo} contentFit="contain" />
-    </View>
+    </Animated.View>
   );
 };
 

@@ -1,4 +1,4 @@
-const logo = require("../assets/images/waslha.png") as string;
+const logo = require("../assets/images/waslha-3.png") as string;
 const onboardingSplash = require("../assets/images/onboarding_splash1.jpg");
 const onboardingSplashDark = require("../assets/images/onboarding_splash1_dark.jpg");
 const idAvatar = require("../assets/images/id_avatar.png");

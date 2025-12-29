@@ -31,10 +31,13 @@ import { useAddress } from "@/data/useAddress";
 import Input from "@/components/Input";
 import { useAuthStatus } from "@/data";
 import { useCart, useConfirmOrder, useValidateCoupon } from "@/data/useCart";
+import { useSettings } from "@/data/useSettings";
 
 // Transaction ereceipt
 const Checkout = () => {
-  const deliveryFees = 20;
+  const { data: settingsData } = useSettings();
+  const deliveryFees = settingsData?.shippingCost ||25;
+  // console.log(settingsData?.shippingCost, "settingsDataaaaa");
   const navigation = useNavigation<NavigationProp<any>>();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -75,7 +78,7 @@ const Checkout = () => {
       { code: couponCode, orderAmount: +totalPrice + deliveryFees },
       {
         onSuccess: async (data) => {
-          console.log(data, "couponssss");
+          // console.log(data, "couponssss");
           if (data?.isValid) {
             setCouponError(null);
 
@@ -123,7 +126,7 @@ const Checkout = () => {
           setErrorAtConfirmOrder(false);
         },
         onError: async (data: any) => {
-          console.log(data, "confirm order");
+          // console.log(data, "confirm order");
           if (data?.statusCode == "401") {
             setShowLoginCard(true);
           } else {
@@ -170,132 +173,99 @@ const Checkout = () => {
     <SafeAreaView
       style={[
         styles.area,
-        { backgroundColor: COLORS.white, direction: isRTL ? "rtl" : "ltr" },
+        { backgroundColor: COLORS.grayscale100, direction: isRTL ? "rtl" : "ltr" },
       ]}
     >
-      <Header title="إتمام الطلب" />
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+      <Header 
+        title="إتمام الطلب" 
+        onBack={() => navigation.navigate("(tabs)", { screen: "cart" })}
+      />
+      <View style={[styles.container, { backgroundColor: COLORS.grayscale100 }]}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ marginVertical: 22 }}>
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.white,
-                  borderRadius: 6,
-                },
-              ]}
-            >
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Name")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+          <View style={{ marginVertical: 16 }}>
+            {/* Customer Information Card */}
+            <View style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconContainer}>
+                  <AntDesign name="user" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={styles.sectionTitle}>معلومات العميل</Text>
+              </View>
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Name")}</Text>
+                <Text style={styles.infoValue}>
                   {authStatus?.user?.firstName}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Address")}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Address")}</Text>
+                <View style={styles.addressContainer}>
                   <TouchableOpacity
                     onPress={() => addressBottomSheet.current.open()}
+                    style={styles.editButton}
                   >
                     <MaterialCommunityIcons
                       name="pencil"
-                      size={20}
+                      size={18}
                       color={COLORS.primary}
-                      style={{ marginEnd: 6 }}
                     />
                   </TouchableOpacity>
-                  <Text style={[styles.viewRight, { color: COLORS.black }]}>
+                  <Text style={[styles.infoValue, ]}>
                     {selectedAddress
                       ? `${selectedAddress?.city} - ${selectedAddress?.state}`
                       : t("Select Address")}
                   </Text>
                 </View>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Phone")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t("Phone")}</Text>
+                <Text style={styles.infoValue}>
                   {authStatus?.user?.phone}
                 </Text>
               </View>
             </View>
 
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.tansparentPrimary,
-                  borderRadius: 6,
-                  marginTop: 20,
-                },
-              ]}
-            >
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Amount")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+            {/* Order Summary Card */}
+            <View style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconContainer}>
+                  <AntDesign name="filetext1" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={styles.sectionTitle}>ملخص الطلب</Text>
+              </View>
+              
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{t("Amount")}</Text>
+                <Text style={styles.summaryValue}>
                   {totalPrice} {t("EGP")}
                 </Text>
               </View>
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Shipping")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+              
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{t("Delivery Fee")}</Text>
+                <Text style={styles.summaryValue}>
                   {deliveryFees} {t("EGP")}
                 </Text>
               </View>
-              {/* <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Tax")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
-                  $ 0
-                </Text>
-              </View> */}
             </View>
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.white,
-                  borderRadius: 16,
-                  marginTop: 16,
-                  padding: 16,
-                },
-              ]}
-            >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: "bold",
-                  color: COLORS.black,
-                  marginBottom: 12,
-                  textAlign: "left",
-                }}
-              >
-                كوبون
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                }}
-              >
+            {/* Coupon Card */}
+            <View style={styles.couponCard}>
+              <View style={styles.couponHeader}>
+                <Image
+                  source={icons.discount as ImageSourcePropType}
+                  style={styles.couponIcon}
+                />
+                <Text style={styles.couponTitle}>كوبون الخصم</Text>
+              </View>
+              
+              <View style={styles.couponInputContainer}>
                 <View style={{ flex: 1 }}>
                   <Input
                     id="coupon"
@@ -303,120 +273,72 @@ const Checkout = () => {
                     value={couponCode}
                     placeholder={t("Enter Promo Code")}
                     placeholderTextColor={COLORS.gray}
-                    containerStyle={{
-                      backgroundColor: COLORS.grayscale100,
-                      borderRadius: 12,
-                      height: 50,
-                      width: "100%",
-                      borderWidth: 0,
-                    }}
+                    containerStyle={styles.couponInput}
                     icon={icons.discount}
                   />
                 </View>
                 <Button
                   title={t("Apply")}
                   filled
-                  style={{
-                    width: 100,
-                    height: 50,
-                    borderRadius: 12,
-                    backgroundColor: COLORS.primary,
-                  }}
+                  style={styles.applyButton}
                   onPress={handleValidateCoupon}
                   isLoading={isPending}
                 />
               </View>
 
               {couponError && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginTop: 8,
-                    backgroundColor: "#FFE5E5",
-                    padding: 8,
-                    borderRadius: 8,
-                  }}
-                >
-                  <AntDesign name="closecircle" size={14} color="#FF4D4D" />
-                  <Text
-                    style={{
-                      color: "#FF4D4D",
-                      fontSize: 12,
-                      fontFamily: "medium",
-                      marginLeft: 8,
-                      flex: 1,
-                      textAlign: "left",
-                    }}
-                  >
-                    {couponError}
-                  </Text>
+                <View style={styles.errorContainer}>
+                  <AntDesign name="closecircle" size={16} color="#FF4D4D" />
+                  <Text style={styles.errorText}>{couponError}</Text>
                 </View>
               )}
+              
               {couponDetails && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginTop: 8,
-                    backgroundColor: "#E5FFE5",
-                    padding: 8,
-                    borderRadius: 8,
-                  }}
-                >
-                  <AntDesign name="checkcircle" size={14} color="#00CC00" />
-                  <Text
-                    style={{
-                      color: "#00CC00",
-                      fontSize: 12,
-                      fontFamily: "medium",
-                      marginLeft: 8,
-                      flex: 1,
-                      textAlign: "left",
-                    }}
-                  >
+                <View style={styles.successContainer}>
+                  <AntDesign name="checkcircle" size={16} color="#00CC00" />
+                  <Text style={styles.successText}>
                     {t("Coupon applied successfully")}
                   </Text>
                 </View>
               )}
             </View>
 
-            <View
-              style={[
-                styles.summaryContainer,
-                {
-                  backgroundColor: COLORS.white,
-                  borderRadius: 6,
-                  marginTop: 20,
-                },
-              ]}
-            >
-              <View style={styles.viewContainer}>
-                <Text style={[styles.viewLeft, { color: "gray" }]}>
-                  {t("Total")}
-                </Text>
-                <Text style={[styles.viewRight, { color: COLORS.black }]}>
+            {/* Total Amount Card */}
+            <View style={styles.totalCard}>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>{t("Total")}</Text>
+                <Text style={styles.totalAmount}>
                   {couponDetails
                     ? couponDetails?.totalAmount
                     : +totalPrice + deliveryFees}{" "}
                   {t("EGP")}
                 </Text>
               </View>
+              {couponDetails && (
+                <View style={styles.savingsRow}>
+                  <Text style={styles.savingsText}>
+                    🎉 لقد وفرت {couponDetails?.discountAmount} {t("EGP")}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </KeyboardAwareScrollView>
 
         <View style={styles.bottomContainer}>
-          <Button
-            title={t("Confirm")}
-            filled
-            style={styles.continueBtn}
-            onPress={() =>
-              selectedAddress
-                ? handleConfirmOrder()
-                : addressBottomSheet.current.open()
-            }
-          />
+          <View style={styles.bottomShadow}>
+            <Button
+              title={t("Confirm")}
+              filled
+              style={styles.continueBtn}
+              onPress={() =>
+                selectedAddress
+                  ? handleConfirmOrder()
+                  : addressBottomSheet.current.open()
+              }
+              isLoading={isPendingForConfirm}
+            />
+          </View>
         </View>
         <RBSheet
           ref={addressBottomSheet}
@@ -469,7 +391,7 @@ const Checkout = () => {
               <TouchableOpacity
                 onPress={() => {
                   addressBottomSheet.current.close();
-                  navigation.navigate("address");
+                  navigation.navigate("address",{returnTo: "checkout",totalPrice:params?.totalPrice});
                 }}
                 style={{
                   flexDirection: "row",
@@ -676,11 +598,7 @@ const Checkout = () => {
                       resizeMode="contain"
                       style={[
                         styles.modalIcon,
-                        {
-                          tintColor: errorAtConfirmOrder
-                            ? "red"
-                            : COLORS.primary,
-                        },
+                       
                       ]}
                     />
                   </View>
@@ -708,6 +626,7 @@ const Checkout = () => {
                       {t("Something went wrong, please try again later")}
                     </Text>
                   ) : (
+                    <>
                     <Text
                       style={[
                         styles.modalSubtitle,
@@ -718,10 +637,14 @@ const Checkout = () => {
                         },
                       ]}
                     >
-                      {t(
-                        "Order confirmed successfully, we will notify you when it is ready for shipping or pickup. Thank you for shopping with us!"
-                      )}
+                      تم تأكيد الطلب بنجاح، سنقوم بإعلامك عندما يكون جاهزاً للشحن أو الاستلام. شكراً لطلبك من  
+                    
+
                     </Text>
+                                                                    <Text style={{ fontFamily: "bold", color: COLORS.primary}}>وصلها!</Text>
+
+                    </>
+                   
                   )}
                 </View>
                 <View style={styles.modalBottom}>
@@ -748,7 +671,7 @@ const Checkout = () => {
         <TouchableWithoutFeedback onPress={() => setShowLoginCard(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <View>
+              <View >
                 <View style={styles.modalTop}>
                   <View
                     style={[
@@ -813,13 +736,307 @@ const Checkout = () => {
 const styles = StyleSheet.create({
   area: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.grayscale100,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.grayscale100,
     padding: 16,
+    paddingBottom: 90,
   },
+  
+  // Section Card Styles
+  sectionCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.grayscale200,
+  },
+  sectionIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.tansparentPrimary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontFamily: "bold",
+    color: COLORS.black,
+  },
+  
+  // Info Row Styles
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  infoLabel: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.gray,
+  },
+  infoValue: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    color: COLORS.black,
+    textAlign: "right",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.grayscale200,
+    marginVertical: 8,
+  },
+  addressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  editButton: {
+    padding: 4,
+  },
+  
+  // Summary Styles
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  summaryLabel: {
+    fontSize: 15,
+    fontFamily: "regular",
+    color: COLORS.gray,
+  },
+  summaryValue: {
+    fontSize: 15,
+    fontFamily: "semibold",
+    color: COLORS.black,
+  },
+  
+  // Coupon Card Styles
+  couponCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 12,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: COLORS.tansparentPrimary,
+  },
+  couponHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  couponIcon: {
+    width: 24,
+    height: 24,
+    tintColor: COLORS.primary,
+    marginLeft: 10,
+  },
+  couponTitle: {
+    fontSize: 17,
+    fontFamily: "bold",
+    color: COLORS.black,
+  },
+  couponInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  couponInput: {
+    backgroundColor: COLORS.grayscale100,
+    borderRadius: 12,
+    height: 52,
+    width: "100%",
+    borderWidth: 0,
+  },
+  applyButton: {
+    width: 100,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: COLORS.primary,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    backgroundColor: "#FFE5E5",
+    padding: 12,
+    borderRadius: 10,
+  },
+  errorText: {
+    color: "#FF4D4D",
+    fontSize: 13,
+    fontFamily: "medium",
+    marginLeft: 10,
+    flex: 1,
+    textAlign: "left",
+  },
+  successContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    backgroundColor: "#E5FFE5",
+    padding: 12,
+    borderRadius: 10,
+  },
+  successText: {
+    color: "#00CC00",
+    fontSize: 13,
+    fontFamily: "medium",
+    marginLeft: 10,
+    flex: 1,
+    textAlign: "left",
+  },
+  
+  // Total Card Styles
+  totalCard: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 8,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontFamily: "bold",
+    color: COLORS.white,
+  },
+  totalAmount: {
+    fontSize: 24,
+    fontFamily: "bold",
+    color: COLORS.white,
+  },
+  savingsRow: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.3)",
+  },
+  savingsText: {
+    fontSize: 14,
+    fontFamily: "semibold",
+    color: COLORS.white,
+    textAlign: "center",
+  },
+  
+  // Bottom Container Styles
+  bottomContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.grayscale200,
+  },
+  bottomShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  continueBtn: {
+    width: "100%",
+    height: 56,
+    borderRadius: 30,
+    backgroundColor: COLORS.primary,
+  },
+  
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalTop: {
+    alignItems: "center",
+  },
+  modalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  modalIcon: {
+    width: 40,
+    height: 40,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: "bold",
+    color: COLORS.black,
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    fontFamily: "regular",
+    color: COLORS.gray,
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  modalBottom: {
+    marginTop: 24,
+    width: 120,
+    marginHorizontal: "auto",
+  },
+  applyBtn: {
+    width: "100%",
+    height: 52,
+    borderRadius: 10,
+  },
+  
+  // Legacy styles kept for compatibility
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -854,13 +1071,13 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    marginBottom: 16,
+    marginBottom: 6,
   },
   viewContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 2,
   },
   viewLeft: {
     fontSize: 14,
@@ -871,80 +1088,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "medium",
     color: COLORS.black,
-  },
-  applyBtn: {
-    width: "25%",
-    height: 50,
-    borderRadius: 6,
-  },
-  bottomContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: COLORS.white,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  continueBtn: {
-    width: "100%",
-    height: 50,
-    borderRadius: 30,
-    backgroundColor: COLORS.primary,
-    shadowColor: COLORS.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 3,
-  },
-  modalContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTop: {
-    alignItems: "center",
-  },
-  modalIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  modalIcon: {
-    width: 30,
-    height: 30,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: "bold",
-    color: COLORS.black,
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    fontFamily: "regular",
-    color: COLORS.gray,
-    textAlign: "center",
-  },
-  modalBottom: {
-    marginTop: 20,
-    width: "100%",
   },
   serviceSubtitle: {
     fontSize: 16,

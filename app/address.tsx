@@ -5,11 +5,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../components/Header";
 import { ScrollView } from "react-native-virtualized-view";
 import Button from "../components/Button";
-import { useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { userAddresses } from "@/data";
 import UserAddressItem from "@/components/UserAddressItem";
 import { useLanguageContext } from "@/contexts/LanguageContext";
 import { useAddAddress, useAddress } from "@/data/useAddress";
+import { NavigationProp } from "@react-navigation/native";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -17,11 +18,13 @@ type Nav = {
 
 // user address location screen
 const Address = () => {
-  const { navigate } = useNavigation<Nav>();
+  const navigation = useNavigation<NavigationProp<any>>();
   const { t, isRTL } = useLanguageContext();
   const { data, isLoading } = useAddress();
   const router = useRouter();
+  const params = useLocalSearchParams();
 
+  const totalPrice = params.totalPrice as string;
   return (
     <SafeAreaView
       style={[
@@ -64,7 +67,7 @@ const Address = () => {
       <View style={styles.btnContainer}>
         <Button
           title={t("Add New Address")}
-          onPress={() => navigate("addnewaddress")}
+          onPress={() => navigation.navigate("addnewaddress",{returnTo: "checkout",totalPrice})}
           filled
           style={styles.btn}
         />

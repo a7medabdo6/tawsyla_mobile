@@ -7,6 +7,7 @@ import {
   FlatList,
   TextInput,
   LayoutAnimation,
+  Linking,
 } from "react-native";
 import React, { useState } from "react";
 import { COLORS, SIZES, icons } from "../constants";
@@ -20,6 +21,7 @@ import HelpCenterItem from "@/components/HelpCenterItem";
 import { useNavigation } from "expo-router";
 import { useLanguageContext } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
+import { useSettings } from "@/data/useSettings";
 
 interface KeywordItemProps {
   item: {
@@ -210,35 +212,36 @@ const faqsRoute = () => {
 
 const contactUsRoute = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const { data } = useSettings();
 
   return (
     <View
       style={[
         styles.routeContainer,
         {
-          backgroundColor: COLORS.tertiaryWhite,
+          // backgroundColor: COLORS.tertiaryWhite,
         },
       ]}
     >
       <HelpCenterItem
         icon={icons.headset}
         title="خدمة العملا"
-        onPress={() => navigation.navigate("customerservice")}
+          onPress={() => Linking.openURL("tel:" + data?.phone1 )}
       />
       <HelpCenterItem
         icon={icons.whatsapp}
         title="واتساب"
-        onPress={() => console.log("Whatsapp")}
+        onPress={() => Linking.openURL("https://wa.me/" + data?.whatsappNumber1)}
       />
-      {/* <HelpCenterItem
+      <HelpCenterItem
         icon={icons.world}
-        title="Website"
-        onPress={() => console.log("Website")}
-      /> */}
+        title="الموقع الإلكتروني"
+        onPress={() => Linking.openURL(data?.website)}
+      />
       <HelpCenterItem
         icon={icons.facebook2}
         title="فيسبوك"
-        onPress={() => console.log("Facebook")}
+        onPress={() => Linking.openURL(data?.facebookPageLink)}
       />
       {/* <HelpCenterItem
         icon={icons.twitter}
@@ -248,7 +251,7 @@ const contactUsRoute = () => {
       <HelpCenterItem
         icon={icons.instagram}
         title="انستجرام"
-        onPress={() => console.log("Instagram")}
+        onPress={() => Linking.openURL(data?.instagramLink)}
       />
     </View>
   );

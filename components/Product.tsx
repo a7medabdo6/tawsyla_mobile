@@ -6,21 +6,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  ActivityIndicator,
 } from "react-native";
-import { AntDesign, FontAwesome } from "@expo/vector-icons"; // You can also use other icon libraries
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
 import { useRouter } from "expo-router";
-import { useAddToCart } from "@/data/useCart";
+import { useAddToCart, useUpdateCartItem, useDeleteCartItem } from "@/data/useCart";
 import { useAddFavourite, useDeleteFavourite } from "@/data/useFavourites";
 import {
   getStoredCartProductIds,
   getStoredFavouriteProductIds,
 } from "@/data/useAppStatus";
 import { useAuthStatus } from "@/data";
-
-// Global state to track which product has an open dropdown
-let currentOpenDropdown: string | null = null;
-const dropdownCallbacks: Map<string, () => void> = new Map();
 
 const ProductCard = ({
   name,
@@ -30,20 +27,23 @@ const ProductCard = ({
   style,
   varints,
   productId,
+  cartItem,
 }: any) => {
   const router = useRouter();
   const { mutateAsync: addToCart, isPending } = useAddToCart();
+  const { mutateAsync: updateCartItem } = useUpdateCartItem();
+  const { mutateAsync: deleteCartItem } = useDeleteCartItem();
   const [isAdded, setIsAdded] = useState(false);
   const [isFav, setIsFav] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [qty, setQty] = useState(0);
-  const dropdownHeight = useRef(new Animated.Value(0)).current;
-  const dropdownOpacity = useRef(new Animated.Value(0)).current;
-  const dropdownTranslateY = useRef(new Animated.Value(-50)).current;
+  const [cartItemId, setCartItemId] = useState<string | null>(null);
+  const [isIncreasing, setIsIncreasing] = useState(false);
+  const [isDecreasing, setIsDecreasing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { data: authStatus, isLoading, refetch } = useAuthStatus();
 
   const { mutateAsync: addFav } = useAddFavourite();
   const { mutateAsync: delFav } = useDeleteFavourite();
+  // console.log(cartItem?.quantity, "aaaaaaaacartItemcartItemcartItemmmmmmm");
 
   // Check initial cart and favourites status
   useEffect(() => {
@@ -60,6 +60,17 @@ const ProductCard = ({
     };
     checkStatus();
   }, [productId]);
+
+  // Update cart quantity from cartItem prop
+  useEffect(() => {
+    if (cartItem) {
+      setCartItemId(cartItem.id);
+      setIsAdded(true);
+    } else {
+      setCartItemId(null);
+      setIsAdded(false);
+    }
+  }, [cartItem]);
 
   // console.log(varints, "varints");
   const getFirstVariantPrice = (variants: any) => {
@@ -78,105 +89,72 @@ const ProductCard = ({
     });
   };
 
-  const closeDropdown = () => {
-    setShowDropdown(false);
-    Animated.parallel([
-      // Animated.timing(dropdownHeight, {
-      //   toValue: 0,
-      //   duration: 200,
-      //   useNativeDriver: false,
-      // }),
-      Animated.spring(dropdownTranslateY, {
-        toValue: 0,
-        useNativeDriver: true,
-        tension: 50,
-        friction: 7,
-      }),
-      Animated.timing(dropdownOpacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  useEffect(() => {
-    // Register this product's close callback
-    dropdownCallbacks.set(productId, closeDropdown);
-    return () => {
-      dropdownCallbacks.delete(productId);
-    };
-  }, [productId]);
-
-  const toggleDropdown = () => {
-    if (isAdded) return;
-
-    // Close any other open dropdown
-    if (currentOpenDropdown && currentOpenDropdown !== productId) {
-      const closeOther = dropdownCallbacks.get(currentOpenDropdown);
-      if (closeOther) closeOther();
-    }
-
-    const toValue = showDropdown ? 0 : 1;
-    setShowDropdown(!showDropdown);
-
-    if (!showDropdown) {
-      currentOpenDropdown = productId;
-    } else {
-      currentOpenDropdown = null;
-    }
-
-    Animated.parallel([
-      Animated.spring(dropdownTranslateY, {
-        toValue: toValue === 1 ? 0 : -50, // slide down from above
-        useNativeDriver: true,
-        tension: 50,
-        friction: 7,
-      }),
-
-      // Animated.spring(dropdownHeight, {
-      //   toValue: toValue * 120,
-      //   useNativeDriver: false,
-      //   tension: 50,
-      //   friction: 7,
-      // }),
-      Animated.timing(dropdownOpacity, {
-        toValue: toValue,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const handleAddToCart = async (quantity: number) => {
-    console.log("handleAddToCart", quantity);
-
+  const handleAddToCart = async () => {
     try {
       const firstVariantId =
         Array.isArray(varints) && varints.length > 0
           ? varints[0]?.id
           : undefined;
       if (!productId || !firstVariantId) return;
-      // console.log({
-      //   productId,
-      //   variantId: firstVariantId,
-      //   quantity,
-      // },"tttttttt");
+      
       await addToCart({
         productId,
         variantId: firstVariantId,
-        quantity,
+        quantity: 1,
       });
-
-      // setIsAdded(true);
-      // currentOpenDropdown = null;
-      // closeDropdown();
+      
+      setIsAdded(true);
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
       if (error?.response?.status === 401) {
-        // Redirect to login page when unauthorized
         router.push("/login");
       }
+    }
+  };
+
+  const handleIncreaseQuantity = async () => {
+    if (!cartItemId) return;
+    setIsIncreasing(true);
+    try {
+      const newQuantity = cartItem?.quantity + 1;
+      await updateCartItem({
+        itemId: cartItemId,
+        quantity: newQuantity,
+      });
+    } catch (error) {
+      // console.log(error);
+    } finally {
+      setIsIncreasing(false);
+    }
+  };
+
+  const handleDecreaseQuantity = async () => {
+    if (!cartItemId || cartItem?.quantity <= 1) return;
+    setIsDecreasing(true);
+    try {
+      const newQuantity = cartItem?.quantity - 1;
+      await updateCartItem({
+        itemId: cartItemId,
+        quantity: newQuantity,
+      });
+    } catch (error) {
+      // console.log(error);
+    } finally {
+      setIsDecreasing(false);
+    }
+  };
+
+  const handleRemoveFromCart = async () => {
+    if (!cartItemId) return;
+    setIsDeleting(true);
+    try {
+      await deleteCartItem(cartItemId);
+      setIsAdded(false);
+      setCartItemId(null);
+    } catch (error) {
+      // console.log(error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -193,7 +171,7 @@ const ProductCard = ({
         setIsFav(true);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -226,7 +204,7 @@ const ProductCard = ({
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleProductPress}>
+      <TouchableOpacity style={{width: "100%"}} onPress={handleProductPress}>
         <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
           {name}
         </Text>
@@ -245,86 +223,79 @@ const ProductCard = ({
 
       <Text style={styles.price}>{getFirstVariantPrice(varints)} ج.م</Text>
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={
-          authStatus?.isAuthenticated
-            ? () => handleAddToCart(1)
-            : () => router.push("/login")
-        }
-        disabled={isPending || isAdded}
-      >
-        <AntDesign name={isAdded ? "check" : "plus"} size={18} color="#fff" />
-      </TouchableOpacity>
-
-      {/* Dropdown Menu */}
-      <Animated.View
-        style={[
-          styles.dropdown,
-          {
-            opacity: dropdownOpacity,
-            transform: [{ translateY: dropdownTranslateY }],
-          },
-        ]}
-        pointerEvents={showDropdown ? "auto" : "none"}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
+      {/* Add to Cart Button or Cart Controls */}
+      {!isAdded ? (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={
+            authStatus?.isAuthenticated
+              ? handleAddToCart
+              : () => router.push("/login")
+          }
+          disabled={isPending}
         >
+          {isPending ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <AntDesign name="plus" size={20} color="#fff" />
+          )}
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.cartControls}>
           <TouchableOpacity
-            onPress={() => {
-              setQty(qty + 1);
-              handleAddToCart(qty + 1);
-            }}
-            style={{
-              backgroundColor: COLORS.primary,
-              padding: 5,
-              borderRadius: 50,
-            }}
+            style={[styles.controlButton]}
+            onPress={handleIncreaseQuantity}
+            disabled={isIncreasing}
           >
-            <AntDesign name={"plus"} size={18} color="#fff" />
+            {isIncreasing ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <AntDesign name="plus" size={16} color="#fff" />
+            )}
           </TouchableOpacity>
-          <Text
-            style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}
-          >
-            {qty}
-          </Text>
+          
+          <Text style={styles.quantityText}>{cartItem?.quantity}</Text>
+          
           <TouchableOpacity
-            disabled={qty == 0}
-            onPress={() => {
-              setQty(qty - 1);
-              handleAddToCart(qty - 1);
-            }}
-            style={{
-              backgroundColor: COLORS.primary,
-              padding: 5,
-              borderRadius: 50,
-              opacity: qty == 0 ? 0.5 : 1,
-            }}
+            style={[styles.controlButton,{backgroundColor: cartItem?.quantity <= 1 ? COLORS.paleGreenDark : COLORS.primary}]}
+            onPress={handleDecreaseQuantity}
+            disabled={cartItem?.quantity <= 1 || isDecreasing}
           >
-            <AntDesign name={"minus"} size={18} color="#fff" />
+            {isDecreasing ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <AntDesign name="minus" size={16} color="#fff" />
+            )}
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleRemoveFromCart}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <MaterialIcons name="delete" size={18} color="#fff" />
+            )}
           </TouchableOpacity>
         </View>
-      </Animated.View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    width: "30%",
-    height: 200,
+    width: "45%",
+    height: 250,
     backgroundColor: COLORS.white,
     borderRadius: 16,
     paddingBottom: 10,
     paddingTop: 5,
 
     paddingHorizontal: 5,
-    margin: 9,
+    margin: 5,
     alignItems: "center",
     position: "relative",
     // elevation: 2,
@@ -359,7 +330,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: "90%",
+    height: "100%",
     resizeMode: "contain",
     marginVertical: 5,
   },
@@ -380,12 +351,13 @@ const styles = StyleSheet.create({
   name: {
     fontWeight: "bold",
     fontSize: 14,
-    marginBottom: 20,
+    marginBottom: 0,
     marginTop: 10,
     // width: "100%",
     // paddingRight: 5,
     color: COLORS.black,
-    // backgroundColor:"red",
+    width: "100%",
+    //  backgroundColor:"red",
     // textAlign:"left"
   },
   ratingContainer: {
@@ -393,74 +365,57 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     width: "100%",
     paddingRight: 5,
-    display: "none",
+    // display: "none",
   },
   price: {
     color: COLORS.primary,
     fontWeight: "bold",
-    // marginBottom: 10,
     width: "100%",
     paddingRight: 5,
+    marginBottom: 6,
+    fontSize: 16,
+   
   },
   addButton: {
     backgroundColor: COLORS.primary,
-    padding: 8,
-    position: "absolute",
-    bottom: 0,
-    end: 0,
-    borderTopEndRadius: 6,
-    borderBottomStartRadius: 16,
-    zIndex: 10,
-  },
-  dropdown: {
-    position: "absolute",
-    bottom: -50,
-    left: 0,
-    backgroundColor: COLORS.white,
-    zIndex: 99999999,
+    padding: 10,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    minWidth: 130,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
-  dropdownTitle: {
-    fontSize: 12,
+  cartControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.tansparentPrimary,
+    borderRadius: 12,
+    padding: 8,
+    width: "100%",
+    gap: 8,
+  },
+  controlButton: {
+    backgroundColor: COLORS.primary,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  quantityText: {
+    fontSize: 16,
     fontWeight: "bold",
-    color: COLORS.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.paleGreenDark,
-    textAlign: "center",
-  },
-  dropdownItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.paleGreen,
-  },
-  dropdownItemSelected: {
-    backgroundColor: COLORS.paleGreen,
-  },
-  dropdownItemText: {
-    fontSize: 14,
     color: COLORS.black,
+    minWidth: 30,
     textAlign: "center",
   },
-  dropdownItemTextSelected: {
-    fontWeight: "bold",
-    color: COLORS.primary,
+  deleteButton: {
+    backgroundColor: COLORS.primary,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

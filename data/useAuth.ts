@@ -17,7 +17,7 @@ export interface RegisterCredentials {
   password: string;
   confirmPassword: string;
   firstName: string;
-  phone:string
+  phone: string
 }
 
 export interface UpdateProfileCredentials {
@@ -42,16 +42,16 @@ export const handleGlobalLogout = async () => {
   try {
     // Clear all auth data from AsyncStorage
     await AsyncStorage.multiRemove(['token', 'user', 'refreshToken']);
-    
+
     // Clear push token
     const pushNotificationService = PushNotificationService.getInstance();
     await pushNotificationService.clearPushToken();
-    
+
     // You can add more cleanup here if needed
     // await AsyncStorage.multiRemove(['cart', 'favorites', 'settings']);
-    
-    console.log('Global logout completed');
-    
+
+    // console.log('Global logout completed');
+
     // Return true to indicate successful logout
     return true;
   } catch (error) {
@@ -89,52 +89,52 @@ export const logoutUser = async (): Promise<void> => {
 // React Query hooks
 export const useLogin = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation<AuthResponse, Error, LoginCredentials>({
     mutationFn: async (credentials) => {
       // Get push token before login
       const pushNotificationService = PushNotificationService.getInstance();
-      const pushToken = await pushNotificationService.getStoredPushToken() || 
-                       await pushNotificationService.registerForPushNotifications();
-      
+      const pushToken = await pushNotificationService.getStoredPushToken() ||
+        await pushNotificationService.registerForPushNotifications();
+
       // Include push token in login credentials
       const loginData = {
         ...credentials,
         pushToken: pushToken || undefined,
       };
-      
+
       return loginUser(loginData);
     },
     onSuccess: async (data) => {
       try {
         // console.log(data,'authStatus');
-        
+
         // Store token and user data in AsyncStorage
         await AsyncStorage.setItem('token', data.token);
         await AsyncStorage.setItem('user', JSON.stringify(data.user));
         if (data.refreshToken) {
           await AsyncStorage.setItem('refreshToken', data.refreshToken);
         }
-        
+
         // Update push token on the server after successful login
         const pushNotificationService = PushNotificationService.getInstance();
         const pushToken = pushNotificationService.getPushToken();
         if (pushToken) {
           try {
-            await updatePushToken(data?.user?.id,pushToken);
-            console.log('Push token updated successfully');
+            await updatePushToken(data?.user?.id, pushToken);
+            // console.log('Push token updated successfully');
           } catch (error) {
-            console.error('Error updating push token:', error);
+            // console.error('Error updating push token:', error);
             // Don't fail login if push token update fails
           }
         }
-        
+
         // Invalidate and refetch user-related queries
         queryClient.invalidateQueries({ queryKey: ["user"] });
         queryClient.invalidateQueries({ queryKey: ["profile"] });
         // Force authStatus to update immediately
         queryClient.setQueryData(["authStatus"], { isAuthenticated: true, user: data.user });
-        
+
         // Set user data in cache
         queryClient.setQueryData(["user"], data.user);
       } catch (error) {
@@ -149,7 +149,7 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation<AuthResponse, Error, RegisterCredentials>({
     mutationFn: registerUser,
     onSuccess: async (data) => {
@@ -159,13 +159,13 @@ export const useRegister = () => {
         // if (data.refreshToken) {
         //   await AsyncStorage.setItem('refreshToken', data.refreshToken);
         // }
-        
+
         // // Invalidate and refetch user-related queries
         // queryClient.invalidateQueries({ queryKey: ["user"] });
         // queryClient.invalidateQueries({ queryKey: ["profile"] });
         // // Force authStatus to update immediately
         // queryClient.setQueryData(["authStatus"], { isAuthenticated: true, user: data.user });
-        
+
         // // Set user data in cache
         // queryClient.setQueryData(["user"], data.user);
       } catch (error) {
@@ -176,25 +176,25 @@ export const useRegister = () => {
       console.error("Registration failed:", error);
     },
   });
- };
+};
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation<AuthResponse, Error, UpdateProfileCredentials>({
     mutationFn: updateProfile,
     onSuccess: async (data) => {
       try {
         // Update stored user data
         await AsyncStorage.setItem('user', JSON.stringify(data.user));
-        
+
         // Invalidate and refetch user-related queries
         queryClient.invalidateQueries({ queryKey: ["user"] });
         queryClient.invalidateQueries({ queryKey: ["profile"] });
-        
+
         // Update authStatus with new user data
         queryClient.setQueryData(["authStatus"], { isAuthenticated: true, user: data.user });
-        
+
         // Set updated user data in cache
         queryClient.setQueryData(["user"], data.user);
       } catch (error) {
@@ -209,28 +209,28 @@ export const useUpdateProfile = () => {
 
 export const useLogout = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, void>({
     mutationFn: logoutUser,
     onSuccess: async () => {
       try {
         // Clear all auth data from AsyncStorage
         await AsyncStorage.multiRemove(['token', 'user', 'refreshToken']);
-        
+
         // Clear push token
         const pushNotificationService = PushNotificationService.getInstance();
         await pushNotificationService.clearPushToken();
-        
+
         // Clear all user-related data from cache
         queryClient.removeQueries({ queryKey: ["user"] });
         queryClient.removeQueries({ queryKey: ["profile"] });
-        
+
         // Specifically invalidate the authStatus query to force re-fetch
         queryClient.invalidateQueries({ queryKey: ["authStatus"] });
-        
+
         // Also clear the authStatus data
         queryClient.setQueryData(["authStatus"], { isAuthenticated: false, user: null });
-        
+
         queryClient.clear();
       } catch (error) {
         console.error("Error clearing auth data:", error);
@@ -244,17 +244,17 @@ export const useLogout = () => {
 
 // Hook for updating push token
 export const useUpdatePushToken = () => {
-  return useMutation<any, Error, {id: string, pushToken: string}>({
-    mutationFn: ({id, pushToken}) => updatePushToken(id, pushToken),
+  return useMutation<any, Error, { id: string, pushToken: string }>({
+    mutationFn: ({ id, pushToken }) => updatePushToken(id, pushToken),
     onSuccess: (data) => {
-      console.log('Push token updated successfully');
+      // console.log('Push token updated successfully');
       return data;
     },
     onError: (error) => {
-      console.error('Push token update failed:', error);
+      // console.error('Push token update failed:', error);
     },
   });
-}; 
+};
 
 // Utility functions for managing authentication state
 export const getStoredToken = async (): Promise<string | null> => {
@@ -301,25 +301,25 @@ export const clearAuthData = async (): Promise<void> => {
   } catch (error) {
     console.error('Error clearing auth data:', error);
   }
-}; 
+};
 
 // Hook for checking authentication status on app startup
 export const useAuthStatus = () => {
   const queryClient = useQueryClient();
-  
+
   return useQuery({
     queryKey: ["authStatus"],
     queryFn: async () => {
       const token = await getStoredToken();
       const user = await getStoredUser();
-      console.log(user,'useruser');
-      
+      // console.log(user, 'useruser');
+
       if (token && user) {
         // Set user data in cache if we have stored data
         queryClient.setQueryData(["user"], user);
         return { isAuthenticated: true, user };
       }
-      
+
       return { isAuthenticated: false, user: null };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -330,29 +330,29 @@ export const useAuthStatus = () => {
 // Hook for components to handle logout events
 export const useLogoutHandler = (navigation: any) => {
   const queryClient = useQueryClient();
-  
+
   const handleLogout = useCallback(async () => {
     try {
       // Clear all auth data from AsyncStorage
       await AsyncStorage.multiRemove(['token', 'user', 'refreshToken']);
-      
+
       // Clear all user-related data from cache
       queryClient.removeQueries({ queryKey: ["user"] });
       queryClient.removeQueries({ queryKey: ["profile"] });
-      
+
       // Specifically invalidate the authStatus query to force re-fetch
       queryClient.invalidateQueries({ queryKey: ["authStatus"] });
-      
+
       // Also clear the authStatus data
       queryClient.setQueryData(["authStatus"], { isAuthenticated: false, user: null });
-      
+
       queryClient.clear();
-      
+
       // Navigate to login screen
       if (navigation && navigation.navigate) {
         navigation.navigate("login");
       }
-      
+
     } catch (error) {
       console.error('Error during logout:', error);
     }

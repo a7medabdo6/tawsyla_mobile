@@ -17,21 +17,21 @@ export const useProducts = (page = 1, limit = 5, categoryId = '') => {
 };
 
 export const useProductsInfinite = (
-	limit = 10, 
-	search = "", 
-	categoryId = "", 
-	priceRange = { min: "", max: "" }, 
-	rating: number | null = null, 
+	limit = 10,
+	search = "",
+	categoryId = "",
+	priceRange = { min: "", max: "" },
+	rating: number | null = null,
 	sortBy = ""
 ) => {
 	return useInfiniteQuery({
 		queryKey: ["products-infinite", search, categoryId, priceRange, rating, sortBy],
 		queryFn: async ({ pageParam = 1 }) => {
 			let url = `/products?page=${pageParam}&limit=${limit}`;
-			
+
 			// Build search object with all filters
 			const searchConditions: any[] = [];
-			
+
 			var filterConditions: any = "";
 
 			// Search filter for nameAr
@@ -40,42 +40,42 @@ export const useProductsInfinite = (
 					nameAr: { $cont: search }
 				});
 			}
-			
+
 			// Rating filter - greater than or equal to selected rating
 			if (rating) {
 				searchConditions.push({
 					rating: { $gte: rating.toString() }
 				});
 			}
-			
+
 			// Category filter - nested category relation
 			if (categoryId) {
 				filterConditions += `filter=category.id||$eq||${categoryId}`
-			
+
 			}
-			
+
 			// Price range filter - nested variants relation
 			if (priceRange.min || priceRange.max) {
-				
+
 				filterConditions += `&filter=variants.price||$between||${priceRange.min},${priceRange.max}`
 
 			}
-			
+
 			if (searchConditions.length > 0) {
 				const searchObject = searchConditions.length === 1 ? searchConditions[0] : { $and: searchConditions };
 				url += `&s=${encodeURIComponent(JSON.stringify(searchObject))}`;
 			}
-			 if(filterConditions){
+			if (filterConditions) {
 				url += `&${filterConditions}`;
 
 			}
-			
+
 			// Sort filter
 			if (sortBy) {
 				url += `&sort=${sortBy}`;
 			}
-			console.log(url,"urlurl");
-			
+			// console.log(url,"urlurl");
+
 			const response = await api.get(url);
 			return response.data;
 		},
@@ -90,7 +90,7 @@ export const useProductsInfinite = (
 	});
 };
 
-export const useMasterCategories = () => {	
+export const useMasterCategories = () => {
 	return useQuery({
 		queryKey: ["master-categories"],
 		queryFn: async () => {
@@ -99,11 +99,11 @@ export const useMasterCategories = () => {
 		},
 	});
 };
-export const useCategories = ({masterId = "",limit = 100}:any) => {
+export const useCategories = ({ masterId = "", limit = 100 }: any) => {
 	return useQuery({
 		queryKey: ["categories", masterId],
 		queryFn: async () => {
-			const response = masterId ?	await api.get(`/categories?filter=masterCategoryId||$eq||${masterId}&limit=${limit}`):await api.get(`/categories?limit=${limit}`);
+			const response = masterId ? await api.get(`/categories?filter=masterCategoryId||$eq||${masterId}&limit=${limit}`) : await api.get(`/categories?limit=${limit}`);
 			return response.data;
 		},
 	});
@@ -119,12 +119,12 @@ export const useBanners = () => {
 };
 
 export const useProduct = (productId: string) => {
-	
+
 	return useQuery({
 		queryKey: ["product", productId],
 		queryFn: async () => {
 			const response = await api.get(`/products/${productId}`);
-			console.log(response.data,"response.dataresponse.data");
+			// console.log(response.data, "response.dataresponse.data");
 			return response.data;
 		},
 		// enabled: !!productId,

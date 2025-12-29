@@ -41,60 +41,57 @@ const renderSortBy = () => {
   };
 
   return (
-    <View style={styles.item}>
-      <Text style={styles.title}>ترتيب حسب</Text>
-      <SelectDropdown
-        data={sortOptions}
-        onSelect={(selectedItem) => {
-          setSortBy(selectedItem.id === sortBy ? "" : selectedItem.id);
-        }}
-        renderButton={(selectedItem, isOpened) => {
-          const currentOption = selectedItem || getSelectedSortOption();
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              <Text style={styles.dropdownButtonTxtStyle}>
-                {currentOption ? currentOption.name : "اختر طريقة الترتيب"}
-              </Text>
-              <MaterialIcons
-                name={isOpened ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
-                size={24}
-                color={COLORS.gray}
-              />
-            </View>
-          );
-        }}
-        renderItem={(item:any, index:any, isSelected:any) => {
-          return (
-            <View
+    <SelectDropdown
+      data={sortOptions}
+      onSelect={(selectedItem) => {
+        setSortBy(selectedItem.id === sortBy ? "" : selectedItem.id);
+      }}
+      renderButton={(selectedItem, isOpened) => {
+        const currentOption = selectedItem || getSelectedSortOption();
+        return (
+          <View style={styles.dropdownButtonStyle}>
+            <Text style={styles.dropdownButtonTxtStyle}>
+              {currentOption ? currentOption.name : "اختر طريقة الترتيب"}
+            </Text>
+            <MaterialIcons
+              name={isOpened ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+              size={24}
+              color={COLORS.primary}
+            />
+          </View>
+        );
+      }}
+      renderItem={(item:any, index:any, isSelected:any) => {
+        return (
+          <View
+            style={[
+              styles.dropdownItemStyle,
+              isSelected && { backgroundColor: COLORS.tansparentPrimary },
+            ]}
+          >
+            <Text
               style={[
-                styles.dropdownItemStyle,
-                isSelected && { backgroundColor: COLORS.gray },
+                styles.dropdownItemTxtStyle,
+                isSelected && { color: COLORS.primary, fontWeight: '600' },
               ]}
             >
-              <Text
-                style={[
-                  styles.dropdownItemTxtStyle,
-                  isSelected && { color: COLORS.primary, fontWeight: '600' },
-                ]}
-              >
-                {item.name}
-              </Text>
-              {isSelected && (
-                <MaterialIcons
-                  name="check"
-                  size={18}
-                  color={COLORS.primary}
-                />
-              )}
-            </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-        dropdownOverlayColor="transparent"
-        statusBarTranslucent={true}
-      />
-    </View>
+              {item.name}
+            </Text>
+            {isSelected && (
+              <MaterialIcons
+                name="check-circle"
+                size={20}
+                color={COLORS.primary}
+              />
+            )}
+          </View>
+        );
+      }}
+      showsVerticalScrollIndicator={false}
+      dropdownStyle={styles.dropdownMenuStyle}
+      dropdownOverlayColor="transparent"
+      statusBarTranslucent={true}
+    />
   );
 };
 const renderRating = () => {
@@ -113,7 +110,7 @@ const renderRating = () => {
           <Text
             key={star}
             style={{
-              color: star <= rating ? COLORS.primary : COLORS.gray,
+              color: star <= rating ? "#FFD700" : COLORS.gray,
               fontSize: 16,
               marginLeft: 2,
             }}
@@ -126,60 +123,62 @@ const renderRating = () => {
   };
 
   return (
-    <View style={styles.item}>
-      <Text style={styles.title}>التقييم</Text>
-      <SelectDropdown
-        data={ratings}
-        onSelect={(selectedItem:any) => {
-          setSelectedRating(selectedItem.value);
-        }}
-        renderButton={(selectedItem:any, isOpened:any) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              {selectedItem ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {renderStars(selectedItem.value)}
-                  <Text style={styles.dropdownButtonTxtStyle}>
-                    {selectedItem.label}
-                  </Text>
-                </View>
-              ) : (
-                <Text style={styles.dropdownButtonTxtStyle}>اختر التقييم</Text>
-              )}
-              <MaterialIcons
-                name={isOpened ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
-                size={24}
-                color={COLORS.gray}
-              />
-            </View>
-          );
-        }}
-        renderItem={(item:any, index:any, isSelected:any) => {
-          return (
-            <View
-              style={{
-                ...styles.dropdownItemStyle,
-                ...(isSelected && { backgroundColor: COLORS.gray }),
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {renderStars(item.value)}
-                <Text style={styles.dropdownItemTxtStyle}>{item.label}</Text>
+    <SelectDropdown
+      data={ratings}
+      onSelect={(selectedItem:any) => {
+        setSelectedRating(selectedItem.value);
+      }}
+      renderButton={(selectedItem:any, isOpened:any) => {
+        return (
+          <View style={styles.dropdownButtonStyle}>
+            {selectedItem ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                {renderStars(selectedItem.value)}
+                <Text style={styles.dropdownButtonTxtStyle}>
+                  {selectedItem.label}
+                </Text>
               </View>
-              {isSelected && (
-                <MaterialIcons
-                  name="check"
-                  size={18}
-                  color={COLORS.primary}
-                />
-              )}
+            ) : (
+              <Text style={styles.dropdownButtonTxtStyle}>اختر التقييم</Text>
+            )}
+            <MaterialIcons
+              name={isOpened ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+              size={24}
+              color={COLORS.primary}
+            />
+          </View>
+        );
+      }}
+      renderItem={(item:any, index:any, isSelected:any) => {
+        return (
+          <View
+            style={{
+              ...styles.dropdownItemStyle,
+              ...(isSelected && { backgroundColor: COLORS.tansparentPrimary }),
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {renderStars(item.value)}
+              <Text style={[
+                styles.dropdownItemTxtStyle,
+                isSelected && { color: COLORS.primary, fontWeight: '600' }
+              ]}>
+                {item.label}
+              </Text>
             </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
-    </View>
+            {isSelected && (
+              <MaterialIcons
+                name="check-circle"
+                size={20}
+                color={COLORS.primary}
+              />
+            )}
+          </View>
+        );
+      }}
+      showsVerticalScrollIndicator={false}
+      dropdownStyle={styles.dropdownMenuStyle}
+    />
   );
 };
 const renderPriceRange = () => {
@@ -196,52 +195,30 @@ const renderNotch = useCallback(() => <Notch />, []);
 
 
         return (
-            <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                    <Image
-                        source={icons.dollarSymbol}
-                        contentFit="contain"
-                        style={styles.sectionIcon}
-                    />
-                    <Text style={styles.sectionTitle}>نطاق السعر</Text>
+            <View>
+                <View style={styles.filterCardHeader}>
+                    <View style={styles.filterIconContainer}>
+                        <MaterialIcons name="payments" size={18} color={COLORS.primary} />
+                    </View>
+                    <Text style={styles.filterCardTitle}>نطاق السعر</Text>
                 </View>
                 <View style={styles.priceContainer}>
                 <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginVertical: 5,
-        //   direction:"rtl"
+          marginVertical: 12,
         }}
       >
-        <View>
-          <Text
-            style={[
-              { fontStyle: "italic" },
-              { textAlign: "left", fontSize: 14, color: "#D2D2D2" }
-            ]}
-          >
-            من
-          </Text>
-          <Text
-            style={[{ fontWeight: "bold" }, { fontSize: 18, color: "#000000" }]}
-          >
+        <View style={styles.priceValueContainer}>
+          <Text style={styles.priceValueLabel}>من</Text>
+          <Text style={styles.priceValueText}>
             {priceRange?.min} {t("EGP")}
           </Text>
         </View>
-        <View>
-          <Text
-            style={[
-              { fontStyle: "italic" },
-              { textAlign: "right", fontSize: 14, color: "#D2D2D2" }
-            ]}
-          >
-                        الى
-
-          </Text>
-          <Text
-            style={[{ fontWeight: "bold" }, { fontSize: 18, color: "#000000" }]}
-          >
+        <View style={styles.priceValueContainer}>
+          <Text style={styles.priceValueLabel}>الى</Text>
+          <Text style={styles.priceValueText}>
             {priceRange?.max} {t("EGP")}
           </Text>
         </View>
@@ -249,8 +226,8 @@ const renderNotch = useCallback(() => <Notch />, []);
                 <RangeSliderRN
          style={styles.slider}
          
-        min={10}
-        max={100}
+        min={5}
+        max={1000}
         low={priceRange.min}
         high={priceRange.max}
         step={1}
@@ -258,11 +235,8 @@ const renderNotch = useCallback(() => <Notch />, []);
         renderThumb={renderThumb}
         renderRail={renderRail}
         renderRailSelected={renderRailSelected}
-        // renderLabel={renderLabel}
-        // renderNotch={renderNotch}
         onValueChanged={handleValueChange}
         onSliderTouchEnd={()=>setSwipeEnabled(true)}
-        // onSlideEnd={() => setSwipeEnabled(true)}
       />
                 
                 </View>
@@ -287,14 +261,12 @@ const handleApplyFilters = () => {
 	};
 
     return(
-        <SafeAreaView style={[styles.container,{direction:'rtl'}]}>
+        <SafeAreaView style={[styles.container,{direction:'rtl', backgroundColor: COLORS.grayscale100}]}>
             <View style={styles.headerContainer}>
 				<View style={styles.headerLeft}>
-					<Image
-						source={images.logo}
-						contentFit="contain"
-						style={styles.headerLogo}
-					/>
+					<View style={styles.headerIconContainer}>
+                        <MaterialIcons name="filter-list" size={24} color={COLORS.primary} />
+                    </View>
 					<Text
 						style={[
 							styles.headerTitle,
@@ -306,74 +278,92 @@ const handleApplyFilters = () => {
 						الفلترة
 					</Text>
 				</View>
-				<View style={styles.headerRight}>
-					<TouchableOpacity
-						style={styles.clearButton}
-						onPress={() => {
-							setSelectedCategory(null);
-							setPriceRange({ min: 10, max: 100 });
-							setSelectedRating(null);
-							setSortBy("");
-						}}
-					>
-						<Text style={styles.clearButtonText}>مسح الكل</Text>
-					</TouchableOpacity>
-				</View>
+				<TouchableOpacity
+					style={styles.clearButtonContainer}
+					onPress={() => {
+						setSelectedCategory(null);
+						setPriceRange({ min: 5, max: 1000 });
+						setSelectedRating(null);
+						setSortBy("");
+                        setSearchQuery("");
+					}}
+				>
+					<MaterialIcons name="refresh" size={20} color={COLORS.primary} />
+					<Text style={styles.clearButtonText}>مسح الكل</Text>
+				</TouchableOpacity>
 			</View>
-            <ScrollView style={styles.container}>
-                <View style={styles.item}>
-                    <Text style={styles.title}>البحث</Text>
-<View style={styles.searchBarContainer}>
-            <Image
-              source={icons.search2}
-              contentFit="contain"
-              style={styles.searchIcon}
-            />
-            <TextInput
-              placeholder="البحث عن منتج  ..."
-              placeholderTextColor={COLORS.gray}
-              style={styles.searchInput}
-              value={searchQuery}
-              editable={true}
-              onChangeText={setSearchQuery}
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity
-                onPress={() => setSearchQuery("")}
-                style={styles.clearButton}
-              >
-                <Image
-                  source={icons.close}
-                  contentFit="contain"
-                  style={styles.clearIcon}
-                />
-              </TouchableOpacity>
-            )}
-          </View>                
+            
+            <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                {/* Search Section */}
+                <View style={styles.filterCard}>
+                    <View style={styles.filterCardHeader}>
+                        <View style={styles.filterIconContainer}>
+                            <MaterialIcons name="search" size={18} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.filterCardTitle}>البحث</Text>
+                    </View>
+                    <View style={styles.searchBarContainer}>
+                        <Image
+                            source={icons.search2}
+                            contentFit="contain"
+                            style={styles.searchIcon}
+                        />
+                        <TextInput
+                            placeholder="البحث عن منتج  ..."
+                            placeholderTextColor={COLORS.gray}
+                            style={styles.searchInput}
+                            value={searchQuery}
+                            editable={true}
+                            onChangeText={setSearchQuery}
+                        />
+                        {searchQuery.length > 0 && (
+                            <TouchableOpacity
+                                onPress={() => setSearchQuery("")}
+                                style={styles.clearSearchButton}
+                            >
+                                <MaterialIcons name="close" size={18} color={COLORS.gray} />
+                            </TouchableOpacity>
+                        )}
+                    </View>                
                 </View>
              
-               
-                {renderSortBy()}
-                {renderRating()}
-                <View style={styles.item}>
+                {/* Sort By Section */}
+                <View style={styles.filterCard}>
+                    <View style={styles.filterCardHeader}>
+                        <View style={styles.filterIconContainer}>
+                            <MaterialIcons name="sort" size={18} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.filterCardTitle}>ترتيب حسب</Text>
+                    </View>
+                    {renderSortBy()}
+                </View>
+                
+                {/* Rating Section */}
+                <View style={styles.filterCard}>
+                    <View style={styles.filterCardHeader}>
+                        <View style={styles.filterIconContainer}>
+                            <MaterialIcons name="star" size={18} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.filterCardTitle}>التقييم</Text>
+                    </View>
+                    {renderRating()}
+                </View>
+                
+                {/* Price Range Section */}
+                <View style={styles.filterCard}>
                     {renderPriceRange()}
                 </View>
-                {/* <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        navigation.closeDrawer();
-                    }}
-                >
-                    <Text style={styles.buttonTxt}>Apply Filters</Text>
-                </TouchableOpacity> */}
+                
+                {/* Apply Button */}
                 <View style={styles.bottomContainer}>
-                                    <TouchableOpacity
-                                        style={styles.applyButton}
-                                        onPress={handleApplyFilters}
-                                    >
-                                        <Text style={styles.applyButtonText}>تطبيق الفلاتر</Text>
-                                    </TouchableOpacity>
-                                </View>
+                    <TouchableOpacity
+                        style={styles.applyButton}
+                        onPress={handleApplyFilters}
+                    >
+                        <MaterialIcons name="check-circle" size={20} color={COLORS.white} />
+                        <Text style={styles.applyButtonText}>تطبيق الفلاتر</Text>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </SafeAreaView>
     )

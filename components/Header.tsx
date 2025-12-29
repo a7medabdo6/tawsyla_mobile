@@ -15,11 +15,20 @@ import { Ionicons } from "@expo/vector-icons";
 
 interface HeaderProps {
   title: string;
+  onBack?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ title }) => {
+const Header: React.FC<HeaderProps> = ({ title, onBack }) => {
   const navigation = useNavigation<NavigationProp<any>>();
   const { t, isRTL } = useLanguageContext();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigation.goBack();
+    }
+  };
 
   return (
     <View
@@ -32,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     >
       {/* Back Button */}
       <TouchableOpacity
-        onPress={() => navigation.goBack()}
+        onPress={handleBack}
         style={styles.backButton}
       >
         <Ionicons
@@ -56,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
-    width: SIZES.width - 32,
+    width: SIZES.width,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

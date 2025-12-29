@@ -109,17 +109,17 @@ const Login = () => {
 
   // Implementing apple authentication
   const appleAuthHandler = () => {
-    console.log("Apple Authentication");
+    // console.log("Apple Authentication");
   };
 
   // Implementing facebook authentication
   const facebookAuthHandler = () => {
-    console.log("Facebook Authentication");
+    // console.log("Facebook Authentication");
   };
 
   // Implementing google authentication
   const googleAuthHandler = () => {
-    console.log("Google Authentication");
+    // console.log("Google Authentication");
   };
 
   // Handle login form submission
@@ -347,7 +347,7 @@ const createStyles = (isRTL: boolean) =>
       marginVertical: 32,
     },
     title: {
-      fontSize: 28,
+      fontSize: 20,
       fontFamily: "bold",
       color: COLORS.black,
       textAlign: "center",

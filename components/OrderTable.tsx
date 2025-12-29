@@ -6,8 +6,8 @@ import { View, Text, FlatList, StyleSheet, Image } from "react-native";
 const OrderTable = ({ data }: any) => {
   const { t, isRTL } = useLanguageContext();
 
-  const renderItem = ({ item }: any) => (
-    <View style={styles.row}>
+  const renderItem = ({ item, index }: any) => (
+    <View style={[styles.row, index === data?.length - 1 && styles.lastRow]}>
       <View style={styles.imageCell}>
         <Image
           source={{
@@ -16,9 +16,15 @@ const OrderTable = ({ data }: any) => {
           style={styles.image}
         />
       </View>
-      <Text style={styles.cell}>{item.product?.nameAr}</Text>
-      <Text style={styles.cell}>{item.quantity}</Text>
-      <Text style={styles.cell}>
+      <Text style={styles.itemNameCell} numberOfLines={2}>
+        {item.product?.nameAr}
+      </Text>
+      <View style={styles.quantityCell}>
+        <View style={styles.quantityBadge}>
+          <Text style={styles.quantityText}>{item.quantity}</Text>
+        </View>
+      </View>
+      <Text style={styles.priceCell}>
         {(item.variant?.price * item.quantity).toFixed(2)} {t("EGP")}
       </Text>
     </View>
@@ -27,13 +33,13 @@ const OrderTable = ({ data }: any) => {
   return (
     <View style={styles.container}>
       {/* Table Header */}
-      <View style={[styles.row, styles.headerRow]}>
-        <Text style={[styles.cell, styles.headerCell, { flex: 0.8 }]}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.headerCell, { flex: 0.8 }]}>
           {t("Image")}
         </Text>
-        <Text style={[styles.cell, styles.headerCell]}>{t("Item")}</Text>
-        <Text style={[styles.cell, styles.headerCell]}>{t("Qty")}</Text>
-        <Text style={[styles.cell, styles.headerCell]}>{t("Total")}</Text>
+        <Text style={styles.headerCell}>{t("Item")}</Text>
+        <Text style={styles.headerCell}>{t("Qty")}</Text>
+        <Text style={styles.headerCell}>{t("Total")}</Text>
       </View>
 
       {/* Table Rows */}
@@ -41,6 +47,7 @@ const OrderTable = ({ data }: any) => {
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        scrollEnabled={false}
       />
     </View>
   );
@@ -48,40 +55,85 @@ const OrderTable = ({ data }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    // margin: 16,
     borderWidth: 1,
-    borderColor: COLORS.paleGreenDark,
-    borderRadius: 6,
+    borderColor: COLORS.grayscale200,
+    borderRadius: 12,
     overflow: "hidden",
     direction: "rtl",
+    backgroundColor: COLORS.white,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.tansparentPrimary,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+  },
+  headerCell: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 13,
+    fontFamily: "bold",
+    color: COLORS.primary,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderColor: COLORS.paleGreenDark,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    borderColor: COLORS.grayscale200,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: COLORS.white,
   },
-  headerRow: {
-    backgroundColor: COLORS.paleGreen,
-  },
-  cell: {
-    flex: 1,
-    textAlign: "center",
-  },
-  headerCell: {
-    fontWeight: "bold",
+  lastRow: {
+    borderBottomWidth: 0,
   },
   imageCell: {
     flex: 0.8,
     alignItems: "center",
+    justifyContent: "center",
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     resizeMode: "cover",
-    borderRadius: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.grayscale200,
+  },
+  itemNameCell: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 13,
+    fontFamily: "medium",
+    color: COLORS.black,
+    paddingHorizontal: 4,
+  },
+  quantityCell: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  quantityBadge: {
+    backgroundColor: COLORS.tansparentPrimary,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minWidth: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  quantityText: {
+    fontSize: 14,
+    fontFamily: "bold",
+    color: COLORS.primary,
+  },
+  priceCell: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 14,
+    fontFamily: "bold",
+    color: COLORS.black,
   },
 });
 

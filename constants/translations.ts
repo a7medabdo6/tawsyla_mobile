@@ -379,7 +379,7 @@ export const translations = {
 
     "Add New Address": "أضف عنوانًا جديدًا",
     city: "المدينة",
-    state: "الولاية",
+    state: "المنطقة",
     additionalInfo: "معلومات إضافية",
     phone: "الهاتف",
     setAsDefault: "تعيين كافتراضي",

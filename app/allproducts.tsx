@@ -65,7 +65,7 @@ const AllProducts = () => {
           setSearchQuery(filters.searchQuery);
         }
       } catch (error) {
-        console.log("Error parsing filters:", error);
+        // console.log("Error parsing filters:", error);
       }
     }
   }, [params.filters]);
@@ -306,7 +306,7 @@ const AllProducts = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
             onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.1}
+            onEndReachedThreshold={0.3}
             ListFooterComponent={renderFooter}
             refreshControl={
               <RefreshControl
@@ -480,6 +480,8 @@ const styles = StyleSheet.create({
   filterIcon: {
     width: 20,
     height: 20,
+    color: COLORS.primary,
+    tintColor: COLORS.primary,
   },
   categoriesContainer: {
     paddingHorizontal: 16,

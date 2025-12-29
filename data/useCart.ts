@@ -13,7 +13,7 @@ export const addToCart = async (payload: AddToCartPayload) => {
     const response = await api.post("cart/items", payload);
     return response.data;
   } catch (error: any) {
-    console.log(error?.response?.data);
+    // console.log(error?.response?.data);
     throw error;
   }
 };
@@ -37,7 +37,7 @@ export const useAddToCart = () => {
           await AsyncStorage.setItem("cartProductIds", JSON.stringify(cartIds));
         }
       } catch (error) {
-        console.log("Error updating cart AsyncStorage:", error);
+        // console.log("Error updating cart AsyncStorage:", error);
       }
     },
   });
@@ -73,7 +73,7 @@ export const updateCartItem = async (payload: UpdateCartItemPayload) => {
     });
     return response.data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     throw error;
   }
 };
@@ -94,7 +94,7 @@ export const deleteCartItem = async (itemId: string) => {
     const response = await api.delete(`cart/items/${itemId}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     throw error;
   }
 };
@@ -118,7 +118,7 @@ export const validateCoupon = async (payload: any) => {
     const response = await api.post(`v1/coupons/validate`, payload);
     return response.data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     throw error;
   }
 };
@@ -138,7 +138,7 @@ export const confirmOrder = async (payload: any) => {
     const response = await api.post(`v1/orders`, payload);
     return response.data;
   } catch (error: any) {
-    console.log(error?.response?.data);
+    // console.log(error?.response?.data);
     throw error?.response?.data;
   }
 };

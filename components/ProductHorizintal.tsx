@@ -1,6 +1,13 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
 import { useRouter } from "expo-router";
 import { useUpdateCartItem, useDeleteCartItem } from "@/data/useCart";
@@ -21,12 +28,12 @@ const ProductCardHorizintal = ({
   productId,
 }: any) => {
   const router = useRouter();
-  const { mutateAsync: updateCartItem, isPending: isUpdating } =
-    useUpdateCartItem();
-  const { mutateAsync: deleteCartItem, isPending: isDeleting } =
-    useDeleteCartItem();
-  const { mutateAsync: deleteFavourite, isPending: isDeletingFav } =
-    useDeleteFavourite();
+  const [isIncreasing, setIsIncreasing] = useState(false);
+  const [isDecreasing, setIsDecreasing] = useState(false);
+  
+  const { mutateAsync: updateCartItem } = useUpdateCartItem();
+  const { mutateAsync: deleteCartItem, isPending: isDeleting } = useDeleteCartItem();
+  const { mutateAsync: deleteFavourite, isPending: isDeletingFav } = useDeleteFavourite();
 
   const isFavouritesMode = icon === "heart";
 
@@ -44,6 +51,12 @@ const ProductCardHorizintal = ({
 
     const newQuantity = increment ? quantity + 1 : Math.max(1, quantity - 1);
 
+    if (increment) {
+      setIsIncreasing(true);
+    } else {
+      setIsDecreasing(true);
+    }
+
     try {
       await updateCartItem({
         itemId,
@@ -53,7 +66,10 @@ const ProductCardHorizintal = ({
         onQuantityChange(newQuantity);
       }
     } catch (error) {
-      console.log("Failed to update quantity:", error);
+      // console.log("Failed to update quantity:", error);
+    } finally {
+      setIsIncreasing(false);
+      setIsDecreasing(false);
     }
   };
 
@@ -63,7 +79,7 @@ const ProductCardHorizintal = ({
     try {
       await deleteCartItem(itemId);
     } catch (error) {
-      console.log("Failed to delete item:", error);
+      // console.log("Failed to delete item:", error);
     }
   };
 
@@ -73,7 +89,7 @@ const ProductCardHorizintal = ({
     try {
       await deleteFavourite(productId);
     } catch (error) {
-      console.log("Failed to delete favourite:", error);
+      // console.log("Failed to delete favourite:", error);
     }
   };
 
@@ -132,31 +148,46 @@ const ProductCardHorizintal = ({
               disabled={isDeletingFav}
               activeOpacity={0.8}
             >
-              <AntDesign name="delete" size={18} color="#fff" />
+              {isDeletingFav ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <MaterialIcons name="delete" size={20} color="#fff" />
+              )}
             </TouchableOpacity>
           ) : (
             <View style={styles.quantityContainer}>
               <TouchableOpacity
                 style={[
                   styles.quantityButton,
-                  quantity <= 1 && styles.disabledButton,
+                  (quantity <= 1 || isDecreasing) && styles.disabledButton,
                 ]}
                 onPress={() => handleQuantityChange(false)}
-                disabled={isUpdating || quantity <= 1}
+                disabled={isDecreasing || isIncreasing || quantity <= 1}
                 activeOpacity={0.7}
               >
-                <AntDesign name="minus" size={14} color="#fff" />
+                {isDecreasing ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <AntDesign name="minus" size={14} color="#fff" />
+                )}
               </TouchableOpacity>
 
               <Text style={styles.quantityText}>{quantity}</Text>
 
               <TouchableOpacity
-                style={styles.quantityButton}
+                style={[
+                  styles.quantityButton,
+                  isIncreasing && styles.disabledButton,
+                ]}
                 onPress={() => handleQuantityChange(true)}
-                disabled={isUpdating}
+                disabled={isIncreasing || isDecreasing}
                 activeOpacity={0.7}
               >
-                <AntDesign name="plus" size={14} color="#fff" />
+                {isIncreasing ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <AntDesign name="plus" size={14} color="#fff" />
+                )}
               </TouchableOpacity>
             </View>
           )}
@@ -171,7 +202,11 @@ const ProductCardHorizintal = ({
           disabled={isDeleting}
           activeOpacity={0.8}
         >
-          <AntDesign name="delete" size={16} color="#fff" />
+          {isDeleting ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <MaterialIcons name="delete" size={18} color="#fff" />
+          )}
         </TouchableOpacity>
       )}
     </View>
@@ -183,19 +218,13 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 145,
     backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 16,
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: COLORS.grayscale200,
     position: "relative",
   },
   imageContainer: {
@@ -208,35 +237,37 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover",
+    resizeMode: "contain",
   },
   contentContainer: {
     flex: 1,
     height: "100%",
     justifyContent: "space-between",
     paddingVertical: 4,
-    marginStart: 12, // Adds space between Image and Content
+    marginStart: 12,
   },
   name: {
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.black,
     textAlign: "left",
     lineHeight: 20,
     marginBottom: 4,
     writingDirection: "rtl",
+    fontFamily: "semibold",
   },
   descriptions: {
     fontSize: 12,
-    color: COLORS.gray3,
+    color: COLORS.gray,
     textAlign: "left",
     marginBottom: 6,
     lineHeight: 16,
     writingDirection: "rtl",
+    fontFamily: "regular",
   },
   ratingContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start", // Start = Right in RTL
+    justifyContent: "flex-start",
     marginBottom: 4,
   },
   bottomRow: {
@@ -248,59 +279,55 @@ const styles = StyleSheet.create({
   price: {
     color: COLORS.primary,
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 17,
     textAlign: "right",
     writingDirection: "rtl",
+    fontFamily: "bold",
   },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.tansparentPrimary,
     borderRadius: 20,
     paddingHorizontal: 8,
     paddingVertical: 4,
     gap: 8,
   },
   quantityButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    backgroundColor: COLORS.primary,
   },
   disabledButton: {
     opacity: 0.5,
   },
   quantityText: {
-    color: "#fff",
+    color: COLORS.black,
     fontSize: 14,
     fontWeight: "bold",
     minWidth: 20,
     textAlign: "center",
+    fontFamily: "bold",
   },
   actionButton: {
-    backgroundColor: "#ff4444",
-    padding: 8,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
+    minWidth: 50,
   },
   deleteCartButton: {
     position: "absolute",
-    top: 8,
-    right: 8, // Left side (opposite to image in RTL)
-    backgroundColor: "#ff4444",
+    top: 10,
+    right: 10,
+    backgroundColor: COLORS.primary,
     padding: 8,
-    borderRadius: 50,
-    shadowColor: "#ff4444",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 8,
     zIndex: 10,
   },
 });

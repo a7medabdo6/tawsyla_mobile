@@ -20,8 +20,8 @@ export const useAppStatus = () => {
 
 				// Extract favourite product IDs
 				const favouritesItems = favouritesResponse?.items || favouritesResponse?.data || favouritesResponse || [];
-			// console.log(favouritesItems,'favouritesItemssssss');
-				const favouriteProductIds =favouritesItems?.length>0 && favouritesItems?.map((item: any) => 
+				// console.log(favouritesItems,'favouritesItemssssss');
+				const favouriteProductIds = favouritesItems?.length > 0 && favouritesItems?.map((item: any) =>
 					item.productId || item.product?.id || item.id
 				);
 
@@ -36,7 +36,7 @@ export const useAppStatus = () => {
 					favouritesItems,
 				};
 			} catch (error) {
-				console.log("Error fetching app status:", error);
+				// console.log("Error fetching app status:", error);
 				// Return empty arrays if API calls fail
 				return {
 					cartProductIds: [],
@@ -57,7 +57,7 @@ export const getStoredCartProductIds = async (): Promise<string[]> => {
 		const ids = await AsyncStorage.getItem('cartProductIds');
 		return ids ? JSON.parse(ids) : [];
 	} catch (error) {
-		console.log("Error getting stored cart IDs:", error);
+		// console.log("Error getting stored cart IDs:", error);
 		return [];
 	}
 };
@@ -66,10 +66,10 @@ export const getStoredFavouriteProductIds = async (): Promise<string[]> => {
 	try {
 		const ids = await AsyncStorage.getItem('favouriteProductIds');
 		// console.log(ids,'idsids');
-		
+
 		return ids ? JSON.parse(ids) : [];
 	} catch (error) {
-		console.log("Error getting stored favourite IDs:", error);
+		// console.log("Error getting stored favourite IDs:", error);
 		return [];
 	}
 };

@@ -5,11 +5,14 @@ import { COLORS } from "../constants";
 import Header from "../components/Header";
 import { ScrollView } from "react-native-virtualized-view";
 import { useLanguageContext } from "@/contexts/LanguageContext";
+import { useSettings } from "@/data/useSettings";
+import HTMLView from 'react-native-htmlview';
 
 // change the privacy data based on your data
 const SettingsPrivacyPolicy = () => {
   const { t, isRTL } = useLanguageContext();
-
+const { data } = useSettings();
+  // console.log(data?.privacyPolicy);
   return (
     <SafeAreaView
       style={[
@@ -17,13 +20,19 @@ const SettingsPrivacyPolicy = () => {
         { backgroundColor: COLORS.white, direction: isRTL ? "rtl" : "ltr" },
       ]}
     >
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header
+      <Header
           title=" سياسة الخصوصية
 "
         />
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View>
+      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+        
+        <ScrollView showsVerticalScrollIndicator={false} >
+        <HTMLView
+            value={data?.privacyPolicy}
+            stylesheet={styles}
+          />
+        </ScrollView>
+          {/* <View>
             <Text style={[styles.settingsTitle, { color: COLORS.black }]}>
               1. المعلومات التي نجمعها
             </Text>
@@ -89,8 +98,7 @@ const SettingsPrivacyPolicy = () => {
             <Text style={[styles.body, { color: COLORS.greyscale900 }]}>
               مقدمي خدمات الدفع الآمن (مثل بوابات الدفع)
             </Text>
-          </View>
-        </ScrollView>
+          </View> */}
       </View>
     </SafeAreaView>
   );

@@ -61,7 +61,7 @@ const Fav = () => {
 
   const { data, isLoading, refetch } = useFavourites();
   const items = data?.items || data?.data || data || [];
-
+console.log(items?.[0]?.product?.variants?.[0]?.price,"itemsitems");
   useFocusEffect(
     React.useCallback(() => {
       refetch();
